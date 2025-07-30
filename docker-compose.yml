@@ -1,0 +1,9 @@
+services:
+  mongo: 
+    image: mongo
+    ports:
+      - "27017:27017"
+    env_file:
+      - .env
+    volumes:
+      - ./local-storage:/data/db

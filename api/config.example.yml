@@ -1,0 +1,9 @@
+database:
+  url: "mongodb://yourusername:yourpassword@localhost:27017"
+  dbname: "yourdbname"
+  
+server:
+  port: "8080"
+
+app:
+  name: "Wedding App"

@@ -1,0 +1,13 @@
+.env
+*.env
+
+**/.env
+**/*.env
+
+.vscode/launch.json
+**/.vscode/launch.json
+
+config.yml
+**/config.yml
+
+local-storage/
