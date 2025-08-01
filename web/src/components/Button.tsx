@@ -1,17 +1,17 @@
 import { useRef, useState } from "react";
 import { smallButtonBurst } from "../functions/success";
 
-interface ButtonProps {
+interface ButtonProps<T> {
   label: string;
   type: ButtonType;
-  onClickAsync: () => Promise<void>;
+  onClickAsync: () => Promise<T>;
 }
 
-export default function Button({
+export default function Button<T>({
   label,
   type,
-  onClickAsync: onClickAsync,
-}: ButtonProps) {
+  onClickAsync,
+}: ButtonProps<T>) {
   const [loading, setLoading] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -47,7 +47,7 @@ export default function Button({
           {label}
         </p>
         <svg
-          className={`absolute size-5 text-white ${
+          className={`absolute size-5 ${
             loading ? "opacity-100 animate-spin" : "opacity-0"
           }`}
           xmlns="http://www.w3.org/2000/svg"
