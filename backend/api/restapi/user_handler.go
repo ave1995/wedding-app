@@ -27,7 +27,7 @@ func (h *userHandler) Register(router *gin.RouterGroup) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			user	body		RegisterRequest	true	"User info"
-//	@Success		201		{object}	domain.User
+//	@Success		201		{object}	model.User
 //	@Failure		400		{object}	map[string]string
 //	@Failure		500		{object}	map[string]string
 //	@Router			/auth/register [post]

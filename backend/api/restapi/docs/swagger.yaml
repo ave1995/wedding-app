@@ -1,5 +1,5 @@
 definitions:
-  domain.User:
+  model.User:
     properties:
       email:
         type: string
@@ -10,7 +10,7 @@ definitions:
       username:
         type: string
     type: object
-  handlers.RegisterRequest:
+  restapi.RegisterRequest:
     properties:
       email:
         type: string
@@ -38,14 +38,14 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/handlers.RegisterRequest'
+          $ref: '#/definitions/restapi.RegisterRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/domain.User'
+            $ref: '#/definitions/model.User'
         "400":
           description: Bad Request
           schema:

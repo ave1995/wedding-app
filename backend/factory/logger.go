@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"os"
 	"sync"
+	"time"
 )
 
 var (
@@ -13,9 +14,17 @@ var (
 
 func getLogger() *slog.Logger {
 	loggerOnce.Do(func() {
-		handler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-			Level: slog.LevelInfo,
+		handler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 			// AddSource: true,
+			Level: slog.LevelInfo,
+			ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+				if a.Key == slog.TimeKey {
+					if t, ok := a.Value.Any().(time.Time); ok {
+						a.Value = slog.StringValue(t.Format(time.DateTime))
+					}
+				}
+				return a
+			},
 		})
 		loggerInstance = slog.New(handler)
 	})

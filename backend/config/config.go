@@ -3,7 +3,6 @@ package config
 import (
 	"fmt"
 
-	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 )
 
@@ -17,11 +16,6 @@ const ENV_PREFIX = "backend"
 
 func NewConfig() (Config, error) {
 	var config Config
-
-	err := godotenv.Load("../.env")
-	if err != nil {
-		return Config{}, fmt.Errorf("load env file: %w", err)
-	}
 
 	if err := envconfig.Process(ENV_PREFIX, &config); err != nil {
 		return Config{}, fmt.Errorf("procces new config: %w", err)
