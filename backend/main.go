@@ -31,10 +31,12 @@ func main() {
 		logger.Error("failed to initialize user service: %w", utils.ErrAttr(err))
 	}
 
+	basicHandler := restapi.NewBasicHandler()
 	userHandler := restapi.NewUserHandler(userService)
 
 	allHandlers := &restapi.Handlers{
-		User: userHandler,
+		User:  userHandler,
+		Basic: basicHandler,
 	}
 
 	server := restapi.NewApiServer(allHandlers, logger, config.ServerConfig())
