@@ -7,7 +7,11 @@ import Toast from "./components/toast/Toast";
 function App() {
   const [message, setMessage] = useState<string | null>(null);
 
+  const sleep = (ms: number) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
+
   const handleClick = async () => {
+    await sleep(1000);
     const result = await getText<string>("/api/ping");
     setMessage(result);
   };
