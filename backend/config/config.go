@@ -7,9 +7,11 @@ import (
 )
 
 type Config struct {
-	Port   string `envconfig:"PORT" required:"true"`
-	DbUrl  string `envconfig:"DBURL" required:"true"`
-	DbName string `envconfig:"DBNAME" required:"true"`
+	Port       string `envconfig:"PORT" required:"true"`
+	DbUrl      string `envconfig:"DBURL" required:"true"`
+	DbName     string `envconfig:"DBNAME" required:"true"`
+	DbUsername string `envconfig:"DBUSERNAME" required:"true"`
+	DbPassword string `envconfig:"DBPASSWORD" required:"true"`
 }
 
 const ENV_PREFIX = "backend"
@@ -25,8 +27,10 @@ func NewConfig() (Config, error) {
 
 func (c Config) StoreConfig() StoreConfig {
 	return StoreConfig{
-		DbUrl:  c.DbUrl,
-		DbName: c.DbName,
+		DbUrl:      c.DbUrl,
+		DbName:     c.DbName,
+		DbUsername: c.DbUsername,
+		DbPassword: c.DbPassword,
 	}
 }
 

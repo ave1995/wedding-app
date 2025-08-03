@@ -18,7 +18,7 @@ var (
 func getMongoClient(ctx context.Context, logger *slog.Logger, config config.StoreConfig) (*mongo.Client, error) {
 	var err error
 	mongoOnce.Do(func() {
-		mongoClient, err = mongodb.ConnectClient(ctx, logger, config.DbUrl)
+		mongoClient, err = mongodb.ConnectClient(ctx, logger, config)
 	})
 
 	return mongoClient, err
