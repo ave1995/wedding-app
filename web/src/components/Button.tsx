@@ -2,17 +2,13 @@ import { useRef, useState } from "react";
 import { smallButtonBurst } from "../functions/success";
 import Spinner from "./spinner";
 
-interface ButtonProps<T> {
+interface ButtonProps<T = void> {
   label: string;
   type: ButtonType;
-  onClickAsync: () => Promise<T>;
+  onClick: () => Promise<T> | void;
 }
 
-export default function Button<T>({
-  label,
-  type,
-  onClickAsync,
-}: ButtonProps<T>) {
+export default function Button<T = void>({ label, type, onClick }: ButtonProps<T>) {
   const [loading, setLoading] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -21,7 +17,7 @@ export default function Button<T>({
 
     setLoading(true);
     try {
-      await onClickAsync();
+      await Promise.resolve(onClick());
     } finally {
       setLoading(false);
       if (buttonRef.current) {
@@ -38,6 +34,7 @@ export default function Button<T>({
         ${GetButtonHoverColor(type)}
         hover:cursor-pointer`}
       onClick={handleClick}
+      disabled={loading}
     >
       <div className="relative flex items-center justify-center">
         <p

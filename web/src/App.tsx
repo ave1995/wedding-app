@@ -22,7 +22,7 @@ function App() {
         <Toast message={message} onClose={() => setMessage(null)}></Toast>
       )}
       <Button
-        onClickAsync={handleClick}
+        onClick={handleClick}
         label="Ping"
         type={ButtonTypeEnum.Basic}
       ></Button>
