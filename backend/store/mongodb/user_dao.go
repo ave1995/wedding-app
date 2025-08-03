@@ -4,6 +4,7 @@ import (
 	"context"
 	"wedding-app/domain/model"
 	"wedding-app/domain/store"
+	"wedding-app/utils"
 
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -26,16 +27,20 @@ func (r *userStore) usersCollection() *mongo.Collection {
 func (r *userStore) RegisterUser(ctx context.Context, username, email, password string) (*model.User, error) {
 	collection := r.usersCollection()
 
-	//TODO: password hash and add
+	hashedPass, err := utils.HashPassword(password)
+	if err != nil {
+		return nil, err
+	}
 
 	mongoUser := &user{
 		ID:          uuid.New(),
 		Username:    username,
 		Email:       email,
+		Password:    hashedPass,
 		IsTemporary: false,
 	}
 
-	_, err := collection.InsertOne(ctx, mongoUser)
+	_, err = collection.InsertOne(ctx, mongoUser)
 	if err != nil {
 		return nil, err
 	}

@@ -11,6 +11,7 @@ type user struct {
 	Username    string    `bson:"username"`
 	Email       string    `bson:"email,omitempty"`
 	IsTemporary bool      `bson:"isTemporary"`
+	Password    string    `bson:"password"`
 }
 
 func (m *user) ToDomain() *model.User {

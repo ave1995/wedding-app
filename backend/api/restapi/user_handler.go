@@ -35,7 +35,7 @@ func (h *userHandler) registerUser(c *gin.Context) {
 	var req RegisterRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		respondWithBadRequest(c, err, "invalid request body")
+		respondWithBadRequest(c, err, "invalid request payload")
 		return
 	}
 
