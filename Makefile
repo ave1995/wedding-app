@@ -28,3 +28,11 @@ swag:
 go:
 	@echo "Running Go app from backend/ with .env"
 	@bash -c 'set -a; source .env; set +a; cd backend && go run main.go'
+
+GO_BUILD_NAME=my-go-app
+
+go-build:
+	cd backend && docker build -t ${GO_BUILD_NAME} .
+
+go-build-run:
+	cd backend && docker run --rm ${GO_BUILD_NAME}

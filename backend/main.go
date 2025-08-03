@@ -2,9 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
-	"os"
 	"wedding-app/api/restapi"
 	"wedding-app/config"
 	"wedding-app/factory"
@@ -14,8 +12,6 @@ import (
 )
 
 func main() {
-	fmt.Printf("Hello world... %s\n", os.Getenv("TEST_ENV"))
-
 	config, err := config.NewConfig()
 	if err != nil {
 		panic(err)
