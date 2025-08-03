@@ -17,8 +17,10 @@ func NewUserStore(database *mongo.Database) store.UserStore {
 	return &userStore{database: database}
 }
 
+const Users_Collection = "users"
+
 func (r *userStore) usersCollection() *mongo.Collection {
-	return r.database.Collection("users")
+	return r.database.Collection(Users_Collection)
 }
 
 func (r *userStore) RegisterUser(ctx context.Context, username, email, password string) (*model.User, error) {

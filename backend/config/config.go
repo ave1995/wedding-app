@@ -7,9 +7,9 @@ import (
 )
 
 type Config struct {
-	Port   string
-	DbUrl  string
-	DbName string
+	Port   string `envconfig:"PORT" required:"true"`
+	DbUrl  string `envconfig:"DBURL" required:"true"`
+	DbName string `envconfig:"DBNAME" required:"true"`
 }
 
 const ENV_PREFIX = "backend"
