@@ -14,15 +14,15 @@ type Config struct {
 	DbPassword string `envconfig:"DBPASSWORD" required:"true"`
 }
 
-const ENV_PREFIX = "backend"
+const EnvPrefix = "backend"
 
 func NewConfig() (Config, error) {
-	var config Config
+	var cfg Config
 
-	if err := envconfig.Process(ENV_PREFIX, &config); err != nil {
+	if err := envconfig.Process(EnvPrefix, &cfg); err != nil {
 		return Config{}, fmt.Errorf("procces new config: %w", err)
 	}
-	return config, nil
+	return cfg, nil
 }
 
 func (c Config) StoreConfig() StoreConfig {
