@@ -7,15 +7,15 @@ import (
 	"wedding-app/config"
 
 	"github.com/gin-gonic/gin"
+	sloggin "github.com/samber/slog-gin"
 )
 
 func NewGinServer(handlers *GinHandlers, logger *slog.Logger, config config.ServerConfig) *http.Server {
 	router := gin.New()
 
-	router.Use(gin.Logger())
-
-	//Use my error middleware
-	router.Use(ErrorHandler())
+	// Add the sloggin middleware to all routes.
+	// The middleware will log all requests attributes.
+	router.Use(sloggin.New(logger))
 	router.Use(gin.Recovery())
 
 	handlers.RegisterAll(router)
