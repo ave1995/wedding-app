@@ -12,6 +12,7 @@ type errorResponse struct {
 	Details string `json:"details,omitempty"`
 }
 
+// TODO: add switch somehow
 func respondWithError(c *gin.Context, httpStatus int, err error, clientMessage string) {
 	c.Error(err)
 
