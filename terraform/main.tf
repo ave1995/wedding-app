@@ -4,12 +4,6 @@ provider "google" {
     region  = var.region
 }
 
-resource "google_artifact_registry_repository" "repo" {
-    repository_id = var.repo_name
-    format = "DOCKER"
-    location = var.region
-}
-
 resource "google_cloud_run_service" "backend" {
     name = var.image_name
     location = var.region
@@ -18,6 +12,21 @@ resource "google_cloud_run_service" "backend" {
       spec {
         containers {
           image = "${var.region}-docker.pkg.dev/${var.project_id}/${var.repo_name}/${var.image_name}:latest"
+
+          env {
+            name  = "BACKEND_DBNAME"
+            value = "your-db-name"
+          }
+
+          env {
+            name  = "BACKEND_DBUSERNAME"
+            value = "your-db-user"
+          }
+
+          env {
+            name  = "BACKEND_DBPASSWORD"
+            value = "your-db-password"
+          }
         }
       }
     }

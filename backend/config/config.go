@@ -14,7 +14,7 @@ type Config struct {
 	DbPassword string `envconfig:"DBPASSWORD" required:"true"`
 }
 
-const EnvPrefix = "backend"
+const EnvPrefix = ""
 
 func NewConfig() (Config, error) {
 	var cfg Config

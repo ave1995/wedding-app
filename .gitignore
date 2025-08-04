@@ -9,4 +9,9 @@ config.yml
 
 local-storage/
 
+
+terraform/.terraform/
+terraform/secrets.tfvars.json
+terraform.tfstate
+*.backup
 *credentials.json

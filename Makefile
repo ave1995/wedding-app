@@ -51,10 +51,6 @@ TF_BUCKET	:= $(GCP_PROJECT_ID)-terraform-state-bucket
 
 IMG_URL := $(REGION)-docker.pkg.dev/$(GCP_PROJECT_ID)/$(REPO)/$(IMAGE):latest
 
-build:
-	docker build -t $(IMG_URL) ./backend
-
-
 create-service-account: ## Create service account in gCloud for Terraform deploying.
 	@if ! gcloud iam service-accounts list --filter="terraform@$(GCP_PROJECT_ID)" | grep terraform@; then \
 		echo "🔧 Creating service account..."; \
@@ -92,6 +88,15 @@ create-backend-bucket: ## Create Cloud Storage bucket for saving Terraform state
 		echo "✅ Bucket gs://$(TF_BUCKET) already exists."; \
 	fi
 
+create-registry-repository:
+	gcloud artifacts repositories create $(REPO) \
+		--repository-format=docker \
+		--location=$(REGION) \
+		--project=$(GCP_PROJECT_ID)
+
+build:
+	docker build -t $(IMG_URL) ./backend
+
 ## Push image to Artifact Registry
 push:
 	gcloud auth configure-docker $(REGION)-docker.pkg.dev
@@ -105,6 +110,9 @@ terraform-init:
 terraform-apply:
 	cd $(TF_DIR) && terraform apply -var-file="$(TF_VARS)" -auto-approve
 
+terraform-destroy:
+	gcloud run services delete $(IMAGE) --region=$(REGION) --project=$(GCP_PROJECT_ID);
+
 ## Run everything in order
 deploy: create-service-account create-credentials create-backend-bucket terraform-init build push terraform-apply
 
@@ -114,6 +122,6 @@ deploy: create-service-account create-credentials create-backend-bucket terrafor
 	create-backend-bucket \
 	terraform-init \
 	terraform-apply \
-	push \
 	build \
+	push \
 	deploy
