@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { smallButtonBurst } from "../functions/success";
-import Spinner from "./spinner";
+import Spinner from "./Spinner";
 
 interface ButtonProps<T = void> {
   label: string;
