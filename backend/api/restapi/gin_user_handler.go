@@ -7,15 +7,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type userHandler struct {
+type UserHandler struct {
 	userService service.UserService
 }
 
-func NewUserHandler(us service.UserService) *userHandler {
-	return &userHandler{userService: us}
+func NewUserHandler(us service.UserService) *UserHandler {
+	return &UserHandler{userService: us}
 }
 
-func (h *userHandler) Register(router *gin.RouterGroup) {
+func (h *UserHandler) Register(router *gin.RouterGroup) {
 	router.POST("/register", h.registerUser)
 }
 
@@ -31,7 +31,7 @@ func (h *userHandler) Register(router *gin.RouterGroup) {
 //	@Failure		400		{object}	map[string]string
 //	@Failure		500		{object}	map[string]string
 //	@Router			/auth/register [post]
-func (h *userHandler) registerUser(c *gin.Context) {
+func (h *UserHandler) registerUser(c *gin.Context) {
 	var req RegisterRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {

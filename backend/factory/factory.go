@@ -2,11 +2,14 @@ package factory
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
+	"net/http"
+	"sync"
+	"wedding-app/api/restapi"
 	"wedding-app/config"
 	"wedding-app/domain/service"
 	"wedding-app/domain/store"
+	"wedding-app/service/user"
 	"wedding-app/store/mongodb"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -15,13 +18,29 @@ import (
 type Factory struct {
 	config config.Config
 
-	logger *slog.Logger
+	logger     *slog.Logger
+	loggerOnce sync.Once
 
 	mongoClient   *mongo.Client
 	mongoDatabase *mongo.Database
+	mongoOnce     sync.Once
+	mongoError    error
 
-	userStore   store.UserStore
-	userService service.UserService
+	userStore     store.UserStore
+	userStoreOnce sync.Once
+	userStoreErr  error
+
+	userService     service.UserService
+	userServiceOnce sync.Once
+	userServiceErr  error
+
+	ginHandlers      *restapi.GinHandlers
+	ginHandlersOnce  sync.Once
+	ginHandlersError error
+
+	server      *http.Server
+	serverOnce  sync.Once
+	serverError error
 }
 
 func NewFactory(config config.Config) *Factory {
@@ -31,69 +50,70 @@ func NewFactory(config config.Config) *Factory {
 }
 
 func (f *Factory) Logger() *slog.Logger {
-	if f.logger == nil {
-		f.logger = getLogger()
-	}
+	f.loggerOnce.Do(func() {
+		f.logger = newLogger()
+	})
 	return f.logger
 }
 
-func (f *Factory) MongoClient(ctx context.Context) (*mongo.Client, error) {
-	if f.mongoClient != nil {
-		return f.mongoClient, nil
-	}
-
-	var err error
-
-	f.mongoClient, err = getMongoClient(ctx, f.Logger(), f.config.StoreConfig())
-	if err != nil {
-		return nil, fmt.Errorf("failed to create mongo client: %w", err)
-	}
-
-	return f.mongoClient, nil
-}
-
 func (f *Factory) MongoDatabase(ctx context.Context) (*mongo.Database, error) {
-	if f.mongoDatabase != nil {
-		return f.mongoDatabase, nil
-	}
+	f.mongoOnce.Do(func() {
+		f.mongoClient, f.mongoError = mongodb.ConnectClient(ctx, f.Logger(), f.config.StoreConfig())
+		if f.mongoError != nil {
+			return
+		}
+		f.mongoDatabase = mongodb.GetDatabase(f.mongoClient, f.config.StoreConfig().DbName)
+	})
 
-	client, err := f.MongoClient(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get mongo client: %w", err)
-	}
-
-	f.mongoDatabase = mongodb.GetDatabase(client, f.config.StoreConfig().DbName)
-	return f.mongoDatabase, err
+	return f.mongoDatabase, f.mongoError
 }
 
 func (f *Factory) UserStore(ctx context.Context) (store.UserStore, error) {
-	if f.userStore != nil {
-		return f.userStore, nil
-	}
-
-	var err error
-
-	database, err := f.MongoDatabase(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get mongo database: %w", err)
-	}
-
-	f.userStore = getUserStore(database)
-	return f.userStore, nil
+	f.userStoreOnce.Do(func() {
+		var db *mongo.Database
+		db, f.userStoreErr = f.MongoDatabase(ctx)
+		if f.userStoreErr != nil {
+			return
+		}
+		f.userStore = mongodb.NewUserStore(db)
+	})
+	return f.userStore, f.userStoreErr
 }
 
 func (f *Factory) UserService(ctx context.Context) (service.UserService, error) {
-	if f.userService != nil {
-		return f.userService, nil
-	}
+	f.userServiceOnce.Do(func() {
+		var store store.UserStore
+		store, f.userServiceErr = f.UserStore(ctx)
+		if f.userServiceErr != nil {
+			return
+		}
+		f.userService = user.NewUserService(store)
+	})
+	return f.userService, f.userServiceErr
+}
 
-	var err error
+func (f *Factory) GinHandlers(ctx context.Context) (*restapi.GinHandlers, error) {
+	f.ginHandlersOnce.Do(func() {
+		basicHandler := restapi.NewBasicHandler()
 
-	store, err := f.UserStore(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get user service: %w", err)
-	}
+		var userService service.UserService
+		userService, f.ginHandlersError = f.UserService(ctx)
+		userHandler := restapi.NewUserHandler(userService)
 
-	f.userService = getUserService(store)
-	return f.userService, nil
+		f.ginHandlers = &restapi.GinHandlers{
+			User:  userHandler,
+			Basic: basicHandler,
+		}
+	})
+	return f.ginHandlers, f.ginHandlersError
+}
+
+func (f *Factory) HttpServer(ctx context.Context) (*http.Server, error) {
+	f.serverOnce.Do(func() {
+		var ginHandlers *restapi.GinHandlers
+		ginHandlers, f.serverError = f.GinHandlers(ctx)
+
+		f.server = restapi.NewGinServer(ginHandlers, f.Logger(), f.config.ServerConfig())
+	})
+	return f.server, f.serverError
 }

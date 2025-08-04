@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewApiServer(handlers *Handlers, logger *slog.Logger, config config.ServerConfig) *http.Server {
+func NewGinServer(handlers *GinHandlers, logger *slog.Logger, config config.ServerConfig) *http.Server {
 	router := gin.New()
 
 	router.Use(gin.Logger())

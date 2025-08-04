@@ -6,12 +6,12 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-type Handlers struct {
-	User  *userHandler
-	Basic *basicHandler
+type GinHandlers struct {
+	User  *UserHandler
+	Basic *BasicHandler
 }
 
-func (h *Handlers) RegisterAll(router *gin.Engine) {
+func (h *GinHandlers) RegisterAll(router *gin.Engine) {
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	auth := router.Group("/auth")

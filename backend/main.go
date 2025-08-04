@@ -3,7 +3,8 @@ package main
 import (
 	"context"
 	"log/slog"
-	"wedding-app/api/restapi"
+	"os"
+
 	"wedding-app/config"
 	"wedding-app/factory"
 	"wedding-app/utils"
@@ -12,32 +13,24 @@ import (
 )
 
 func main() {
-	config, err := config.NewConfig()
+	cfg, err := config.NewConfig()
 	if err != nil {
 		panic(err)
 	}
 
-	factory := factory.NewFactory(config)
+	fac := factory.NewFactory(cfg)
 
 	mainContext := context.Background()
 
-	logger := factory.Logger()
+	logger := fac.Logger()
 
-	userService, err := factory.UserService(mainContext)
+	server, err := fac.HttpServer(mainContext)
 	if err != nil {
 		logger.Error("failed to initialize user service: ", utils.ErrAttr(err))
+		os.Exit(1)
 	}
 
-	basicHandler := restapi.NewBasicHandler()
-	userHandler := restapi.NewUserHandler(userService)
-
-	allHandlers := &restapi.Handlers{
-		User:  userHandler,
-		Basic: basicHandler,
-	}
-
-	server := restapi.NewApiServer(allHandlers, logger, config.ServerConfig())
-	logger.InfoContext(context.Background(), "starting server", slog.String("addr", server.Addr))
+	logger.Info("starting server", slog.String("addr", server.Addr))
 	if err := server.ListenAndServe(); err != nil {
 		logger.Error("failed to listen and server: %w", utils.ErrAttr(err))
 	}
