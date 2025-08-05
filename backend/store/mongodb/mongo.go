@@ -11,10 +11,12 @@ import (
 )
 
 func ConnectClient(ctx context.Context, logger *slog.Logger, config config.StoreConfig) (*mongo.Client, error) {
-	clientOptions := options.Client().ApplyURI(config.DbUrl).SetAuth(options.Credential{
-		Username: config.DbUsername,
-		Password: config.DbPassword,
-	})
+	clientOptions := options.Client().ApplyURI(config.DbUrl)
+
+	// .SetAuth(options.Credential{
+	// 	Username: config.DbUsername,
+	// 	Password: config.DbPassword,
+	// })
 
 	//Only 10 sec for an attempt
 	connectionContext, connectionContextCancel := context.WithTimeout(ctx, 10*time.Second)

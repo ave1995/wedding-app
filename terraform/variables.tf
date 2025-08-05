@@ -14,3 +14,7 @@ variable "repo_name" {
 variable "image_name" {
   type = string
 }
+
+variable "database_name" {
+  type = string
+}

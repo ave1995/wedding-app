@@ -7,18 +7,23 @@ import (
 )
 
 type user struct {
-	ID          uuid.UUID `bson:"_id"`
-	Username    string    `bson:"username"`
-	Email       string    `bson:"email,omitempty"`
-	IsTemporary bool      `bson:"isTemporary"`
-	Password    string    `bson:"password"`
+	ID          string `bson:"_id"`
+	Username    string `bson:"username"`
+	Email       string `bson:"email,omitempty"`
+	IsTemporary bool   `bson:"isTemporary"`
+	Password    string `bson:"password"`
 }
 
-func (m *user) ToDomain() *model.User {
+func (m *user) ToDomain() (*model.User, error) {
+	id, err := uuid.Parse(m.ID)
+	if err != nil {
+		return nil, err
+	}
+
 	return &model.User{
-		ID:          m.ID,
+		ID:          id,
 		Username:    m.Username,
 		Email:       m.Email,
 		IsTemporary: m.IsTemporary,
-	}
+	}, nil
 }

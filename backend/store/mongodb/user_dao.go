@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"context"
+	"log/slog"
 	"wedding-app/domain/model"
 	"wedding-app/domain/store"
 	"wedding-app/utils"
@@ -12,10 +13,11 @@ import (
 
 type userStore struct {
 	database *mongo.Database
+	logger   *slog.Logger
 }
 
-func NewUserStore(database *mongo.Database) store.UserStore {
-	return &userStore{database: database}
+func NewUserStore(database *mongo.Database, logger *slog.Logger) store.UserStore {
+	return &userStore{database: database, logger: logger}
 }
 
 const UsersCollection = "users"
@@ -33,7 +35,7 @@ func (r *userStore) RegisterUser(ctx context.Context, username, email, password 
 	}
 
 	mongoUser := &user{
-		ID:          uuid.New(),
+		ID:          uuid.New().String(),
 		Username:    username,
 		Email:       email,
 		Password:    hashedPass,
@@ -42,8 +44,14 @@ func (r *userStore) RegisterUser(ctx context.Context, username, email, password 
 
 	_, err = collection.InsertOne(ctx, mongoUser)
 	if err != nil {
+		r.logger.Error("failed to insert one to: %w", utils.ErrAttr(err), slog.Any("user", mongoUser))
 		return nil, err
 	}
 
-	return mongoUser.ToDomain(), nil
+	user, err := mongoUser.ToDomain()
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }

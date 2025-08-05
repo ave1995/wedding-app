@@ -75,7 +75,7 @@ func (f *Factory) UserStore(ctx context.Context) (store.UserStore, error) {
 		if f.userStoreErr != nil {
 			return
 		}
-		f.userStore = mongodb.NewUserStore(db)
+		f.userStore = mongodb.NewUserStore(db, f.Logger())
 	})
 	return f.userStore, f.userStoreErr
 }
