@@ -7,8 +7,17 @@ import (
 )
 
 type GinHandlers struct {
-	User  *UserHandler
-	Basic *BasicHandler
+	User           *UserHandler
+	Basic          *BasicHandler
+	AuthMiddleware gin.HandlerFunc
+}
+
+func NewGinHandlers(user *UserHandler, basic *BasicHandler, authMiddleware gin.HandlerFunc) *GinHandlers {
+	return &GinHandlers{
+		User:           user,
+		Basic:          basic,
+		AuthMiddleware: authMiddleware,
+	}
 }
 
 func (h *GinHandlers) RegisterAll(router *gin.Engine) {
@@ -18,5 +27,6 @@ func (h *GinHandlers) RegisterAll(router *gin.Engine) {
 	h.User.Register(auth)
 
 	api := router.Group("/api")
+	api.Use(h.AuthMiddleware)
 	h.Basic.Register(api)
 }

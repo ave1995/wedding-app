@@ -12,6 +12,8 @@ type Config struct {
 	DbName     string `envconfig:"DBNAME" required:"true"`
 	DbUsername string `envconfig:"DBUSERNAME"`
 	DbPassword string `envconfig:"DBPASSWORD"`
+	SecretKey  string `envconfig:"SECRETKEY" required:"true"`
+	Duration   string `envconfig:"DURATION"`
 }
 
 const EnvPrefix = ""
@@ -37,5 +39,12 @@ func (c Config) StoreConfig() StoreConfig {
 func (c Config) ServerConfig() ServerConfig {
 	return ServerConfig{
 		Port: c.Port,
+	}
+}
+
+func (c Config) AuthConfig() AuthConfig {
+	return AuthConfig{
+		SecretKey: c.SecretKey,
+		Duration:  c.Duration,
 	}
 }

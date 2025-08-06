@@ -9,6 +9,7 @@ import (
 	"wedding-app/config"
 	"wedding-app/domain/service"
 	"wedding-app/domain/store"
+	"wedding-app/service/jwt"
 	"wedding-app/service/user"
 	"wedding-app/store/mongodb"
 
@@ -98,12 +99,21 @@ func (f *Factory) GinHandlers(ctx context.Context) (*restapi.GinHandlers, error)
 
 		var userService service.UserService
 		userService, f.ginHandlersError = f.UserService(ctx)
+		if f.ginHandlersError != nil {
+			return
+		}
+
 		userHandler := restapi.NewUserHandler(userService)
 
-		f.ginHandlers = &restapi.GinHandlers{
-			User:  userHandler,
-			Basic: basicHandler,
+		var jwtService service.JWTService
+		jwtService, f.ginHandlersError = jwt.NewJWTService(f.config.AuthConfig(), f.Logger())
+		if f.ginHandlersError != nil {
+			return
 		}
+
+		authMiddleware := restapi.AuthMiddleware(jwtService)
+
+		f.ginHandlers = restapi.NewGinHandlers(userHandler, basicHandler, authMiddleware)
 	})
 	return f.ginHandlers, f.ginHandlersError
 }
