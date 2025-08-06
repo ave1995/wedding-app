@@ -18,10 +18,10 @@ func NewQuizHandler(qs service.QuizService) *QuizHandler {
 func (h *QuizHandler) Register(router *gin.RouterGroup) {
 	router.POST("/create-quiz", h.createQuiz)
 	router.GET("/join-quiz", h.joinQuiz)
-	router.GET("/get-quiz", h.getQuiz)
+	router.GET("/quiz/:id", h.getQuiz)
 }
 
-// registerQuiz godoc
+// createQuiz godoc
 //
 //	@Summary		Register a new quiz
 //	@Description	Create a quiz with name
@@ -51,20 +51,27 @@ func (h *QuizHandler) createQuiz(c *gin.Context) {
 	c.JSON(http.StatusCreated, quiz)
 }
 
-// GetQuizHandler godoc
+// joinQuiz godoc
+//
 // @Summary Get a quiz by Invite Code
 // @Description Retrieve a single quiz by Invite Code
 // @Tags quiz
-// @Security BearerAuth
 // @Produce json
-// @Param invite path string true "Quiz Invite Code"
+// @Param invite query string true "Quiz Invite Code"
 // @Success 200 {object} model.Quiz
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /api/quiz/{invite} [get]
+// @Router /api/join-quiz [get]
 func (h *QuizHandler) joinQuiz(c *gin.Context) {
-	inviteCode := c.Param("invite")
+	inviteCode := c.Query("invite")
+
+	if inviteCode == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invite query parameter is required",
+		})
+		return
+	}
 
 	quiz, err := h.quizService.GetQuizByInviteCode(c, inviteCode)
 	if err != nil {
@@ -75,7 +82,7 @@ func (h *QuizHandler) joinQuiz(c *gin.Context) {
 	c.JSON(http.StatusOK, quiz)
 }
 
-// GetQuizHandler godoc
+// getQuiz godoc
 // @Summary Get a quiz by ID
 // @Description Retrieve a single quiz by its ID
 // @Tags quiz

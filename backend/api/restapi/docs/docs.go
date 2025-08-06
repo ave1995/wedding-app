@@ -72,27 +72,22 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/quiz/{id}": {
+        "/api/join-quiz": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Retrieve a single quiz by its ID",
+                "description": "Retrieve a single quiz by Invite Code",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "quiz"
                 ],
-                "summary": "Get a quiz by ID",
+                "summary": "Get a quiz by Invite Code",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Quiz ID",
-                        "name": "id",
-                        "in": "path",
+                        "description": "Quiz Invite Code",
+                        "name": "invite",
+                        "in": "query",
                         "required": true
                     }
                 ],
@@ -133,26 +128,26 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/quiz/{invite}": {
+        "/api/quiz/{id}": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Retrieve a single quiz by Invite Code",
+                "description": "Retrieve a single quiz by its ID",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "quiz"
                 ],
-                "summary": "Get a quiz by Invite Code",
+                "summary": "Get a quiz by ID",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Quiz Invite Code",
-                        "name": "invite",
+                        "description": "Quiz ID",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }

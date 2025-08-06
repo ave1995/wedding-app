@@ -79,6 +79,43 @@ paths:
       summary: Register a new quiz
       tags:
       - quiz
+  /api/join-quiz:
+    get:
+      description: Retrieve a single quiz by Invite Code
+      parameters:
+      - description: Quiz Invite Code
+        in: query
+        name: invite
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Quiz'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a quiz by Invite Code
+      tags:
+      - quiz
   /api/quiz/{id}:
     get:
       description: Retrieve a single quiz by its ID
@@ -116,45 +153,6 @@ paths:
       security:
       - BearerAuth: []
       summary: Get a quiz by ID
-      tags:
-      - quiz
-  /api/quiz/{invite}:
-    get:
-      description: Retrieve a single quiz by Invite Code
-      parameters:
-      - description: Quiz Invite Code
-        in: path
-        name: invite
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.Quiz'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get a quiz by Invite Code
       tags:
       - quiz
   /auth/register:
