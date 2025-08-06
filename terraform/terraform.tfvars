@@ -1,0 +1,5 @@
+project_id = "wedding-468009"
+region = "europe-west1"
+repo_name = "wedding-app-repo"
+image_name = "wedding-backend"
+database_name = "wedding-database-mongo"

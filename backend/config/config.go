@@ -10,11 +10,11 @@ type Config struct {
 	Port       string `envconfig:"PORT" required:"true"`
 	DbUrl      string `envconfig:"DBURL" required:"true"`
 	DbName     string `envconfig:"DBNAME" required:"true"`
-	DbUsername string `envconfig:"DBUSERNAME" required:"true"`
-	DbPassword string `envconfig:"DBPASSWORD" required:"true"`
+	DbUsername string `envconfig:"DBUSERNAME"`
+	DbPassword string `envconfig:"DBPASSWORD"`
 }
 
-const EnvPrefix = "backend"
+const EnvPrefix = ""
 
 func NewConfig() (Config, error) {
 	var cfg Config
