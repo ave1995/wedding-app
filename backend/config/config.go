@@ -2,18 +2,20 @@ package config
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/kelseyhightower/envconfig"
 )
 
 type Config struct {
-	Port       string `envconfig:"PORT" required:"true"`
-	DbUrl      string `envconfig:"DBURL" required:"true"`
-	DbName     string `envconfig:"DBNAME" required:"true"`
-	DbUsername string `envconfig:"DBUSERNAME"`
-	DbPassword string `envconfig:"DBPASSWORD"`
-	SecretKey  string `envconfig:"SECRETKEY" required:"true"`
-	Duration   string `envconfig:"DURATION"`
+	Port       string        `envconfig:"PORT" required:"true"`
+	DbUrl      string        `envconfig:"DBURL" required:"true"`
+	DbName     string        `envconfig:"DBNAME" required:"true"`
+	DbUsername string        `envconfig:"DBUSERNAME"`
+	DbPassword string        `envconfig:"DBPASSWORD"`
+	SecretKey  string        `envconfig:"SECRETKEY" required:"true"`
+	Duration   time.Duration `envconfig:"DURATION" default:"15m"`
+	Origins    []string      `envconfig:"WEB_ORIGIN"`
 }
 
 const EnvPrefix = ""
@@ -38,7 +40,8 @@ func (c Config) StoreConfig() StoreConfig {
 
 func (c Config) ServerConfig() ServerConfig {
 	return ServerConfig{
-		Port: c.Port,
+		Port:    c.Port,
+		Origins: c.Origins,
 	}
 }
 

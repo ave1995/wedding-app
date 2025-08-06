@@ -6,6 +6,7 @@ import (
 	"time"
 	"wedding-app/config"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	sloggin "github.com/samber/slog-gin"
 )
@@ -17,6 +18,15 @@ func NewGinServer(handlers *GinHandlers, logger *slog.Logger, config config.Serv
 	// The middleware will log all requests attributes.
 	router.Use(sloggin.New(logger))
 	router.Use(gin.Recovery())
+
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     config.Origins,
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 
 	handlers.RegisterAll(router)
 

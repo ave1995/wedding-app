@@ -1,6 +1,8 @@
 package config
 
+import "time"
+
 type AuthConfig struct {
 	SecretKey string
-	Duration  string
+	Duration  time.Duration
 }

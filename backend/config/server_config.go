@@ -1,6 +1,7 @@
 package config
 
 type ServerConfig struct {
-	Host string
-	Port string
+	Host    string
+	Port    string
+	Origins []string
 }

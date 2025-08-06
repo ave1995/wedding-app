@@ -20,19 +20,8 @@ type jwtService struct {
 	logger        *slog.Logger
 }
 
-func NewJWTService(config config.AuthConfig, logger *slog.Logger) (service.JWTService, error) {
-	var tokenDuration time.Duration
-	if config.Duration == "" {
-		tokenDuration = 15 * time.Minute
-	} else {
-		var err error
-		tokenDuration, err = time.ParseDuration(config.Duration)
-		if err != nil {
-			return nil, fmt.Errorf("invalid token duration: %q: %w", config.Duration, err)
-		}
-	}
-
-	return &jwtService{secretKey: config.SecretKey, tokenDuration: tokenDuration, logger: logger}, nil
+func NewJWTService(config config.AuthConfig, logger *slog.Logger) service.JWTService {
+	return &jwtService{secretKey: config.SecretKey, tokenDuration: config.Duration, logger: logger}
 }
 
 type claims struct {

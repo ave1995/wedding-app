@@ -144,11 +144,7 @@ func (f *Factory) GinHandlers(ctx context.Context) (*restapi.GinHandlers, error)
 		}
 		quizHandler := restapi.NewQuizHandler(quizService)
 
-		var jwtService service.JWTService
-		jwtService, f.ginHandlersError = jwt.NewJWTService(f.config.AuthConfig(), f.Logger())
-		if f.ginHandlersError != nil {
-			return
-		}
+		jwtService := jwt.NewJWTService(f.config.AuthConfig(), f.Logger())
 
 		authMiddleware := restapi.AuthMiddleware(jwtService)
 
