@@ -24,10 +24,12 @@ func NewJWTService(config config.AuthConfig, logger *slog.Logger) (service.JWTSe
 	var tokenDuration time.Duration
 	if config.Duration == "" {
 		tokenDuration = 15 * time.Minute
-	}
-	tokenDuration, err := time.ParseDuration(config.Duration)
-	if err != nil {
-		return nil, fmt.Errorf("invalid token duration: %q: %w", config.Duration, err)
+	} else {
+		var err error
+		tokenDuration, err = time.ParseDuration(config.Duration)
+		if err != nil {
+			return nil, fmt.Errorf("invalid token duration: %q: %w", config.Duration, err)
+		}
 	}
 
 	return &jwtService{secretKey: config.SecretKey, tokenDuration: tokenDuration, logger: logger}, nil

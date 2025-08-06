@@ -23,7 +23,7 @@ mongo-express-stop:
 	docker rm -f mongo-express
 
 swag:
-	swag init -g ./backend/main.go -o backend/api/restapi/docs
+	cd backend && swag init -g main.go -o api/restapi/docs
 
 go:
 	@echo "Running Go app from backend/ with .env"

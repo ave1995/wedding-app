@@ -12,29 +12,29 @@ import (
 const ContextKey = "user"
 
 func AuthMiddleware(jwtService service.JWTService) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		authHeader := c.GetHeader("Authorization")
+	return func(ctx *gin.Context) {
+		authHeader := ctx.GetHeader("Authorization")
 		if authHeader == "" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Missing authorization header"})
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Missing authorization header"})
 			return
 		}
 
 		const prefix = "Bearer "
 		if len(authHeader) <= len(prefix) || authHeader[:len(prefix)] != prefix {
-			c.AbortWithStatusJSON(401, gin.H{"error": "Invalid authorization header format"})
+			ctx.AbortWithStatusJSON(401, gin.H{"error": "Invalid authorization header format"})
 			return
 		}
 
 		tokenString := authHeader[len(prefix):]
 		accessToken, err := jwtService.Verify(tokenString)
 		if err != nil {
-			c.AbortWithStatusJSON(401, gin.H{"error": "Invalid or expired token"})
+			ctx.AbortWithStatusJSON(401, gin.H{"error": "Invalid or expired token"})
 			return
 		}
 
-		c.Set(ContextKey, accessToken)
+		ctx.Set(ContextKey, accessToken)
 
-		c.Next()
+		ctx.Next()
 	}
 }
 

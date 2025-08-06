@@ -10,6 +10,7 @@ import (
 	"wedding-app/domain/service"
 	"wedding-app/domain/store"
 	"wedding-app/service/jwt"
+	"wedding-app/service/quiz"
 	"wedding-app/service/user"
 	"wedding-app/store/mongodb"
 
@@ -34,6 +35,14 @@ type Factory struct {
 	userService     service.UserService
 	userServiceOnce sync.Once
 	userServiceErr  error
+
+	quizStore     store.QuizStore
+	quizStoreOnce sync.Once
+	quizStoreErr  error
+
+	quizService     service.QuizService
+	quizServiceOnce sync.Once
+	quizServiceErr  error
 
 	ginHandlers      *restapi.GinHandlers
 	ginHandlersOnce  sync.Once
@@ -93,6 +102,30 @@ func (f *Factory) UserService(ctx context.Context) (service.UserService, error) 
 	return f.userService, f.userServiceErr
 }
 
+func (f *Factory) QuizStore(ctx context.Context) (store.QuizStore, error) {
+	f.quizStoreOnce.Do(func() {
+		var db *mongo.Database
+		db, f.quizStoreErr = f.MongoDatabase(ctx)
+		if f.quizStoreErr != nil {
+			return
+		}
+		f.quizStore = mongodb.NewQuizStore(db)
+	})
+	return f.quizStore, f.quizStoreErr
+}
+
+func (f *Factory) QuizService(ctx context.Context) (service.QuizService, error) {
+	f.quizServiceOnce.Do(func() {
+		var store store.QuizStore
+		store, f.quizServiceErr = f.QuizStore(ctx)
+		if f.quizServiceErr != nil {
+			return
+		}
+		f.quizService = quiz.NewQuizService(store)
+	})
+	return f.quizService, f.quizServiceErr
+}
+
 func (f *Factory) GinHandlers(ctx context.Context) (*restapi.GinHandlers, error) {
 	f.ginHandlersOnce.Do(func() {
 		basicHandler := restapi.NewBasicHandler()
@@ -102,8 +135,14 @@ func (f *Factory) GinHandlers(ctx context.Context) (*restapi.GinHandlers, error)
 		if f.ginHandlersError != nil {
 			return
 		}
-
 		userHandler := restapi.NewUserHandler(userService)
+
+		var quizService service.QuizService
+		quizService, f.ginHandlersError = f.QuizService(ctx)
+		if f.ginHandlersError != nil {
+			return
+		}
+		quizHandler := restapi.NewQuizHandler(quizService)
 
 		var jwtService service.JWTService
 		jwtService, f.ginHandlersError = jwt.NewJWTService(f.config.AuthConfig(), f.Logger())
@@ -113,7 +152,7 @@ func (f *Factory) GinHandlers(ctx context.Context) (*restapi.GinHandlers, error)
 
 		authMiddleware := restapi.AuthMiddleware(jwtService)
 
-		f.ginHandlers = restapi.NewGinHandlers(userHandler, basicHandler, authMiddleware)
+		f.ginHandlers, f.ginHandlersError = restapi.NewGinHandlers(userHandler, basicHandler, quizHandler, authMiddleware)
 	})
 	return f.ginHandlers, f.ginHandlersError
 }
@@ -122,6 +161,9 @@ func (f *Factory) HttpServer(ctx context.Context) (*http.Server, error) {
 	f.serverOnce.Do(func() {
 		var ginHandlers *restapi.GinHandlers
 		ginHandlers, f.serverError = f.GinHandlers(ctx)
+		if f.serverError != nil {
+			return
+		}
 
 		f.server = restapi.NewGinServer(ginHandlers, f.Logger(), f.config.ServerConfig())
 	})

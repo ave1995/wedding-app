@@ -22,12 +22,12 @@ func NewUserStore(database *mongo.Database, logger *slog.Logger) store.UserStore
 
 const UsersCollection = "users"
 
-func (r *userStore) usersCollection() *mongo.Collection {
-	return r.database.Collection(UsersCollection)
+func (s *userStore) usersCollection() *mongo.Collection {
+	return s.database.Collection(UsersCollection)
 }
 
-func (r *userStore) RegisterUser(ctx context.Context, username, email, password string) (*model.User, error) {
-	collection := r.usersCollection()
+func (s *userStore) RegisterUser(ctx context.Context, username, email, password string) (*model.User, error) {
+	collection := s.usersCollection()
 
 	hashedPass, err := utils.HashPassword(password)
 	if err != nil {
@@ -35,7 +35,7 @@ func (r *userStore) RegisterUser(ctx context.Context, username, email, password 
 	}
 
 	mongoUser := &user{
-		ID:          uuid.New().String(),
+		ID:          uuid.NewString(),
 		Username:    username,
 		Email:       email,
 		Password:    hashedPass,
@@ -44,7 +44,7 @@ func (r *userStore) RegisterUser(ctx context.Context, username, email, password 
 
 	_, err = collection.InsertOne(ctx, mongoUser)
 	if err != nil {
-		r.logger.Error("failed to insert one to: %w", utils.ErrAttr(err), slog.Any("user", mongoUser))
+		s.logger.Error("failed to insert one to: %w", utils.ErrAttr(err), slog.Any("user", mongoUser))
 		return nil, err
 	}
 
