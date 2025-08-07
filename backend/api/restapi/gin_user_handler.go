@@ -35,13 +35,13 @@ func (h *UserHandler) registerUser(c *gin.Context) {
 	var req RegisterRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		respondWithBadRequest(c, err, "invalid request payload")
+		c.Error(NewInvalidRequestPayloadAPIError(err))
 		return
 	}
 
 	user, err := h.userService.RegisterUser(c, req.Username, req.Email, req.Password)
 	if err != nil {
-		respondWithInternalError(c, err)
+		c.Error(NewInternalAPIError(err))
 		return
 	}
 

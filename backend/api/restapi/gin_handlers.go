@@ -40,11 +40,13 @@ func NewGinHandlers(user *UserHandler, basic *BasicHandler, quiz *QuizHandler, a
 func (h *GinHandlers) RegisterAll(router *gin.Engine) {
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
+	basic := router.Group("/")
+	h.Basic.Register(basic)
+
 	auth := router.Group("/auth")
 	h.User.Register(auth)
 
 	api := router.Group("/api")
 	// api.Use(h.AuthMiddleware)
-	h.Basic.Register(api)
 	h.Quiz.Register(api)
 }

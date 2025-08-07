@@ -52,7 +52,7 @@ resource "google_cloud_run_service" "backend" {
 
           env {
             name = "WEB_ORIGIN"
-            value = "https://bernarovi.today"
+            value = "https://bednarovi.today"
           }
 
           env {

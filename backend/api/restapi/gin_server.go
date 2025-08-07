@@ -18,6 +18,7 @@ func NewGinServer(handlers *GinHandlers, logger *slog.Logger, config config.Serv
 	// The middleware will log all requests attributes.
 	router.Use(sloggin.New(logger))
 	router.Use(gin.Recovery())
+	router.Use(ErrorHandler(logger))
 
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     config.Origins,

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { get } from "../functions/fetch";
+import InputText from "../components/input_text/InputText";
 
 function InvitePage() {
   const API_BASE_URL = import.meta.env.VITE_API_URL;
@@ -21,6 +22,11 @@ function InvitePage() {
     }
   }, [code]);
 
-  return <div></div>;
+  return (
+    <div>
+      <h2>New Guest</h2>
+      <InputText></InputText>
+    </div>
+  );
 }
 export default InvitePage;

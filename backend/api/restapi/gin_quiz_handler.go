@@ -38,13 +38,13 @@ func (h *QuizHandler) createQuiz(c *gin.Context) {
 	var req CreateQuizRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		respondWithBadRequest(c, err, "invalid request payload")
+		c.Error(NewInvalidRequestPayloadAPIError(err))
 		return
 	}
 
 	quiz, err := h.quizService.CreateQuiz(c, req.Name)
 	if err != nil {
-		respondWithInternalError(c, err)
+		c.Error(NewInternalAPIError(err))
 		return
 	}
 
@@ -67,15 +67,13 @@ func (h *QuizHandler) joinQuiz(c *gin.Context) {
 	inviteCode := c.Query("invite")
 
 	if inviteCode == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "invite query parameter is required",
-		})
+		c.Error(NewAPIError(http.StatusBadRequest, "invite query parameter is required", nil))
 		return
 	}
 
 	quiz, err := h.quizService.GetQuizByInviteCode(c, inviteCode)
 	if err != nil {
-		respondWithInternalError(c, err)
+		c.Error(NewAPIError(http.StatusNotFound, "failed to find quiz!", err))
 		return
 	}
 
@@ -99,7 +97,7 @@ func (h *QuizHandler) getQuiz(c *gin.Context) {
 
 	quiz, err := h.quizService.GetQuizByID(c, id)
 	if err != nil {
-		respondWithInternalError(c, err)
+		c.Error(NewAPIError(http.StatusNotFound, "failed to find quiz!", err))
 		return
 	}
 
