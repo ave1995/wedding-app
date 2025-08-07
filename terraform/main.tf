@@ -51,6 +51,16 @@ resource "google_cloud_run_service" "backend" {
           }
 
           env {
+            name = "WEB_ORIGIN"
+            value = "https://bernarovi.today"
+          }
+
+          env {
+             name = "SECRETKEY"
+             value = "12345"
+          }
+
+          env {
             name  = "REDEPLOY_TRIGGER"
             value = timestamp() # updates every apply
           }

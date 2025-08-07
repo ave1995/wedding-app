@@ -50,6 +50,8 @@ DATABASE      := $(shell grep database_name $(TF_DIR)/$(TF_VARS) | cut -d'"' -f2
 
 TF_BUCKET	:= $(GCP_PROJECT_ID)-terraform-state-bucket
 
+GOOGLE_CREDS  := $(CURDIR)/credentials.json
+
 IMG_URL := $(REGION)-docker.pkg.dev/$(GCP_PROJECT_ID)/$(REPO)/$(IMAGE):latest
 
 create-service-account: ## Create service account in gCloud for Terraform deploying.
@@ -116,11 +118,11 @@ push:
 
 ## Init Terraform in TF_DIR
 terraform-init:
-	cd $(TF_DIR) && terraform init
+	cd $(TF_DIR) && GOOGLE_APPLICATION_CREDENTIALS=$(GOOGLE_CREDS) terraform init
 
 ## Apply Terraform with tfvars
 terraform-apply:
-	cd $(TF_DIR) && terraform apply -var-file="$(TF_VARS)" -auto-approve
+	cd $(TF_DIR) && GOOGLE_APPLICATION_CREDENTIALS=$(GOOGLE_CREDS) terraform apply -var-file="$(TF_VARS)" -auto-approve
 
 terraform-destroy:
 	gcloud run services delete $(IMAGE) --region=$(REGION) --project=$(GCP_PROJECT_ID);
