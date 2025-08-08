@@ -18,3 +18,7 @@ variable "image_name" {
 variable "database_name" {
   type = string
 }
+
+variable "user_icon_name" {
+  type = string
+}
