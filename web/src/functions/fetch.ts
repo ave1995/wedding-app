@@ -22,6 +22,7 @@ const _fetch = async <T>(req: {
   method: string;
   func: "json" | "text";
   content?: any;
+  setCredentials?: boolean;
 }): Promise<FetchResult<T>> => {
   let init: RequestInit;
 
@@ -30,9 +31,13 @@ const _fetch = async <T>(req: {
       headers: req.func == "json" ? _getJsonHeaders() : _getTextHeaders(),
       method: req.method,
       body: JSON.stringify(req.content),
+      ...(req.setCredentials ? { credentials: "include" } : {}),
     };
   } else {
-    init = { method: req.method };
+    init = {
+      method: req.method,
+      ...(req.setCredentials ? { credentials: "include" } : {}),
+    };
   }
 
   try {
@@ -86,4 +91,18 @@ export const getText = async <T>(url: string, query: TContent = null) =>
     url: _parseUrl(url, query),
     method: "GET",
     func: "text",
+  }) as Promise<FetchResult<T>>;
+
+export const post = async <T>(
+  url: string,
+  query: TContent = null,
+  content: TContent = null,
+  setCredentials?: boolean,
+) =>
+  _fetch<T>({
+    url: _parseUrl(url, query),
+    method: "POST",
+    func: "json",
+    content,
+    setCredentials,
   }) as Promise<FetchResult<T>>;

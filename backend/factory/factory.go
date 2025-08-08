@@ -57,6 +57,9 @@ type Factory struct {
 	svgServiceOnce sync.Once
 	svgServiceErr  error
 
+	jwtService     service.JWTService
+	jwtServiceOnce sync.Once
+
 	ginHandlers      *restapi.GinHandlers
 	ginHandlersOnce  sync.Once
 	ginHandlersError error
@@ -110,7 +113,7 @@ func (f *Factory) UserService(ctx context.Context) (service.UserService, error) 
 		if f.userServiceErr != nil {
 			return
 		}
-		f.userService = user.NewUserService(store)
+		f.userService = user.NewUserService(store, f.JWTService())
 	})
 	return f.userService, f.userServiceErr
 }
@@ -164,6 +167,13 @@ func (f *Factory) SvgService(ctx context.Context) (service.SvgService, error) {
 	return f.svgService, f.svgServiceErr
 }
 
+func (f *Factory) JWTService() service.JWTService {
+	f.jwtServiceOnce.Do(func() {
+		f.jwtService = jwt.NewJWTService(f.config.AuthConfig(), f.Logger())
+	})
+	return f.jwtService
+}
+
 func (f *Factory) GinHandlers(ctx context.Context) (*restapi.GinHandlers, error) {
 	f.ginHandlersOnce.Do(func() {
 		var svgService service.SvgService
@@ -178,7 +188,7 @@ func (f *Factory) GinHandlers(ctx context.Context) (*restapi.GinHandlers, error)
 		if f.ginHandlersError != nil {
 			return
 		}
-		userHandler := restapi.NewUserHandler(userService)
+		userHandler := restapi.NewUserHandler(userService, f.Logger())
 
 		var quizService service.QuizService
 		quizService, f.ginHandlersError = f.QuizService(ctx)
@@ -187,9 +197,7 @@ func (f *Factory) GinHandlers(ctx context.Context) (*restapi.GinHandlers, error)
 		}
 		quizHandler := restapi.NewQuizHandler(quizService)
 
-		jwtService := jwt.NewJWTService(f.config.AuthConfig(), f.Logger())
-
-		authMiddleware := restapi.AuthMiddleware(jwtService)
+		authMiddleware := restapi.AuthMiddleware(f.JWTService())
 
 		f.ginHandlers, f.ginHandlersError = restapi.NewGinHandlers(userHandler, basicHandler, quizHandler, authMiddleware)
 	})

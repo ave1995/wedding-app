@@ -26,7 +26,9 @@ func (h *QuizHandler) Register(router *gin.RouterGroup) {
 //	@Summary		Register a new quiz
 //	@Description	Create a quiz with name
 //	@Tags			quiz
-//	@Security BearerAuth
+//
+// @Security CookieAuth
+//
 //	@Accept			json
 //	@Produce		json
 //	@Param			quiz	body		CreateQuizRequest	true	"Quiz info"
@@ -84,7 +86,7 @@ func (h *QuizHandler) joinQuiz(c *gin.Context) {
 // @Summary Get a quiz by ID
 // @Description Retrieve a single quiz by its ID
 // @Tags quiz
-// @Security BearerAuth
+// @Security CookieAuth
 // @Produce json
 // @Param id path string true "Quiz ID"
 // @Success 200 {object} model.Quiz

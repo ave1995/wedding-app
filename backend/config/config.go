@@ -14,7 +14,7 @@ type Config struct {
 	DbUsername      string        `envconfig:"DBUSERNAME"`
 	DbPassword      string        `envconfig:"DBPASSWORD"`
 	SecretKey       string        `envconfig:"SECRETKEY" required:"true"`
-	Duration        time.Duration `envconfig:"DURATION" default:"15m"`
+	Duration        time.Duration `envconfig:"DURATION" default:"1h"`
 	Origins         []string      `envconfig:"WEB_ORIGIN"`
 	UserIconsBucket string        `envconfig:"USERICONS_BUCKET" required:"true"`
 }

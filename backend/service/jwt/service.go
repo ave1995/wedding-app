@@ -53,7 +53,6 @@ func (j *jwtService) Generate(user *model.User) (*model.AccessToken, error) {
 	accessToken := &model.AccessToken{
 		Token:     signedToken,
 		ExpiresAt: expiresAt,
-		UserID:    user.ID,
 	}
 
 	return accessToken, nil
@@ -61,16 +60,17 @@ func (j *jwtService) Generate(user *model.User) (*model.AccessToken, error) {
 
 // Verify implements service.JWTService.
 func (j *jwtService) Verify(tokenString string) (*model.AccessToken, error) {
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
+	claims := &claims{}
+
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (any, error) {
 		return []byte(j.secretKey), nil
 	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	claims, ok := token.Claims.(*claims)
-	if !ok || !token.Valid {
-		return nil, fmt.Errorf("invalid token")
+	if !token.Valid {
+		return nil, fmt.Errorf("token is not valid")
 	}
 
 	userID, err := uuid.Parse(claims.UserID)

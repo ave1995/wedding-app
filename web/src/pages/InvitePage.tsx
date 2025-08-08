@@ -4,13 +4,12 @@ import { get } from "../functions/fetch";
 import InputText from "../components/input_text/InputText";
 import IconSelector, {
   type SvgItem,
-} from "../components/iconSelector/IconSelector";
+} from "../components/icon_selector/IconSelector";
 import Button from "../components/Button";
 import type { Quiz } from "../models/Quiz";
+import { apiUrl } from "../functions/api";
 
 function InvitePage() {
-  const API_BASE_URL = import.meta.env.VITE_API_URL;
-
   const [searchParams] = useSearchParams();
   const code = searchParams.get("code");
   const navigate = useNavigate();
@@ -19,14 +18,14 @@ function InvitePage() {
   useEffect(() => {
     if (code) {
       async function fetchQuiz() {
-        const result = await get<Quiz>(`${API_BASE_URL}/api/join-quiz`, {
+        const result = await get<Quiz>(apiUrl("/api/join-quiz"), {
           invite: code,
         });
 
-        if (result.error) {
-          console.error(result.error);
-          navigate("/not-found");
-        }
+        // if (result.error) {
+        //   console.error(result.error);
+        //   navigate("/not-found");
+        // }
 
       }
       fetchQuiz();

@@ -47,6 +47,6 @@ func (h *GinHandlers) RegisterAll(router *gin.Engine) {
 	h.User.Register(auth)
 
 	api := router.Group("/api")
-	// api.Use(h.AuthMiddleware)
+	api.Use(h.AuthMiddleware)
 	h.Quiz.Register(api)
 }

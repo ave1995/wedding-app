@@ -12,6 +12,9 @@ import (
 	_ "wedding-app/api/restapi/docs"
 )
 
+// @securityDefinitions.apikey CookieAuth
+// @in cookie
+// @name access_token
 func main() {
 	cfg, err := config.NewConfig()
 	if err != nil {

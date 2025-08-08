@@ -2,12 +2,14 @@ package mongodb
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"wedding-app/domain/model"
 	"wedding-app/domain/store"
 	"wedding-app/utils"
 
 	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -46,6 +48,32 @@ func (s *userStore) RegisterUser(ctx context.Context, username, email, password 
 	if err != nil {
 		s.logger.Error("failed to insert one to: %w", utils.ErrAttr(err), slog.Any("user", mongoUser))
 		return nil, err
+	}
+
+	user, err := mongoUser.ToDomain()
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+// LoginUser implements store.UserStore.
+func (s *userStore) LoginUser(ctx context.Context, email string, password string) (*model.User, error) {
+	collection := s.usersCollection()
+
+	var mongoUser user
+	err := collection.FindOne(ctx, bson.M{"email": email}).Decode(&mongoUser)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			// User not found
+			return nil, fmt.Errorf("invalid email")
+		}
+		return nil, err
+	}
+
+	if !utils.CheckPasswordHash(password, mongoUser.Password) {
+		return nil, fmt.Errorf("invalid password")
 	}
 
 	user, err := mongoUser.ToDomain()
