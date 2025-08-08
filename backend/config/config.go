@@ -8,14 +8,15 @@ import (
 )
 
 type Config struct {
-	Port       string        `envconfig:"PORT" required:"true"`
-	DbUrl      string        `envconfig:"DBURL" required:"true"`
-	DbName     string        `envconfig:"DBNAME" required:"true"`
-	DbUsername string        `envconfig:"DBUSERNAME"`
-	DbPassword string        `envconfig:"DBPASSWORD"`
-	SecretKey  string        `envconfig:"SECRETKEY" required:"true"`
-	Duration   time.Duration `envconfig:"DURATION" default:"15m"`
-	Origins    []string      `envconfig:"WEB_ORIGIN"`
+	Port            string        `envconfig:"PORT" required:"true"`
+	DbUrl           string        `envconfig:"DBURL" required:"true"`
+	DbName          string        `envconfig:"DBNAME" required:"true"`
+	DbUsername      string        `envconfig:"DBUSERNAME"`
+	DbPassword      string        `envconfig:"DBPASSWORD"`
+	SecretKey       string        `envconfig:"SECRETKEY" required:"true"`
+	Duration        time.Duration `envconfig:"DURATION" default:"15m"`
+	Origins         []string      `envconfig:"WEB_ORIGIN"`
+	UserIconsBucket string        `envconfig:"USERICONS_BUCKET" required:"true"`
 }
 
 const EnvPrefix = ""
@@ -49,5 +50,11 @@ func (c Config) AuthConfig() AuthConfig {
 	return AuthConfig{
 		SecretKey: c.SecretKey,
 		Duration:  c.Duration,
+	}
+}
+
+func (c Config) BucketConfig() BucketConfig {
+	return BucketConfig{
+		UserIconsBucket: c.UserIconsBucket,
 	}
 }

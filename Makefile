@@ -27,7 +27,7 @@ swag:
 
 go:
 	@echo "Running Go app from backend/ with .env"
-	@bash -c 'set -a; source .env; set +a; cd backend && go run main.go'
+	@bash -c 'set -a; source .env; export GOOGLE_APPLICATION_CREDENTIALS=$(GOOGLE_CREDS); set +a; cd backend && go run main.go'
 
 GO_BUILD_NAME=my-go-app
 
