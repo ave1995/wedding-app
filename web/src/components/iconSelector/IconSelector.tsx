@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { get } from "../../functions/fetch";
 
-export interface SvgItem {
+export type SvgItem = {
   Name: string;
   URL: string;
-}
+};
 
 interface IconSelectorProps {
   onSelect: (icon: SvgItem) => void;
@@ -18,7 +18,11 @@ export default function IconSelector({ onSelect, onClose }: IconSelectorProps) {
   useEffect(() => {
     async function fetchIcons() {
       const svgItems = await get<SvgItem[]>(`${API_BASE_URL}/user-svgs`);
-      setSvgs(svgItems);
+      if (svgItems.error || svgItems.data == null) {
+        console.error(svgItems.error)
+      } 
+
+      setSvgs(svgItems.data!);
     }
     fetchIcons();
   }, []);
