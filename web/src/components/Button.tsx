@@ -4,7 +4,7 @@ import Spinner from "./Spinner";
 
 interface ButtonProps<T = void> {
   label: string;
-  type: ButtonType;
+  type?: ButtonType;
   onClick: () => Promise<T> | void;
 }
 
@@ -56,7 +56,7 @@ export const ButtonTypeEnum = {
 
 type ButtonType = (typeof ButtonTypeEnum)[keyof typeof ButtonTypeEnum];
 
-function GetButtonColor(type: ButtonType) {
+function GetButtonColor(type?: ButtonType) {
   switch (type) {
     case ButtonTypeEnum.Basic:
       return "bg-pink-500";
@@ -65,7 +65,7 @@ function GetButtonColor(type: ButtonType) {
   }
 }
 
-function GetButtonHoverColor(type: ButtonType) {
+function GetButtonHoverColor(type?: ButtonType) {
   switch (type) {
     case ButtonTypeEnum.Basic:
       return "hover:bg-pink-700";

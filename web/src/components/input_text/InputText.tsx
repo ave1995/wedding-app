@@ -1,13 +1,17 @@
 interface InputTextProps {
   placeholder?: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-export default function InputText({ placeholder }: InputTextProps) {
+export default function InputText({ placeholder, value, onChange }: InputTextProps) {
   return (
     <input
       type="text"
       placeholder={placeholder}
-      className="border rounded-lg px-3 py-2 text-black"
+      value={value}
+      onChange={onChange}
+      className="border-2 rounded-lg px-3 py-2 text-black"
     />
   );
 }
