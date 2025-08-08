@@ -21,7 +21,11 @@ function HomePage() {
   const handleClick = async () => {
     await sleep(1000);
     const result = await getText<string>(`${API_BASE_URL}/ping`);
-    setMessage(result);
+    if (result.error) {
+      console.error(result.error);
+    } else {
+      setMessage(result.data);
+    }
   };
 
   return (

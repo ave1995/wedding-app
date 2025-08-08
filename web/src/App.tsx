@@ -3,6 +3,7 @@ import "./App.css";
 import HomePage from "./pages/HomePage";
 import InvitePage from "./pages/InvitePage";
 import NotFoundPage from "./pages/NotFound";
+import LoginPage from "./pages/LoginPage";
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/invite" element={<InvitePage />} />
+        <Route path="/login" element={<LoginPage />} />
 
         <Route path="*" element={<NotFoundPage />}></Route>
       </Routes>
