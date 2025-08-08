@@ -22,10 +22,12 @@ function InvitePage() {
           invite: code,
         });
 
-        // if (result.error) {
-        //   console.error(result.error);
-        //   navigate("/not-found");
-        // }
+        if (result.error) {
+          console.error(result.error);
+          navigate("/not-found");
+        }
+
+        
 
       }
       fetchQuiz();

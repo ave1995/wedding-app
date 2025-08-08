@@ -79,6 +79,8 @@ func (h *QuizHandler) joinQuiz(c *gin.Context) {
 		return
 	}
 
+	//check if User is authenticated
+
 	c.JSON(http.StatusOK, quiz)
 }
 
