@@ -9,12 +9,11 @@ import (
 )
 
 type userService struct {
-	store      store.UserStore
-	jwtService service.JWTService
+	store store.UserStore
 }
 
-func NewUserService(store store.UserStore, jwtService service.JWTService) service.UserService {
-	return &userService{store: store, jwtService: jwtService}
+func NewUserService(store store.UserStore) service.UserService {
+	return &userService{store: store}
 }
 
 func (s *userService) RegisterUser(ctx context.Context, username, email, password string) (*model.User, error) {
@@ -22,11 +21,11 @@ func (s *userService) RegisterUser(ctx context.Context, username, email, passwor
 }
 
 // LoginUser implements service.UserService.
-func (s *userService) LoginUser(ctx context.Context, email string, password string) (*model.AccessToken, error) {
+func (s *userService) LoginUser(ctx context.Context, email string, password string) (*model.User, error) {
 	user, err := s.store.LoginUser(ctx, email, password)
 	if err != nil {
 		return nil, fmt.Errorf("failed to login user %q: %w", email, err)
 	}
 
-	return s.jwtService.Generate(user)
+	return user, nil
 }

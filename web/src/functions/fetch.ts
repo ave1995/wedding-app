@@ -79,11 +79,12 @@ const _parseQuery = (query: Record<any, any>) =>
 const _parseUrl = (url: string, query: TContent = null) =>
   query ? `${url}?${_parseQuery(query)}` : url;
 
-export const get = async <T>(url: string, query: TContent = null) =>
+export const get = async <T>(url: string, query: TContent = null, setCredentials?: boolean,) =>
   _fetch<T>({
     url: _parseUrl(url, query),
     method: "GET",
     func: "json",
+    setCredentials,
   }) as Promise<FetchResult<T>>;
 
 export const getText = async <T>(url: string, query: TContent = null) =>

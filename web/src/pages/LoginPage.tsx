@@ -12,10 +12,15 @@ function LoginPage() {
   const [passwordValue, setPasswordValue] = useState("");
 
   async function handleJoin() {
-    const result = await post<AccessToken>(apiUrl("/login"), {
+    const result = await post<AccessToken>(
+      apiUrl("/auth/login"),
+      {},
+      {
         email: emailValue,
-        password: passwordValue
-    }, {}, true);
+        password: passwordValue,
+      },
+      true
+    );
   }
 
   return (

@@ -1,6 +1,7 @@
 package restapi
 
 import (
+	"fmt"
 	"net/http"
 	"wedding-app/domain/service"
 
@@ -9,16 +10,20 @@ import (
 
 type QuizHandler struct {
 	quizService service.QuizService
+	jwtService  service.JWTService
 }
 
-func NewQuizHandler(qs service.QuizService) *QuizHandler {
-	return &QuizHandler{quizService: qs}
+func NewQuizHandler(qs service.QuizService, js service.JWTService) *QuizHandler {
+	return &QuizHandler{quizService: qs, jwtService: js}
 }
 
 func (h *QuizHandler) Register(router *gin.RouterGroup) {
 	router.POST("/create-quiz", h.createQuiz)
-	router.GET("/join-quiz", h.joinQuiz)
 	router.GET("/quiz/:id", h.getQuiz)
+}
+
+func (h *QuizHandler) RegisterAnonymous(router *gin.RouterGroup) {
+	router.GET("/join-quiz", h.joinQuiz)
 }
 
 // createQuiz godoc
@@ -80,8 +85,19 @@ func (h *QuizHandler) joinQuiz(c *gin.Context) {
 	}
 
 	// TODO: check if User is authenticated
+	token, err := c.Cookie(CookieAccessTokenName)
+	if err != nil {
+		c.JSON(http.StatusOK, quiz)
+		return
+	}
 
-	c.JSON(http.StatusOK, quiz)
+	_, err = h.jwtService.Verify(token)
+	if err != nil {
+		c.JSON(http.StatusOK, quiz)
+		return
+	}
+
+	c.Redirect(http.StatusFound, fmt.Sprintf("/quiz/%d", quiz.ID))
 }
 
 // getQuiz godoc

@@ -11,11 +11,12 @@ import (
 
 type UserHandler struct {
 	userService service.UserService
+	jwtService  service.JWTService
 	logger      *slog.Logger
 }
 
-func NewUserHandler(us service.UserService, logger *slog.Logger) *UserHandler {
-	return &UserHandler{userService: us, logger: logger}
+func NewUserHandler(us service.UserService, js service.JWTService, logger *slog.Logger) *UserHandler {
+	return &UserHandler{userService: us, jwtService: js, logger: logger}
 }
 
 func (h *UserHandler) Register(router *gin.RouterGroup) {
@@ -52,6 +53,8 @@ func (h *UserHandler) registerUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, user)
 }
 
+const CookieAccessTokenName = "access_token"
+
 // registerUser godoc
 //
 //	@Summary		Login a existing user
@@ -72,7 +75,13 @@ func (h *UserHandler) loginUser(c *gin.Context) {
 		return
 	}
 
-	accessToken, err := h.userService.LoginUser(c, req.Email, req.Password)
+	user, err := h.userService.LoginUser(c, req.Email, req.Password)
+	if err != nil {
+		c.Error(NewInternalAPIError(err))
+		return
+	}
+
+	accessToken, err := h.jwtService.Generate(user)
 	if err != nil {
 		c.Error(NewInternalAPIError(err))
 		return
@@ -83,13 +92,13 @@ func (h *UserHandler) loginUser(c *gin.Context) {
 		slog.Time("duration", accessToken.ExpiresAt))
 
 	c.SetCookie(
-		"access_token",
+		CookieAccessTokenName,
 		accessToken.Token,
 		int(time.Until(accessToken.ExpiresAt).Seconds()), // cookie lifetime
-		"/",  // path
-		"",   // domain ("" works for localhost)
-		true, // secure (HTTPS only)
-		true, // httpOnly
+		"/",   // path
+		"",    // domain ("" works for localhost)
+		false, // secure (HTTPS only)
+		true,  // httpOnly
 	)
 
 	c.JSON(http.StatusOK, gin.H{

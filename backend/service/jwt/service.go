@@ -2,7 +2,6 @@ package jwt
 
 import (
 	"fmt"
-	"log"
 	"log/slog"
 	"time"
 	"wedding-app/config"
@@ -66,7 +65,7 @@ func (j *jwtService) Verify(tokenString string) (*model.AccessToken, error) {
 		return []byte(j.secretKey), nil
 	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
 	if err != nil {
-		log.Fatal(err)
+		return nil, fmt.Errorf("token not parsed: %w", err)
 	}
 
 	if !token.Valid {

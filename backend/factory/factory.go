@@ -113,7 +113,7 @@ func (f *Factory) UserService(ctx context.Context) (service.UserService, error) 
 		if f.userServiceErr != nil {
 			return
 		}
-		f.userService = user.NewUserService(store, f.JWTService())
+		f.userService = user.NewUserService(store)
 	})
 	return f.userService, f.userServiceErr
 }
@@ -188,14 +188,14 @@ func (f *Factory) GinHandlers(ctx context.Context) (*restapi.GinHandlers, error)
 		if f.ginHandlersError != nil {
 			return
 		}
-		userHandler := restapi.NewUserHandler(userService, f.Logger())
+		userHandler := restapi.NewUserHandler(userService, f.JWTService(), f.Logger())
 
 		var quizService service.QuizService
 		quizService, f.ginHandlersError = f.QuizService(ctx)
 		if f.ginHandlersError != nil {
 			return
 		}
-		quizHandler := restapi.NewQuizHandler(quizService)
+		quizHandler := restapi.NewQuizHandler(quizService, f.JWTService())
 
 		authMiddleware := restapi.AuthMiddleware(f.JWTService())
 

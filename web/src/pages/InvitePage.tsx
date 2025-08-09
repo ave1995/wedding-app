@@ -18,16 +18,14 @@ function InvitePage() {
   useEffect(() => {
     if (code) {
       async function fetchQuiz() {
-        const result = await get<Quiz>(apiUrl("/api/join-quiz"), {
+        const result = await get<Quiz>(apiUrl("/auth/join-quiz"), {
           invite: code,
-        });
+        }, true);
 
         if (result.error) {
           console.error(result.error);
           navigate("/not-found");
         }
-
-        
 
       }
       fetchQuiz();
@@ -35,7 +33,7 @@ function InvitePage() {
       console.error("No code from you!")
       navigate("/not-found");
     }
-  }, []);
+  }, [code, navigate]);
 
   // Icon state
   const [selectedIcon, setSelectedIcon] = useState<SvgItem | null>(null);
