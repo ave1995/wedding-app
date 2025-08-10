@@ -27,9 +27,14 @@ func (m *user) ToDomain() (*model.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	quizID, err := uuid.Parse(m.QuizID)
-	if err != nil {
-		return nil, err
+
+	var quizID uuid.UUID
+	if m.QuizID != "" {
+		parsedQuizID, err := uuid.Parse(m.QuizID)
+		if err != nil {
+			return nil, err
+		}
+		quizID = parsedQuizID
 	}
 
 	return &model.User{

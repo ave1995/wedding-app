@@ -9,11 +9,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const ContextKey = "user"
+const CookieAccessTokenName = "access_token"
+
+const ContextUserIDKey = "userID"
 
 func AuthMiddleware(jwtService service.JWTService) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		tokenString, err := ctx.Cookie("access_token")
+		tokenString, err := ctx.Cookie(CookieAccessTokenName)
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 			return
@@ -25,7 +27,8 @@ func AuthMiddleware(jwtService service.JWTService) gin.HandlerFunc {
 			return
 		}
 
-		ctx.Set(ContextKey, accessToken.UserID)
+		// TODO: I have to know how to control if user is guest
+		ctx.Set(ContextUserIDKey, accessToken.UserID)
 
 		ctx.Next()
 	}
@@ -35,7 +38,7 @@ var ErrAccessTokenNotInContext = errors.New("access token not found in context")
 var ErrAccessTokenHasInvalidTypeInContext = errors.New("access token in context has invalid type")
 
 func GetUserFromContext(c *gin.Context) (*model.AccessToken, error) {
-	val, exists := c.Get(ContextKey)
+	val, exists := c.Get(ContextUserIDKey)
 	if !exists {
 		return nil, ErrAccessTokenNotInContext
 	}

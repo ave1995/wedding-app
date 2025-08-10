@@ -61,8 +61,6 @@ func (h *UserHandler) registerUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, user)
 }
 
-const CookieAccessTokenName = "access_token"
-
 // registerUser godoc
 //
 //	@Summary		Login a existing user
