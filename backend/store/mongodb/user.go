@@ -12,7 +12,14 @@ type user struct {
 	Email       string `bson:"email,omitempty"`
 	IsTemporary bool   `bson:"isTemporary"`
 	Password    string `bson:"password"`
+	IconUrl     string `bson:"iconUrl"`
 }
+
+const (
+	userFieldID          = "_id"
+	userFieldEmail       = "email"
+	userFieldIsTemporary = "isTemporary"
+)
 
 func (m *user) ToDomain() (*model.User, error) {
 	id, err := uuid.Parse(m.ID)
@@ -25,5 +32,6 @@ func (m *user) ToDomain() (*model.User, error) {
 		Username:    m.Username,
 		Email:       m.Email,
 		IsTemporary: m.IsTemporary,
+		IconUrl:     m.IconUrl,
 	}, nil
 }

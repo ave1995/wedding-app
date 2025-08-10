@@ -2,10 +2,13 @@ package mongodb
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"log/slog"
 	"time"
 	"wedding-app/config"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -42,4 +45,16 @@ func ConnectClient(ctx context.Context, logger *slog.Logger, config config.Store
 
 func GetDatabase(client *mongo.Client, name string) *mongo.Database {
 	return client.Database(name)
+}
+
+func getByFilter[T any](ctx context.Context, collection *mongo.Collection, filter bson.M) (*T, error) {
+	var result T
+	err := collection.FindOne(ctx, filter).Decode(&result)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, mongo.ErrNoDocuments
+		}
+		return nil, fmt.Errorf("find by filter failed: %w", err)
+	}
+	return &result, nil
 }

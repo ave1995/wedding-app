@@ -28,20 +28,21 @@ func (s *userStore) usersCollection() *mongo.Collection {
 	return s.database.Collection(UsersCollection)
 }
 
-func (s *userStore) RegisterUser(ctx context.Context, username, email, password string) (*model.User, error) {
+func (s *userStore) RegisterUser(ctx context.Context, params model.RegisterUserParams) (*model.User, error) {
 	collection := s.usersCollection()
 
-	hashedPass, err := utils.HashPassword(password)
+	hashedPass, err := utils.HashPassword(params.Password)
 	if err != nil {
 		return nil, err
 	}
 
 	mongoUser := &user{
 		ID:          uuid.NewString(),
-		Username:    username,
-		Email:       email,
+		Username:    params.Username,
+		Email:       params.Email,
 		Password:    hashedPass,
 		IsTemporary: false,
+		IconUrl:     params.IconURL,
 	}
 
 	_, err = collection.InsertOne(ctx, mongoUser)
@@ -79,6 +80,21 @@ func (s *userStore) LoginUser(ctx context.Context, email string, password string
 	user, err := mongoUser.ToDomain()
 	if err != nil {
 		return nil, err
+	}
+
+	return user, nil
+}
+
+// GetUserByID implements store.UserStore.
+func (s *userStore) GetUserByID(ctx context.Context, id uuid.UUID) (*model.User, error) {
+	result, err := getByFilter[user](ctx, s.usersCollection(), bson.M{userFieldID: id.String()})
+	if err != nil {
+		return nil, fmt.Errorf("failed to find user: %w", err)
+	}
+
+	user, err := result.ToDomain()
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert user to domain model: %w", err)
 	}
 
 	return user, nil

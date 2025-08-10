@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 	"time"
+	"wedding-app/domain/model"
 	"wedding-app/domain/service"
 
 	"github.com/gin-gonic/gin"
@@ -44,7 +45,13 @@ func (h *UserHandler) registerUser(c *gin.Context) {
 		return
 	}
 
-	user, err := h.userService.RegisterUser(c, req.Username, req.Email, req.Password)
+	user, err := h.userService.RegisterUser(
+		c,
+		model.RegisterUserParams{
+			Username: req.Username,
+			Email:    req.Email,
+			Password: req.Password,
+			IconURL:  req.IconUrl})
 	if err != nil {
 		c.Error(NewInternalAPIError(err))
 		return

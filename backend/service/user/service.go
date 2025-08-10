@@ -6,6 +6,8 @@ import (
 	"wedding-app/domain/model"
 	"wedding-app/domain/service"
 	"wedding-app/domain/store"
+
+	"github.com/google/uuid"
 )
 
 type userService struct {
@@ -16,8 +18,8 @@ func NewUserService(store store.UserStore) service.UserService {
 	return &userService{store: store}
 }
 
-func (s *userService) RegisterUser(ctx context.Context, username, email, password string) (*model.User, error) {
-	return s.store.RegisterUser(ctx, username, email, password)
+func (s *userService) RegisterUser(ctx context.Context, params model.RegisterUserParams) (*model.User, error) {
+	return s.store.RegisterUser(ctx, params)
 }
 
 // LoginUser implements service.UserService.
@@ -28,4 +30,14 @@ func (s *userService) LoginUser(ctx context.Context, email string, password stri
 	}
 
 	return user, nil
+}
+
+// GetUserByID implements service.UserService.
+func (s *userService) GetUserByID(ctx context.Context, id string) (*model.User, error) {
+	parsed, err := uuid.Parse(id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse id %q: %w", id, err)
+	}
+
+	return s.store.GetUserByID(ctx, parsed)
 }
