@@ -1,7 +1,6 @@
 package restapi
 
 import (
-	"fmt"
 	"net/http"
 	"wedding-app/domain/service"
 
@@ -84,20 +83,17 @@ func (h *QuizHandler) joinQuiz(c *gin.Context) {
 		return
 	}
 
-	// TODO: check if User is authenticated
-	token, err := c.Cookie(CookieAccessTokenName)
-	if err != nil {
-		c.JSON(http.StatusOK, quiz)
-		return
+	authenticated := false
+	token, err := c.Cookie(CookieAccessTokenName) // Trying get acces token
+	if err == nil {                               // I did find it
+		_, verifyErr := h.jwtService.Verify(token) // Trying verify access token
+		authenticated = (verifyErr == nil)         // Without error then I know it's authenticated
 	}
 
-	_, err = h.jwtService.Verify(token)
-	if err != nil {
-		c.JSON(http.StatusOK, quiz)
-		return
-	}
-
-	c.Redirect(http.StatusFound, fmt.Sprintf("/quiz/%d", quiz.ID))
+	c.JSON(http.StatusOK, gin.H{
+		"quiz":          quiz,
+		"authenticated": authenticated,
+	})
 }
 
 // getQuiz godoc

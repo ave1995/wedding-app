@@ -9,28 +9,47 @@ import Button from "../components/Button";
 import type { Quiz } from "../models/Quiz";
 import { apiUrl } from "../functions/api";
 
+type InviteQuizResult = {
+  quiz: Quiz;
+  authenticated: boolean;
+};
+
 function InvitePage() {
   const [searchParams] = useSearchParams();
   const code = searchParams.get("code");
   const navigate = useNavigate();
 
+  const [quiz, setQuiz] = useState<Quiz | null>(null);
+
   //OnMount
   useEffect(() => {
     if (code) {
       async function fetchQuiz() {
-        const result = await get<Quiz>(apiUrl("/auth/join-quiz"), {
-          invite: code,
-        }, true);
-
+        // Trying get quiz and also check if i am authenticated
+        const result = await get<InviteQuizResult>(
+          apiUrl("/auth/join-quiz"),
+          {
+            invite: code,
+          },
+          true
+        );
+        // Check If I didn't find quiz
         if (result.error) {
           console.error(result.error);
           navigate("/not-found");
         }
-
+        // I know I find it so lets save it
+        setQuiz(result.data!.quiz);
+        // Check if I am authenticated and if so, let's go straight to the quiz
+        if (result.data!.authenticated) {
+          navigate(`/quiz/${quiz!.ID}`, {
+            state: { quiz: quiz! },
+          });
+        }
       }
       fetchQuiz();
     } else {
-      console.error("No code from you!")
+      console.error("No code from you!");
       navigate("/not-found");
     }
   }, [code, navigate]);

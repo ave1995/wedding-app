@@ -4,6 +4,7 @@ import HomePage from "./pages/HomePage";
 import InvitePage from "./pages/InvitePage";
 import NotFoundPage from "./pages/NotFound";
 import LoginPage from "./pages/LoginPage";
+import QuizPage from "./pages/QuizPage";
 
 function App() {
   return (
@@ -12,8 +13,9 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/invite" element={<InvitePage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/quiz/:quizId" element={<QuizPage />} />
 
-        <Route path="*" element={<NotFoundPage />}></Route>
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   );
