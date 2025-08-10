@@ -2,7 +2,6 @@ package mongodb
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"wedding-app/domain/model"
 	"wedding-app/domain/store"
@@ -49,33 +48,21 @@ func (s *quizStore) CreateQuiz(ctx context.Context, name string) (*model.Quiz, e
 	return quiz, nil
 }
 
-const FilterTypeInviteCode = "Invite Code"
-
 // GetQuizByInviteCode implements store.QuizStore.
-func (s *quizStore) GetQuizByInviteCode(ctx context.Context, inviteCode string) (*model.Quiz, error) {
-	filter := bson.M{quizFieldInviteCode: inviteCode}
-	return s.getQuizByFilter(ctx, filter, FilterTypeInviteCode, inviteCode)
+func (s *quizStore) GetQuizByInviteCode(ctx context.Context, inviteCode uuid.UUID) (*model.Quiz, error) {
+	return s.getQuizByFilter(ctx, bson.M{quizFieldInviteCode: inviteCode.String()})
 }
 
-const FilterTypeID = "ID"
-
 // GetQuizByID implements store.QuizStore.
-func (s *quizStore) GetQuizByID(ctx context.Context, id string) (*model.Quiz, error) {
-	filter := bson.M{quizFieldID: id}
-	return s.getQuizByFilter(ctx, filter, FilterTypeID, id)
+func (s *quizStore) GetQuizByID(ctx context.Context, id uuid.UUID) (*model.Quiz, error) {
+	return s.getQuizByFilter(ctx, bson.M{quizFieldID: id.String()})
 }
 
 // getQuizByFilter is a helper that encapsulates shared quiz get logic.
-func (s *quizStore) getQuizByFilter(ctx context.Context, filter bson.M, filterType string, filterValue string) (*model.Quiz, error) {
-	collection := s.quizzesCollection()
-
-	var result quiz
-	err := collection.FindOne(ctx, filter).Decode(&result)
+func (s *quizStore) getQuizByFilter(ctx context.Context, filter bson.M) (*model.Quiz, error) {
+	result, err := getByFilter[quiz](ctx, s.quizzesCollection(), filter)
 	if err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, nil
-		}
-		return nil, fmt.Errorf("failed to find quiz by %s %q: %w", filterType, filterValue, err)
+		return nil, fmt.Errorf("failed to find quiz: %w", err)
 	}
 
 	quiz, err := result.ToDomain()

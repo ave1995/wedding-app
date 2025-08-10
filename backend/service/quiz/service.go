@@ -25,18 +25,20 @@ func (q *quizService) CreateQuiz(ctx context.Context, name string) (*model.Quiz,
 
 // GetQuizByInviteCode implements service.QuizService.
 func (q *quizService) GetQuizByInviteCode(ctx context.Context, inviteCode string) (*model.Quiz, error) {
-	if err := uuid.Validate(inviteCode); err != nil {
-		return nil, fmt.Errorf("invalid invite code %q: %w", inviteCode, err)
+	parsed, err := uuid.Parse(inviteCode)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse invite code %q: %w", inviteCode, err)
 	}
 
-	return q.store.GetQuizByInviteCode(ctx, inviteCode)
+	return q.store.GetQuizByInviteCode(ctx, parsed)
 }
 
 // GetQuizByID implements service.QuizService.
 func (q *quizService) GetQuizByID(ctx context.Context, id string) (*model.Quiz, error) {
-	if err := uuid.Validate(id); err != nil {
-		return nil, fmt.Errorf("invalid invite code %q: %w", id, err)
+	parsed, err := uuid.Parse(id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse id %q: %w", id, err)
 	}
 
-	return q.store.GetQuizByID(ctx, id)
+	return q.store.GetQuizByID(ctx, parsed)
 }

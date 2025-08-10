@@ -10,5 +10,5 @@ type AccessToken struct {
 	Token     string
 	ExpiresAt time.Time
 	UserID    uuid.UUID
-	// Role      string
+	IsGuest   bool
 }

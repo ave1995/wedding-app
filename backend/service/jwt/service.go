@@ -2,7 +2,6 @@ package jwt
 
 import (
 	"fmt"
-	"log"
 	"log/slog"
 	"time"
 	"wedding-app/config"
@@ -25,8 +24,8 @@ func NewJWTService(config config.AuthConfig, logger *slog.Logger) service.JWTSer
 }
 
 type claims struct {
-	UserID string `json:"UserID"`
-	// Role   string `json:"role"`
+	UserID  string `json:"UserID"`
+	IsGuest bool   `json:"IsGuest"`
 	jwt.RegisteredClaims
 }
 
@@ -35,7 +34,8 @@ func (j *jwtService) Generate(user *model.User) (*model.AccessToken, error) {
 	expiresAt := time.Now().Add(j.tokenDuration)
 
 	claims := claims{
-		UserID: user.ID.String(),
+		UserID:  user.ID.String(),
+		IsGuest: user.IsGuest,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expiresAt),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -53,7 +53,6 @@ func (j *jwtService) Generate(user *model.User) (*model.AccessToken, error) {
 	accessToken := &model.AccessToken{
 		Token:     signedToken,
 		ExpiresAt: expiresAt,
-		UserID:    user.ID,
 	}
 
 	return accessToken, nil
@@ -61,16 +60,17 @@ func (j *jwtService) Generate(user *model.User) (*model.AccessToken, error) {
 
 // Verify implements service.JWTService.
 func (j *jwtService) Verify(tokenString string) (*model.AccessToken, error) {
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
+	claims := &claims{}
+
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (any, error) {
 		return []byte(j.secretKey), nil
 	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
 	if err != nil {
-		log.Fatal(err)
+		return nil, fmt.Errorf("token not parsed: %w", err)
 	}
 
-	claims, ok := token.Claims.(*claims)
-	if !ok || !token.Valid {
-		return nil, fmt.Errorf("invalid token")
+	if !token.Valid {
+		return nil, fmt.Errorf("token is not valid")
 	}
 
 	userID, err := uuid.Parse(claims.UserID)
@@ -82,7 +82,7 @@ func (j *jwtService) Verify(tokenString string) (*model.AccessToken, error) {
 		Token:     tokenString,
 		ExpiresAt: claims.ExpiresAt.Time,
 		UserID:    userID,
-		// Role:      claims.Role,
+		IsGuest:   claims.IsGuest,
 	}
 
 	return accessToken, nil

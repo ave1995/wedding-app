@@ -9,16 +9,20 @@ import (
 
 type QuizHandler struct {
 	quizService service.QuizService
+	jwtService  service.JWTService
 }
 
-func NewQuizHandler(qs service.QuizService) *QuizHandler {
-	return &QuizHandler{quizService: qs}
+func NewQuizHandler(qs service.QuizService, js service.JWTService) *QuizHandler {
+	return &QuizHandler{quizService: qs, jwtService: js}
 }
 
 func (h *QuizHandler) Register(router *gin.RouterGroup) {
 	router.POST("/create-quiz", h.createQuiz)
-	router.GET("/join-quiz", h.joinQuiz)
 	router.GET("/quiz/:id", h.getQuiz)
+}
+
+func (h *QuizHandler) RegisterAnonymous(router *gin.RouterGroup) {
+	router.GET("/join-quiz", h.joinQuiz)
 }
 
 // createQuiz godoc
@@ -26,7 +30,9 @@ func (h *QuizHandler) Register(router *gin.RouterGroup) {
 //	@Summary		Register a new quiz
 //	@Description	Create a quiz with name
 //	@Tags			quiz
-//	@Security BearerAuth
+//
+// @Security CookieAuth
+//
 //	@Accept			json
 //	@Produce		json
 //	@Param			quiz	body		CreateQuizRequest	true	"Quiz info"
@@ -77,14 +83,24 @@ func (h *QuizHandler) joinQuiz(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, quiz)
+	authenticated := false
+	token, err := c.Cookie(CookieAccessTokenName) // Trying get acces token
+	if err == nil {                               // I did find it
+		_, verifyErr := h.jwtService.Verify(token) // Trying verify access token
+		authenticated = (verifyErr == nil)         // Without error then I know it's authenticated
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"quiz":          quiz,
+		"authenticated": authenticated,
+	})
 }
 
 // getQuiz godoc
 // @Summary Get a quiz by ID
 // @Description Retrieve a single quiz by its ID
 // @Tags quiz
-// @Security BearerAuth
+// @Security CookieAuth
 // @Produce json
 // @Param id path string true "Quiz ID"
 // @Success 200 {object} model.Quiz

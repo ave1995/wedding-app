@@ -26,6 +26,17 @@ definitions:
     required:
     - name
     type: object
+  restapi.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 6
+        type: string
+    required:
+    - email
+    - password
+    type: object
   restapi.RegisterRequest:
     properties:
       email:
@@ -75,7 +86,7 @@ paths:
               type: string
             type: object
       security:
-      - BearerAuth: []
+      - CookieAuth: []
       summary: Register a new quiz
       tags:
       - quiz
@@ -151,10 +162,46 @@ paths:
               type: string
             type: object
       security:
-      - BearerAuth: []
+      - CookieAuth: []
       summary: Get a quiz by ID
       tags:
       - quiz
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login with with email and password
+      parameters:
+      - description: User info
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/restapi.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Login a existing user
+      tags:
+      - auth
   /auth/register:
     post:
       consumes:
@@ -189,4 +236,9 @@ paths:
       summary: Register a new user
       tags:
       - auth
+securityDefinitions:
+  CookieAuth:
+    in: cookie
+    name: access_token
+    type: apiKey
 swagger: "2.0"

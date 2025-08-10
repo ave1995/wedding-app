@@ -27,7 +27,7 @@ swag:
 
 go:
 	@echo "Running Go app from backend/ with .env"
-	@bash -c 'set -a; source .env; set +a; cd backend && go run main.go'
+	@bash -c 'set -a; source .env; export GOOGLE_APPLICATION_CREDENTIALS=$(GOOGLE_CREDS); set +a; cd backend && go run main.go'
 
 GO_BUILD_NAME=my-go-app
 
@@ -124,17 +124,20 @@ terraform-init:
 terraform-apply:
 	cd $(TF_DIR) && GOOGLE_APPLICATION_CREDENTIALS=$(GOOGLE_CREDS) terraform apply -var-file="$(TF_VARS)" -auto-approve
 
+ICONS_BUCKET	:= $(shell grep user_icon_name $(TF_DIR)/$(TF_VARS) | cut -d'"' -f2)
+ICONS_DIR=icons
+
+upload-icons:
+	gsutil -m cp $(ICONS_DIR)/*.svg gs://$(ICONS_BUCKET)/
+	gsutil setmeta -h "Content-Type:image/svg+xml" gs://$(ICONS_BUCKET)/*.svg
+
 terraform-destroy:
 	gcloud run services delete $(IMAGE) --region=$(REGION) --project=$(GCP_PROJECT_ID);
 
 ## Run everything in order
-deploy: create-service-account create-credentials create-backend-bucket terraform-init build push terraform-apply
+deploy: create-service-account create-credentials create-backend-bucket terraform-init build push terraform-apply upload-icons
 
 CREDENTIALS_PATH := /Users/ave/wedding-app/credentials.json
-
-set-google-credentials:
-	export GOOGLE_APPLICATION_CREDENTIALS=$(CREDENTIALS_PATH)    
-
 
 .PHONY: \
 	create-service-account \

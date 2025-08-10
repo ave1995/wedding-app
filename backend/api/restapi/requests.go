@@ -4,6 +4,18 @@ type RegisterRequest struct {
 	Username string `json:"username" binding:"required"`
 	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password" binding:"required,min=6"`
+	IconUrl  string `json:"iconurl" binding:"required"`
+}
+
+type LoginRequest struct {
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required,min=6"`
+}
+
+type CreateGuestRequest struct {
+	Username string `json:"username" binding:"required"`
+	IconUrl  string `json:"iconurl" binding:"required"`
+	QuizID   string `json:"quizID" binding:"required"`
 }
 
 type CreateQuizRequest struct {

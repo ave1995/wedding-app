@@ -2,6 +2,7 @@ package factory
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"sync"
@@ -11,9 +12,12 @@ import (
 	"wedding-app/domain/store"
 	"wedding-app/service/jwt"
 	"wedding-app/service/quiz"
+	"wedding-app/service/svg"
 	"wedding-app/service/user"
+	googlecloud "wedding-app/store/googleCloud"
 	"wedding-app/store/mongodb"
 
+	"cloud.google.com/go/storage"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -43,6 +47,18 @@ type Factory struct {
 	quizService     service.QuizService
 	quizServiceOnce sync.Once
 	quizServiceErr  error
+
+	googleCloudClient *storage.Client
+	svgStore          store.SvgStore
+	svgStoreOnce      sync.Once
+	svgStoreErr       error
+
+	svgService     service.SvgService
+	svgServiceOnce sync.Once
+	svgServiceErr  error
+
+	jwtService     service.JWTService
+	jwtServiceOnce sync.Once
 
 	ginHandlers      *restapi.GinHandlers
 	ginHandlersOnce  sync.Once
@@ -126,27 +142,62 @@ func (f *Factory) QuizService(ctx context.Context) (service.QuizService, error) 
 	return f.quizService, f.quizServiceErr
 }
 
+func (f *Factory) SvgStore(ctx context.Context) (store.SvgStore, error) {
+	f.svgStoreOnce.Do(func() {
+		var client *storage.Client
+		client, f.svgStoreErr = googlecloud.ConnectClient(ctx)
+		if f.svgStoreErr != nil {
+			return
+		}
+
+		f.svgStore = googlecloud.NewCloud(client, f.config.BucketConfig(), f.Logger())
+	})
+	return f.svgStore, f.svgStoreErr
+}
+
+func (f *Factory) SvgService(ctx context.Context) (service.SvgService, error) {
+	f.svgServiceOnce.Do(func() {
+		store, err := f.SvgStore(ctx)
+		if err != nil {
+			f.svgServiceErr = fmt.Errorf("failed to initialize svg service: %w", err)
+			return
+		}
+		f.svgService = svg.NewSvgService(store)
+	})
+	return f.svgService, f.svgServiceErr
+}
+
+func (f *Factory) JWTService() service.JWTService {
+	f.jwtServiceOnce.Do(func() {
+		f.jwtService = jwt.NewJWTService(f.config.AuthConfig(), f.Logger())
+	})
+	return f.jwtService
+}
+
 func (f *Factory) GinHandlers(ctx context.Context) (*restapi.GinHandlers, error) {
 	f.ginHandlersOnce.Do(func() {
-		basicHandler := restapi.NewBasicHandler()
+		var svgService service.SvgService
+		svgService, f.ginHandlersError = f.SvgService(ctx)
+		if f.ginHandlersError != nil {
+			return
+		}
+		basicHandler := restapi.NewBasicHandler(svgService)
 
 		var userService service.UserService
 		userService, f.ginHandlersError = f.UserService(ctx)
 		if f.ginHandlersError != nil {
 			return
 		}
-		userHandler := restapi.NewUserHandler(userService)
+		userHandler := restapi.NewUserHandler(userService, f.JWTService(), f.Logger())
 
 		var quizService service.QuizService
 		quizService, f.ginHandlersError = f.QuizService(ctx)
 		if f.ginHandlersError != nil {
 			return
 		}
-		quizHandler := restapi.NewQuizHandler(quizService)
+		quizHandler := restapi.NewQuizHandler(quizService, f.JWTService())
 
-		jwtService := jwt.NewJWTService(f.config.AuthConfig(), f.Logger())
-
-		authMiddleware := restapi.AuthMiddleware(jwtService)
+		authMiddleware := restapi.AuthMiddleware(f.JWTService())
 
 		f.ginHandlers, f.ginHandlersError = restapi.NewGinHandlers(userHandler, basicHandler, quizHandler, authMiddleware)
 	})
