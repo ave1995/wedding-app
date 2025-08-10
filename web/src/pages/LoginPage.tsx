@@ -2,8 +2,8 @@ import { useState } from "react";
 import InputText from "../components/input_text/InputText";
 import Button from "../components/Button";
 import { post } from "../functions/fetch";
-import type { AccessToken } from "../models/AccessToken";
 import { apiUrl } from "../functions/api";
+import type { SimpleResponse } from "../models/SimpleResponse";
 
 function LoginPage() {
   // Input Text state
@@ -12,7 +12,7 @@ function LoginPage() {
   const [passwordValue, setPasswordValue] = useState("");
 
   async function handleJoin() {
-    const result = await post<AccessToken>(
+    const result = await post<SimpleResponse>(
       apiUrl("/auth/login"),
       {},
       {
@@ -21,6 +21,12 @@ function LoginPage() {
       },
       true
     );
+
+    if (result.error) {
+      console.error(result.error);
+    } else {
+      console.log(result.data);
+    }
   }
 
   return (

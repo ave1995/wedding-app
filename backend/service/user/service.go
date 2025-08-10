@@ -41,3 +41,16 @@ func (s *userService) GetUserByID(ctx context.Context, id string) (*model.User, 
 
 	return s.store.GetUserByID(ctx, parsed)
 }
+
+// CreateGuest implements service.UserService.
+func (s *userService) CreateGuest(ctx context.Context, params model.CreateGuestParams) (*model.User, error) {
+	if err := uuid.Validate(params.QuizID); err != nil {
+		return nil, fmt.Errorf("quiz ID is invalid: %w", err)
+	}
+	user, err := s.store.CreateGuest(ctx, params)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create guest %q: %w", params.Username, err)
+	}
+
+	return user, nil
+}

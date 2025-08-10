@@ -23,6 +23,7 @@ func NewUserHandler(us service.UserService, js service.JWTService, logger *slog.
 func (h *UserHandler) Register(router *gin.RouterGroup) {
 	router.POST("/register", h.registerUser)
 	router.POST("/login", h.loginUser)
+	router.POST("/create-guest", h.createGuest)
 }
 
 // registerUser godoc
@@ -88,20 +89,46 @@ func (h *UserHandler) loginUser(c *gin.Context) {
 		return
 	}
 
+	h.handleAuthentication(c, user, "Login successful")
+}
+
+func (h *UserHandler) createGuest(c *gin.Context) {
+	var req CreateGuestRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.Error(NewInvalidRequestPayloadAPIError(err))
+		return
+	}
+
+	user, err := h.userService.CreateGuest(
+		c,
+		model.CreateGuestParams{
+			Username: req.Username,
+			IconUrl:  req.IconUrl,
+			QuizID:   req.QuizID})
+	if err != nil {
+		c.Error(NewInternalAPIError(err))
+		return
+	}
+
+	h.handleAuthentication(c, user, "Guest created successful")
+}
+
+func (h *UserHandler) handleAuthentication(c *gin.Context, user *model.User, message string) {
 	accessToken, err := h.jwtService.Generate(user)
 	if err != nil {
 		c.Error(NewInternalAPIError(err))
 		return
 	}
 
-	h.logger.Info("Login successful",
+	h.logger.Info("Authentication successful",
 		slog.String("token", accessToken.Token),
 		slog.Time("duration", accessToken.ExpiresAt))
 
 	c.SetCookie(
 		CookieAccessTokenName,
 		accessToken.Token,
-		int(time.Until(accessToken.ExpiresAt).Seconds()), // cookie lifetime
+		int(time.Until(accessToken.ExpiresAt).Seconds()),
 		"/",   // path
 		"",    // domain ("" works for localhost)
 		false, // secure (HTTPS only)
@@ -109,6 +136,6 @@ func (h *UserHandler) loginUser(c *gin.Context) {
 	)
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Login successful",
+		"message": message,
 	})
 }

@@ -24,8 +24,8 @@ func NewJWTService(config config.AuthConfig, logger *slog.Logger) service.JWTSer
 }
 
 type claims struct {
-	UserID string `json:"UserID"`
-	// Role   string `json:"role"`
+	UserID  string `json:"UserID"`
+	IsGuest bool   `json:"IsGuest"`
 	jwt.RegisteredClaims
 }
 
@@ -34,7 +34,8 @@ func (j *jwtService) Generate(user *model.User) (*model.AccessToken, error) {
 	expiresAt := time.Now().Add(j.tokenDuration)
 
 	claims := claims{
-		UserID: user.ID.String(),
+		UserID:  user.ID.String(),
+		IsGuest: user.IsGuest,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expiresAt),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -81,7 +82,7 @@ func (j *jwtService) Verify(tokenString string) (*model.AccessToken, error) {
 		Token:     tokenString,
 		ExpiresAt: claims.ExpiresAt.Time,
 		UserID:    userID,
-		// Role:      claims.Role,
+		IsGuest:   claims.IsGuest,
 	}
 
 	return accessToken, nil

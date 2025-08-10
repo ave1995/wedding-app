@@ -29,34 +29,46 @@ func (s *userStore) usersCollection() *mongo.Collection {
 }
 
 func (s *userStore) RegisterUser(ctx context.Context, params model.RegisterUserParams) (*model.User, error) {
-	collection := s.usersCollection()
-
 	hashedPass, err := utils.HashPassword(params.Password)
 	if err != nil {
 		return nil, err
 	}
 
 	mongoUser := &user{
-		ID:          uuid.NewString(),
-		Username:    params.Username,
-		Email:       params.Email,
-		Password:    hashedPass,
-		IsTemporary: false,
-		IconUrl:     params.IconURL,
+		ID:       uuid.NewString(),
+		Username: params.Username,
+		Email:    params.Email,
+		Password: hashedPass,
+		IsGuest:  false,
+		IconUrl:  params.IconURL,
 	}
 
-	_, err = collection.InsertOne(ctx, mongoUser)
+	return s.insertUser(ctx, mongoUser)
+}
+
+// CreateGuest implements store.UserStore.
+func (s *userStore) CreateGuest(ctx context.Context, params model.CreateGuestParams) (*model.User, error) {
+	mongoUser := &user{
+		ID:       uuid.NewString(),
+		Username: params.Username,
+		IconUrl:  params.IconUrl,
+		IsGuest:  true,
+		QuizID:   params.QuizID,
+	}
+
+	return s.insertUser(ctx, mongoUser)
+}
+
+func (s *userStore) insertUser(ctx context.Context, u *user) (*model.User, error) {
+	collection := s.usersCollection()
+
+	_, err := collection.InsertOne(ctx, u)
 	if err != nil {
-		s.logger.Error("failed to insert one to: %w", utils.ErrAttr(err), slog.Any("user", mongoUser))
+		s.logger.Error("failed to insert one to: %w", utils.ErrAttr(err), slog.Any("user", u))
 		return nil, err
 	}
 
-	user, err := mongoUser.ToDomain()
-	if err != nil {
-		return nil, err
-	}
-
-	return user, nil
+	return u.ToDomain()
 }
 
 // LoginUser implements store.UserStore.

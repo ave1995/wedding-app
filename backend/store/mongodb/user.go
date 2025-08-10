@@ -7,18 +7,19 @@ import (
 )
 
 type user struct {
-	ID          string `bson:"_id"`
-	Username    string `bson:"username"`
-	Email       string `bson:"email,omitempty"`
-	IsTemporary bool   `bson:"isTemporary"`
-	Password    string `bson:"password"`
-	IconUrl     string `bson:"iconUrl"`
+	ID       string `bson:"_id"`
+	Username string `bson:"username"`
+	Email    string `bson:"email,omitempty"`
+	Password string `bson:"password"`
+	IconUrl  string `bson:"iconUrl"`
+	IsGuest  bool   `bson:"isGuest"`
+	QuizID   string `bson:"quizId,omitempty"`
 }
 
 const (
-	userFieldID          = "_id"
-	userFieldEmail       = "email"
-	userFieldIsTemporary = "isTemporary"
+	userFieldID      = "_id"
+	userFieldEmail   = "email"
+	userFieldIsGuest = "isGuest"
 )
 
 func (m *user) ToDomain() (*model.User, error) {
@@ -26,12 +27,17 @@ func (m *user) ToDomain() (*model.User, error) {
 	if err != nil {
 		return nil, err
 	}
+	quizID, err := uuid.Parse(m.QuizID)
+	if err != nil {
+		return nil, err
+	}
 
 	return &model.User{
-		ID:          id,
-		Username:    m.Username,
-		Email:       m.Email,
-		IsTemporary: m.IsTemporary,
-		IconUrl:     m.IconUrl,
+		ID:       id,
+		Username: m.Username,
+		Email:    m.Email,
+		IsGuest:  m.IsGuest,
+		IconUrl:  m.IconUrl,
+		QuizID:   quizID,
 	}, nil
 }

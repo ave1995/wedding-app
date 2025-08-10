@@ -12,6 +12,12 @@ type LoginRequest struct {
 	Password string `json:"password" binding:"required,min=6"`
 }
 
+type CreateGuestRequest struct {
+	Username string `json:"username" binding:"required"`
+	IconUrl  string `json:"iconurl" binding:"required"`
+	QuizID   string `json:"quizID" binding:"required"`
+}
+
 type CreateQuizRequest struct {
 	Name string `json:"name" binding:"required"`
 }

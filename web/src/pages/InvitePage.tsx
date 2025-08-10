@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { get } from "../functions/fetch";
+import { get, post } from "../functions/fetch";
 import InputText from "../components/input_text/InputText";
 import IconSelector, {
   type SvgItem,
@@ -8,6 +8,7 @@ import IconSelector, {
 import Button from "../components/Button";
 import type { Quiz } from "../models/Quiz";
 import { apiUrl } from "../functions/api";
+import type { SimpleResponse } from "../models/SimpleResponse";
 
 type InviteQuizResult = {
   quiz: Quiz;
@@ -24,8 +25,8 @@ function InvitePage() {
   //OnMount
   useEffect(() => {
     if (code) {
-      async function fetchQuiz() {
-        // Trying get quiz and also check if i am authenticated
+      async function joinQuiz() {
+        // Trying get quiz and also check if i'm authenticated
         const result = await get<InviteQuizResult>(
           apiUrl("/auth/join-quiz"),
           {
@@ -40,14 +41,14 @@ function InvitePage() {
         }
         // I know I find it so lets save it
         setQuiz(result.data!.quiz);
-        // Check if I am authenticated and if so, let's go straight to the quiz
+        // Check if I'm authenticated and if so, let's go straight to the quiz
         if (result.data!.authenticated) {
           navigate(`/quiz/${quiz!.ID}`, {
             state: { quiz: quiz! },
           });
         }
       }
-      fetchQuiz();
+      joinQuiz();
     } else {
       console.error("No code from you!");
       navigate("/not-found");
@@ -61,7 +62,28 @@ function InvitePage() {
   // Input Text state
   const [inputValue, setInputValue] = useState("");
 
-  async function handleJoin() {}
+  // TODO: add validation
+  async function handleJoin() {
+    const result = await post<SimpleResponse>(
+      apiUrl("/auth/create-guest"),
+      {},
+      {
+        username: inputValue,
+        iconurl: selectedIcon!.URL,
+        quizID: quiz!.ID,
+      },
+      true
+    );
+
+    if (result.error) {
+      console.error(result.error);
+    } else {
+      console.log(result.data);
+      navigate(`/quiz/${quiz!.ID}`, {
+        state: { quiz: quiz! },
+      });
+    }
+  }
 
   return (
     <div>
