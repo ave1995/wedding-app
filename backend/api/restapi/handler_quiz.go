@@ -90,6 +90,7 @@ func (h *QuizHandler) joinQuiz(c *gin.Context) {
 		authenticated = (verifyErr == nil)         // Without error then I know it's authenticated
 	}
 
+	// TODO: work differently with response, use unauthorized
 	c.JSON(http.StatusOK, gin.H{
 		"quiz":          quiz,
 		"authenticated": authenticated,
