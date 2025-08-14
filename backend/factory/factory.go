@@ -48,6 +48,22 @@ type Factory struct {
 	quizServiceOnce sync.Once
 	quizServiceErr  error
 
+	questionStore     store.QuestionStore
+	questionStoreOnce sync.Once
+	questionStoreErr  error
+
+	questionService     service.QuestionService
+	questionServiceOnce sync.Once
+	questionServiceErr  error
+
+	answerStore     store.AnswerStore
+	answerStoreOnce sync.Once
+	answerStoreErr  error
+
+	anwserService     service.AnswerService
+	answerServiceOnce sync.Once
+	answerServiceErr  error
+
 	googleCloudClient *storage.Client
 	svgStore          store.SvgStore
 	svgStoreOnce      sync.Once
