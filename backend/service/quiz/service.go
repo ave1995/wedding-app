@@ -29,7 +29,6 @@ func (q *quizService) GetQuizByInviteCode(ctx context.Context, inviteCode string
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse invite code %q: %w", inviteCode, err)
 	}
-
 	return q.store.GetQuizByInviteCode(ctx, parsed)
 }
 
@@ -37,8 +36,7 @@ func (q *quizService) GetQuizByInviteCode(ctx context.Context, inviteCode string
 func (q *quizService) GetQuizByID(ctx context.Context, id string) (*model.Quiz, error) {
 	parsed, err := uuid.Parse(id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse id %q: %w", id, err)
+		return nil, fmt.Errorf("failed to parse ID %q: %w", id, err)
 	}
-
 	return q.store.GetQuizByID(ctx, parsed)
 }
