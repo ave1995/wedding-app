@@ -14,7 +14,7 @@ type anwserService struct {
 	answerStore store.AnswerStore
 }
 
-func NewAnswerServoce(answerStore store.AnswerStore) service.AnswerService {
+func NewAnswerService(answerStore store.AnswerStore) service.AnswerService {
 	return &anwserService{answerStore: answerStore}
 }
 
