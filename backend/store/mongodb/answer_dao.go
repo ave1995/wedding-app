@@ -6,6 +6,7 @@ import (
 	"wedding-app/domain/store"
 
 	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -24,16 +25,22 @@ func (s *answerStore) answersCollection() *mongo.Collection {
 }
 
 // CreateAnswer implements store.AnswerStore.
-func (s *answerStore) CreateAnswer(ctx context.Context, text string, questionID uuid.UUID) (*model.Answer, error) {
-	panic("unimplemented")
+func (s *answerStore) CreateAnswer(ctx context.Context, text string, questionID uuid.UUID, isCorrect bool) (*model.Answer, error) {
+	mongoAnswer := &answer{
+		ID:         uuid.NewString(),
+		QuestionID: questionID.String(),
+		Text:       text,
+		IsCorrect:  isCorrect,
+	}
+	return createAndConvert(ctx, s.answersCollection(), mongoAnswer)
 }
 
 // GetAnswerByID implements store.AnswerStore.
 func (s *answerStore) GetAnswerByID(ctx context.Context, id uuid.UUID) (*model.Answer, error) {
-	panic("unimplemented")
+	return getByFilterAndConvert[*answer](ctx, s.answersCollection(), bson.M{AnswerFieldID: id.String()})
 }
 
 // GetAnswersByQuestionID implements store.AnswerStore.
 func (s *answerStore) GetAnswersByQuestionID(ctx context.Context, questionID uuid.UUID) ([]*model.Answer, error) {
-	panic("unimplemented")
+	return getManyByFilterAndConvert[*answer](ctx, s.answersCollection(), bson.M{AnswerFieldQuestionID: questionID.String()})
 }

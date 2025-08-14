@@ -47,8 +47,25 @@ func GetDatabase(client *mongo.Client, name string) *mongo.Database {
 	return client.Database(name)
 }
 
-func getByFilter[T any](ctx context.Context, collection *mongo.Collection, filter bson.M) (*T, error) {
-	var result T
+// getByFilter fetches a single document from a MongoDB collection that matches the given filter
+// and decodes it into the specified local model type.
+//
+// Type Parameters:
+//
+//	L - The local model type that represents the MongoDB document structure.
+//
+// Parameters:
+//
+//	ctx        - The context for managing request deadlines and cancellation.
+//	collection - The MongoDB collection to query.
+//	filter     - The BSON filter used to select the document.
+//
+// Returns:
+//
+//	A pointer to a localModel instance containing the decoded document,
+//	or an error if the query fails or no document is found.
+func getByFilter[L any](ctx context.Context, collection *mongo.Collection, filter bson.M) (*L, error) {
+	var result L
 	err := collection.FindOne(ctx, filter).Decode(&result)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -58,3 +75,5 @@ func getByFilter[T any](ctx context.Context, collection *mongo.Collection, filte
 	}
 	return &result, nil
 }
+
+const FieldID = "_id"

@@ -33,7 +33,6 @@ func (s *userStore) RegisterUser(ctx context.Context, params model.RegisterUserP
 	if err != nil {
 		return nil, err
 	}
-
 	mongoUser := &user{
 		ID:       uuid.NewString(),
 		Username: params.Username,
@@ -42,8 +41,7 @@ func (s *userStore) RegisterUser(ctx context.Context, params model.RegisterUserP
 		IsGuest:  false,
 		IconUrl:  params.IconURL,
 	}
-
-	return s.insertUser(ctx, mongoUser)
+	return createAndConvert(ctx, s.usersCollection(), mongoUser)
 }
 
 // CreateGuest implements store.UserStore.
@@ -55,20 +53,7 @@ func (s *userStore) CreateGuest(ctx context.Context, params model.CreateGuestPar
 		IsGuest:  true,
 		QuizID:   params.QuizID,
 	}
-
-	return s.insertUser(ctx, mongoUser)
-}
-
-func (s *userStore) insertUser(ctx context.Context, u *user) (*model.User, error) {
-	collection := s.usersCollection()
-
-	_, err := collection.InsertOne(ctx, u)
-	if err != nil {
-		s.logger.Error("failed to insert one to: %w", utils.ErrAttr(err), slog.Any("user", u))
-		return nil, err
-	}
-
-	return u.ToDomain()
+	return createAndConvert(ctx, s.usersCollection(), mongoUser)
 }
 
 // LoginUser implements store.UserStore.
@@ -99,15 +84,5 @@ func (s *userStore) LoginUser(ctx context.Context, email string, password string
 
 // GetUserByID implements store.UserStore.
 func (s *userStore) GetUserByID(ctx context.Context, id uuid.UUID) (*model.User, error) {
-	result, err := getByFilter[user](ctx, s.usersCollection(), bson.M{userFieldID: id.String()})
-	if err != nil {
-		return nil, fmt.Errorf("failed to find user: %w", err)
-	}
-
-	user, err := result.ToDomain()
-	if err != nil {
-		return nil, fmt.Errorf("failed to convert user to domain model: %w", err)
-	}
-
-	return user, nil
+	return getByFilterAndConvert[*user](ctx, s.usersCollection(), bson.M{UserFieldID: id.String()})
 }

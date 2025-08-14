@@ -14,6 +14,11 @@ type answer struct {
 	IsCorrect  bool   `bson:"isCorrect"`
 }
 
+const (
+	AnswerFieldID         = FieldID
+	AnswerFieldQuestionID = "questionId"
+)
+
 func (a *answer) ToDomain() (*model.Answer, error) {
 	id, err := uuid.Parse(a.ID)
 	if err != nil {

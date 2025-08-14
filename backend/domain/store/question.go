@@ -12,9 +12,3 @@ type QuestionStore interface {
 	GetQuestionByID(ctx context.Context, id uuid.UUID) (*model.Question, error)
 	GetQuestionsByQuizID(ctx context.Context, quizID uuid.UUID) ([]*model.Question, error)
 }
-
-type AnswerStore interface {
-	CreateAnswer(ctx context.Context, text string, questionID uuid.UUID) (*model.Answer, error)
-	GetAnswerByID(ctx context.Context, id uuid.UUID) (*model.Answer, error)
-	GetAnswersByQuestionID(ctx context.Context, questionID uuid.UUID) ([]*model.Answer, error)
-}

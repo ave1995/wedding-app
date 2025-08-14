@@ -17,9 +17,9 @@ type user struct {
 }
 
 const (
-	userFieldID      = "_id"
-	userFieldEmail   = "email"
-	userFieldIsGuest = "isGuest"
+	UserFieldID      = FieldID
+	UserFieldEmail   = "email"
+	UserFieldIsGuest = "isGuest"
 )
 
 func (m *user) ToDomain() (*model.User, error) {

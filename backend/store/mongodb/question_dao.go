@@ -24,16 +24,21 @@ func (s *questionStore) questionsCollection() *mongo.Collection {
 }
 
 // CreateQuestion implements store.QuestionStore.
-func (q *questionStore) CreateQuestion(ctx context.Context, text string, quizID uuid.UUID) (*model.Question, error) {
-	panic("unimplemented")
+func (s *questionStore) CreateQuestion(ctx context.Context, text string, quizID uuid.UUID) (*model.Question, error) {
+	mongoQuestion := &question{
+		ID:     uuid.NewString(),
+		QuizID: quizID.String(),
+		Text:   text,
+	}
+	return createAndConvert(ctx, s.questionsCollection(), mongoQuestion)
 }
 
 // GetQuestionByID implements store.QuestionStore.
-func (q *questionStore) GetQuestionByID(ctx context.Context, id uuid.UUID) (*model.Question, error) {
+func (s *questionStore) GetQuestionByID(ctx context.Context, id uuid.UUID) (*model.Question, error) {
 	panic("unimplemented")
 }
 
 // GetQuestionsByQuizID implements store.QuestionStore.
-func (q *questionStore) GetQuestionsByQuizID(ctx context.Context, quizID uuid.UUID) ([]*model.Question, error) {
+func (s *questionStore) GetQuestionsByQuizID(ctx context.Context, quizID uuid.UUID) ([]*model.Question, error) {
 	panic("unimplemented")
 }

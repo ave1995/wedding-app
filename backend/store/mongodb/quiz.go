@@ -14,9 +14,9 @@ type quiz struct {
 }
 
 const (
-	quizFieldID         = "_id"
-	quizFieldName       = "name"
-	quizFieldInviteCode = "inviteCode"
+	QuizFieldID         = FieldID
+	QuizFieldName       = "name"
+	QuizFieldInviteCode = "inviteCode"
 )
 
 func (m *quiz) ToDomain() (*model.Quiz, error) {
