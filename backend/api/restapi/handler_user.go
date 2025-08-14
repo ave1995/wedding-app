@@ -20,12 +20,6 @@ func NewUserHandler(us service.UserService, js service.JWTService, logger *slog.
 	return &UserHandler{userService: us, jwtService: js, logger: logger}
 }
 
-func (h *UserHandler) Register(router *gin.RouterGroup) {
-	router.POST("/register", h.registerUser)
-	router.POST("/login", h.loginUser)
-	router.POST("/create-guest", h.createGuest)
-}
-
 // registerUser godoc
 //
 //	@Summary		Register a new user

@@ -41,13 +41,19 @@ func (h *GinHandlers) RegisterAll(router *gin.Engine) {
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	basic := router.Group("/")
-	h.Basic.Register(basic)
+	basic.GET("/ping", func(c *gin.Context) {
+		c.String(200, "pong")
+	})
+	basic.GET("/user-svgs", h.Basic.getUserSvgs)
 
 	auth := router.Group("/auth")
-	h.User.Register(auth)
-	h.Quiz.RegisterAnonymous(auth)
+	auth.POST("/register", h.User.registerUser)
+	auth.POST("/login", h.User.loginUser)
+	auth.POST("/create-guest", h.User.createGuest)
+	auth.GET("/join-quiz", h.Quiz.joinQuiz)
 
 	api := router.Group("/api")
 	api.Use(h.AuthMiddleware)
-	h.Quiz.Register(api)
+	api.POST("/create-quiz", h.Quiz.createQuiz)
+	api.GET("/quiz/:id", h.Quiz.getQuiz)
 }

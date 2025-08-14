@@ -16,15 +16,6 @@ func NewQuizHandler(qs service.QuizService, js service.JWTService) *QuizHandler 
 	return &QuizHandler{quizService: qs, jwtService: js}
 }
 
-func (h *QuizHandler) Register(router *gin.RouterGroup) {
-	router.POST("/create-quiz", h.createQuiz)
-	router.GET("/quiz/:id", h.getQuiz)
-}
-
-func (h *QuizHandler) RegisterAnonymous(router *gin.RouterGroup) {
-	router.GET("/join-quiz", h.joinQuiz)
-}
-
 // createQuiz godoc
 //
 //	@Summary		Register a new quiz
