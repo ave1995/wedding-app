@@ -12,10 +12,12 @@ type GinHandlers struct {
 	User           *UserHandler
 	Basic          *BasicHandler
 	Quiz           *QuizHandler
+	Question       *QuestionHandler
+	Answer         *AnswerHandler
 	AuthMiddleware gin.HandlerFunc
 }
 
-func NewGinHandlers(user *UserHandler, basic *BasicHandler, quiz *QuizHandler, authMiddleware gin.HandlerFunc) (*GinHandlers, error) {
+func NewGinHandlers(user *UserHandler, basic *BasicHandler, quiz *QuizHandler, question *QuestionHandler, answer *AnswerHandler, authMiddleware gin.HandlerFunc) (*GinHandlers, error) {
 	if user == nil {
 		return nil, errors.New("user handler must not be nil")
 	}
@@ -25,6 +27,12 @@ func NewGinHandlers(user *UserHandler, basic *BasicHandler, quiz *QuizHandler, a
 	if quiz == nil {
 		return nil, errors.New("quiz handler must not be nil")
 	}
+	if question == nil {
+		return nil, errors.New("question handler must not be nil")
+	}
+	if answer == nil {
+		return nil, errors.New("answer handler must not be nil")
+	}
 	if authMiddleware == nil {
 		return nil, errors.New("auth middleware must not be nil")
 	}
@@ -33,6 +41,8 @@ func NewGinHandlers(user *UserHandler, basic *BasicHandler, quiz *QuizHandler, a
 		User:           user,
 		Basic:          basic,
 		Quiz:           quiz,
+		Question:       question,
+		Answer:         answer,
 		AuthMiddleware: authMiddleware,
 	}, nil
 }
@@ -54,6 +64,15 @@ func (h *GinHandlers) RegisterAll(router *gin.Engine) {
 
 	api := router.Group("/api")
 	api.Use(h.AuthMiddleware)
+	// Quiz endpoints
 	api.POST("/create-quiz", h.Quiz.createQuiz)
 	api.GET("/quiz/:id", h.Quiz.getQuiz)
+	// Questions endpoints
+	api.POST("/create-question", h.Question.createQuestion)
+	api.GET("/questions/:id", h.Question.getQuestionByID)
+	api.GET("/questions", h.Question.getQuestionsByQuizID)
+	// Answers endpoints
+	api.POST("/create-answer", h.Answer.createAnswer)
+	api.GET("/answers/:id", h.Answer.getAnswerByID)
+	api.GET("/answers", h.Answer.getAnswersByQuestionID)
 }

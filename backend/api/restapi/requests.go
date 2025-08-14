@@ -15,9 +15,20 @@ type LoginRequest struct {
 type CreateGuestRequest struct {
 	Username string `json:"username" binding:"required"`
 	IconUrl  string `json:"iconurl" binding:"required"`
-	QuizID   string `json:"quizID" binding:"required"`
+	QuizID   string `json:"quizID" binding:"required,uuid"`
 }
 
 type CreateQuizRequest struct {
 	Name string `json:"name" binding:"required"`
+}
+
+type CreateQuestionRequest struct {
+	Text   string `json:"text" binding:"required"`
+	QuizID string `json:"quiz_id" binding:"required,uuid"`
+}
+
+type CreateAnswerRequest struct {
+	Text       string `json:"text" binding:"required"`
+	QuestionID string `json:"question_id" binding:"required,uuid"`
+	IsCorrect  bool   `json:"iscorrect"`
 }

@@ -213,9 +213,23 @@ func (f *Factory) GinHandlers(ctx context.Context) (*restapi.GinHandlers, error)
 		}
 		quizHandler := restapi.NewQuizHandler(quizService, f.JWTService())
 
+		var questionService service.QuestionService
+		questionService, f.ginHandlersError = f.QuestionService(ctx)
+		if f.ginHandlersError != nil {
+			return
+		}
+		questionHandler := restapi.NewQuestionHandler(questionService)
+
+		var answerService service.AnswerService
+		answerService, f.ginHandlersError = f.AnswerService(ctx)
+		if f.ginHandlersError != nil {
+			return
+		}
+		answerHandler := restapi.NewAnswerHandler(answerService)
+
 		authMiddleware := restapi.AuthMiddleware(f.JWTService())
 
-		f.ginHandlers, f.ginHandlersError = restapi.NewGinHandlers(userHandler, basicHandler, quizHandler, authMiddleware)
+		f.ginHandlers, f.ginHandlersError = restapi.NewGinHandlers(userHandler, basicHandler, quizHandler, questionHandler, answerHandler, authMiddleware)
 	})
 	return f.ginHandlers, f.ginHandlersError
 }
