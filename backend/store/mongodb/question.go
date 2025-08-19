@@ -9,7 +9,7 @@ import (
 
 type question struct {
 	ID     string `bson:"_id"`
-	QuizID string `bson:"quizId"`
+	QuizID string `bson:"quiz_id"`
 	Text   string `bson:"text"`
 }
 

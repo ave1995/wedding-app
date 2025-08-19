@@ -9,14 +9,14 @@ import (
 
 type answer struct {
 	ID         string `bson:"_id"`
-	QuestionID string `bson:"questionId"`
+	QuestionID string `bson:"question_id"`
 	Text       string `bson:"text"`
-	IsCorrect  bool   `bson:"isCorrect"`
+	IsCorrect  bool   `bson:"is_correct"`
 }
 
 const (
 	AnswerFieldID         = FieldID
-	AnswerFieldQuestionID = "questionId"
+	AnswerFieldQuestionID = "question_id"
 )
 
 func (a *answer) ToDomain() (*model.Answer, error) {
