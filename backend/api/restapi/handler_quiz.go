@@ -1,6 +1,7 @@
 package restapi
 
 import (
+	"errors"
 	"net/http"
 	"wedding-app/domain/service"
 
@@ -8,12 +9,13 @@ import (
 )
 
 type QuizHandler struct {
-	quizService service.QuizService
-	jwtService  service.JWTService
+	quizService    service.QuizService
+	jwtService     service.JWTService
+	sessionService service.SessionService
 }
 
 func NewQuizHandler(qs service.QuizService, js service.JWTService) *QuizHandler {
-	return &QuizHandler{quizService: qs, jwtService: js}
+	return &QuizHandler{quizService: qs, jwtService: js} //TODO: add session service
 }
 
 // createQuiz godoc
@@ -110,4 +112,32 @@ func (h *QuizHandler) getQuiz(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, quiz)
+}
+
+func (h *QuizHandler) startQuiz(c *gin.Context) {
+	quizID := c.Param("quizId")
+
+	userID, err := GetUserIDForQuizFromContext(c, quizID)
+	if err != nil {
+		if errors.Is(err, ErrUserIsNotAuthorizedForQuizInContext) {
+			c.Error(NewAPIError(http.StatusUnauthorized, "unauthorized for quiz!", err))
+			return
+		}
+		c.Error(NewInternalAPIError(err))
+		return
+	}
+
+	session, err := h.sessionService.StartQuiz(c, userID.String(), quizID)
+	if err != nil {
+		c.Error(NewInternalAPIError(err))
+		return
+	}
+
+	question, err := h.sessionService.GetCurrentQuestion(c, session.ID.String())
+	if err != nil {
+		c.Error(NewInternalAPIError(err))
+		return
+	}
+
+	c.JSON(http.StatusOK, question)
 }

@@ -11,4 +11,5 @@ type AccessToken struct {
 	ExpiresAt time.Time
 	UserID    uuid.UUID
 	IsGuest   bool
+	QuizID    uuid.UUID
 }

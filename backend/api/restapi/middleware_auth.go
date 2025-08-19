@@ -7,11 +7,12 @@ import (
 	"wedding-app/domain/service"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 const CookieAccessTokenName = "access_token"
 
-const ContextUserIDKey = "userID"
+const ContextAccessTokenKey = CookieAccessTokenName
 
 func AuthMiddleware(jwtService service.JWTService) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -28,7 +29,7 @@ func AuthMiddleware(jwtService service.JWTService) gin.HandlerFunc {
 		}
 
 		// TODO: I have to know how to control if user is guest
-		ctx.Set(ContextUserIDKey, accessToken.UserID)
+		ctx.Set(ContextAccessTokenKey, accessToken)
 
 		ctx.Next()
 	}
@@ -37,8 +38,8 @@ func AuthMiddleware(jwtService service.JWTService) gin.HandlerFunc {
 var ErrAccessTokenNotInContext = errors.New("access token not found in context")
 var ErrAccessTokenHasInvalidTypeInContext = errors.New("access token in context has invalid type")
 
-func GetUserFromContext(c *gin.Context) (*model.AccessToken, error) {
-	val, exists := c.Get(ContextUserIDKey)
+func getAccessTokenFromContext(c *gin.Context) (*model.AccessToken, error) {
+	val, exists := c.Get(ContextAccessTokenKey)
 	if !exists {
 		return nil, ErrAccessTokenNotInContext
 	}
@@ -49,4 +50,19 @@ func GetUserFromContext(c *gin.Context) (*model.AccessToken, error) {
 	}
 
 	return accessToken, nil
+}
+
+var ErrUserIsNotAuthorizedForQuizInContext = errors.New("user is unauthorized for quiz in context")
+
+func GetUserIDForQuizFromContext(c *gin.Context, quizID string) (userID uuid.UUID, err error) {
+	token, err := getAccessTokenFromContext(c)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	if token.IsGuest && quizID != token.QuizID.String() {
+		return uuid.Nil, ErrUserIsNotAuthorizedForQuizInContext
+	}
+
+	return token.UserID, nil
 }

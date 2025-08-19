@@ -26,6 +26,7 @@ func NewJWTService(config config.AuthConfig, logger *slog.Logger) service.JWTSer
 type claims struct {
 	UserID  string `json:"UserID"`
 	IsGuest bool   `json:"IsGuest"`
+	QuizID  string `json:"QuizID"`
 	jwt.RegisteredClaims
 }
 
@@ -36,6 +37,7 @@ func (j *jwtService) Generate(user *model.User) (*model.AccessToken, error) {
 	claims := claims{
 		UserID:  user.ID.String(),
 		IsGuest: user.IsGuest,
+		QuizID:  user.QuizID.String(),
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expiresAt),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -78,11 +80,23 @@ func (j *jwtService) Verify(tokenString string) (*model.AccessToken, error) {
 		return nil, fmt.Errorf("invalid user ID in claims: %q: %w", claims.UserID, err)
 	}
 
+	var quizID uuid.UUID
+	if claims.IsGuest {
+		var err error
+		quizID, err = uuid.Parse(claims.QuizID)
+		if err != nil {
+			return nil, fmt.Errorf("invalid quiz ID in claims: %q: %w", claims.UserID, err)
+		}
+	} else {
+		quizID = uuid.Nil
+	}
+
 	accessToken := &model.AccessToken{
 		Token:     tokenString,
 		ExpiresAt: claims.ExpiresAt.Time,
 		UserID:    userID,
 		IsGuest:   claims.IsGuest,
+		QuizID:    quizID,
 	}
 
 	return accessToken, nil
