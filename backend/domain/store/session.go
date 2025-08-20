@@ -8,8 +8,8 @@ import (
 )
 
 type SessionStore interface {
-	CreateSession(ctx context.Context, userID uuid.UUID, quizID uuid.UUID) (*model.UserQuizSession, error)
-	FindActive(ctx context.Context, userID uuid.UUID, quizID uuid.UUID) (*model.UserQuizSession, error)
-	FindByID(ctx context.Context, sessionID uuid.UUID) (*model.UserQuizSession, error)
-	UpdateSession(ctx context.Context, session *model.UserQuizSession) error
+	CreateSession(ctx context.Context, userID uuid.UUID, quizID uuid.UUID, questionCount int64) (*model.Session, error)
+	FindActive(ctx context.Context, userID uuid.UUID, quizID uuid.UUID) (*model.Session, error)
+	FindByID(ctx context.Context, sessionID uuid.UUID) (*model.Session, error)
+	UpdateSession(ctx context.Context, session *model.Session) error
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type AttemptAnswerStore interface {
-	GetAnsweredBySession(ctx context.Context, sessionID uuid.UUID) ([]*model.AttemptAnswer, error)
-	CreateAttemptAnswer(ctx context.Context, params model.CreateAttemptAnswerParams) (*model.AttemptAnswer, error)
+type AttemptStore interface {
+	GetAnsweredBySessionIDAndQuestionID(ctx context.Context, sessionID uuid.UUID, questionID uuid.UUID) (*model.Attempt, error)
+	CreateAttemptAnswer(ctx context.Context, params model.CreateAttemptParams) (*model.Attempt, error)
 }

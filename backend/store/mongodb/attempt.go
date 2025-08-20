@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type attemptAnswer struct {
+type attempt struct {
 	ID         string `bson:"_id"`
 	SessionID  string `bson:"session_id"`
 	QuestionID string `bson:"question_id"`
@@ -15,7 +15,14 @@ type attemptAnswer struct {
 	IsCorrect  bool   `bson:"is_correct"`
 }
 
-func (m *attemptAnswer) ToDomain() (*model.AttemptAnswer, error) {
+const (
+	AttemptFieldID         = FieldID
+	AttemptFieldSessionID  = "session_id"
+	AttemptFieldQuestionID = "question_id"
+	AttemptFieldAnswerID   = "answer_id"
+)
+
+func (m *attempt) ToDomain() (*model.Attempt, error) {
 	id, err := uuid.Parse(m.ID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse attempt answer ID %q: %w", m.ID, err)
@@ -36,7 +43,7 @@ func (m *attemptAnswer) ToDomain() (*model.AttemptAnswer, error) {
 		return nil, fmt.Errorf("failed to parse answer ID %q: %w", m.AnswerID, err)
 	}
 
-	return &model.AttemptAnswer{
+	return &model.Attempt{
 		ID:         id,
 		SessionID:  sessionID,
 		QuestionID: questionID,

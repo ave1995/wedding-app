@@ -2,16 +2,24 @@ package mongodb
 
 import (
 	"fmt"
+	"time"
 	"wedding-app/domain/model"
 
 	"github.com/google/uuid"
 )
 
 type question struct {
-	ID     string `bson:"_id"`
-	QuizID string `bson:"quiz_id"`
-	Text   string `bson:"text"`
+	ID        string    `bson:"_id"`
+	QuizID    string    `bson:"quiz_id"`
+	Text      string    `bson:"text"`
+	CreatedAt time.Time `bson:"created_at"`
 }
+
+const (
+	QuestionFieldID        = FieldID
+	QuestionFieldQuizID    = "quiz_id"
+	QuestionFieldCreatedAt = "created_at"
+)
 
 func (q *question) ToDomain() (*model.Question, error) {
 	id, err := uuid.Parse(q.ID)
@@ -25,8 +33,9 @@ func (q *question) ToDomain() (*model.Question, error) {
 	}
 
 	return &model.Question{
-		ID:     id,
-		QuizID: quizID,
-		Text:   q.Text,
+		ID:        id,
+		QuizID:    quizID,
+		Text:      q.Text,
+		CreatedAt: q.CreatedAt,
 	}, nil
 }

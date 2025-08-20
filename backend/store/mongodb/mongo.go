@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"time"
 	"wedding-app/config"
+	"wedding-app/domain/apperrors"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -69,7 +70,7 @@ func getByFilter[L any](ctx context.Context, collection *mongo.Collection, filte
 	err := collection.FindOne(ctx, filter).Decode(&result)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, mongo.ErrNoDocuments
+			return nil, apperrors.ErrNotFound
 		}
 		return nil, fmt.Errorf("find by filter failed: %w", err)
 	}

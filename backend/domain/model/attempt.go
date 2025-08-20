@@ -2,7 +2,8 @@ package model
 
 import "github.com/google/uuid"
 
-type AttemptAnswer struct {
+// Attempt in Sesssion for Question with selected Answer
+type Attempt struct {
 	ID         uuid.UUID
 	SessionID  uuid.UUID
 	QuestionID uuid.UUID
@@ -10,7 +11,7 @@ type AttemptAnswer struct {
 	IsCorrect  bool
 }
 
-type CreateAttemptAnswerParams struct {
+type CreateAttemptParams struct {
 	SessionID  uuid.UUID
 	QuestionID uuid.UUID
 	AnswerID   uuid.UUID

@@ -6,6 +6,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type DomainMapper[D any] interface {
@@ -72,8 +73,13 @@ func getManyByFilterAndConvert[L DomainMapper[D], D any](
 	ctx context.Context,
 	collection *mongo.Collection,
 	filter bson.M,
+	sort *bson.D,
 ) ([]*D, error) {
-	cursor, err := collection.Find(ctx, filter)
+	var opts *options.FindOptions
+	if sort != nil {
+		opts = options.Find().SetSort(sort)
+	}
+	cursor, err := collection.Find(ctx, filter, opts)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get cursor: %w", err)
 	}
