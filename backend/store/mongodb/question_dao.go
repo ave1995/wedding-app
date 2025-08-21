@@ -58,13 +58,18 @@ func (s *questionStore) GetOrderedQuestionsByQuizID(ctx context.Context, quizID 
 }
 
 // GetCountQuestionsByQuizID implements store.QuestionStore.
-func (s *questionStore) GetCountQuestionsByQuizID(ctx context.Context, quizID uuid.UUID) (int64, error) {
+func (s *questionStore) GetCountQuestionsByQuizID(ctx context.Context, quizID uuid.UUID) (int, error) {
 	filter := bson.M{QuestionFieldQuizID: quizID.String()}
 
-	count, err := s.questionsCollection().CountDocuments(ctx, filter)
+	count64, err := s.questionsCollection().CountDocuments(ctx, filter)
 	if err != nil {
 		return 0, fmt.Errorf("failed to count questions: %w", err)
 	}
 
-	return count, nil
+	// Check for overflow on 32-bit systems
+	if count64 > int64(^uint(0)>>1) { // max int value
+		return 0, fmt.Errorf("question count too large to fit in int: %d", count64)
+	}
+
+	return int(count64), nil
 }

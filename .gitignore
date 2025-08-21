@@ -15,3 +15,5 @@ terraform/secrets.tfvars.json
 terraform.tfstate
 *.backup
 *credentials.json
+
+**/coverage.txt

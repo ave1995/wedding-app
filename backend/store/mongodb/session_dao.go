@@ -26,7 +26,7 @@ func (s *sessionStore) sessionCollection() *mongo.Collection {
 }
 
 // CreateSession implements store.SessionStore.
-func (s *sessionStore) CreateSession(ctx context.Context, userID uuid.UUID, quizID uuid.UUID, questionCount int64) (*model.Session, error) {
+func (s *sessionStore) CreateSession(ctx context.Context, userID uuid.UUID, quizID uuid.UUID, questionCount int) (*model.Session, error) {
 	mongoSession := &session{
 		ID:            uuid.NewString(),
 		UserID:        userID.String(),

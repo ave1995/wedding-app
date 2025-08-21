@@ -11,8 +11,8 @@ type session struct {
 	ID            string `bson:"_id"`
 	UserID        string `bson:"user_id"`
 	QuizID        string `bson:"quiz_id"`
-	CurrentQIndex int64  `bson:"current_qindex"`
-	TotalQCount   int64  `bson:"total_qcount"`
+	CurrentQIndex int    `bson:"current_qindex"`
+	TotalQCount   int    `bson:"total_qcount"`
 	IsCompleted   bool   `bson:"is_completed"`
 }
 

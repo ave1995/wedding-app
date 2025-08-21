@@ -7,7 +7,7 @@ type Session struct {
 	ID            uuid.UUID
 	UserID        uuid.UUID
 	QuizID        uuid.UUID
-	CurrentQIndex int64
-	TotalQCount   int64
+	CurrentQIndex int
+	TotalQCount   int
 	IsCompleted   bool
 }

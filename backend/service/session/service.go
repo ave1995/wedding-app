@@ -38,6 +38,12 @@ func (s *sessionService) GetCurrentQuestion(ctx context.Context, sessionID strin
 	if err != nil {
 		return nil, fmt.Errorf("failed to load questions: %w", err)
 	}
+	if len(questions) == 0 {
+		return nil, fmt.Errorf("no questions found for quiz ID %s", session.QuizID)
+	}
+	if session.CurrentQIndex < 0 || session.CurrentQIndex >= len(questions) {
+		return nil, fmt.Errorf("current question index %d out of range (0-%d)", session.CurrentQIndex, len(questions)-1)
+	}
 	// Grab the current question by index
 	return questions[session.CurrentQIndex], nil
 }
