@@ -32,3 +32,8 @@ type CreateAnswerRequest struct {
 	QuestionID string `json:"question_id" binding:"required,uuid"`
 	IsCorrect  bool   `json:"iscorrect"`
 }
+
+type SubmitAnswerRequest struct {
+	QuestionID string `json:"question_id" binding:"required,uuid"`
+	AnswerID   string `json:"answer_id" binding:"required,uuid"`
+}

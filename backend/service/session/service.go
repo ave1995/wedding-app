@@ -44,12 +44,27 @@ func (s *sessionService) GetCurrentQuestion(ctx context.Context, sessionID strin
 	if session.CurrentQIndex < 0 || session.CurrentQIndex >= len(questions) {
 		return nil, fmt.Errorf("current question index %d out of range (0-%d)", session.CurrentQIndex, len(questions)-1)
 	}
+	// TODO: zeptat se Radka
+	originalQuestion := questions[session.CurrentQIndex]
+	question := &model.Question{
+		ID:        originalQuestion.ID,
+		QuizID:    originalQuestion.QuizID,
+		Text:      originalQuestion.Text,
+		CreatedAt: originalQuestion.CreatedAt,
+	}
+
+	answers, err := s.answerStore.GetAnswersByQuestionID(ctx, question.ID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load answers for question %q: %w", question.Text, err)
+	}
+
+	question.Answers = answers
 	// Grab the current question by index
-	return questions[session.CurrentQIndex], nil
+	return question, nil
 }
 
-// StartQuiz implements service.SessionService.
-func (s *sessionService) StartQuiz(ctx context.Context, userID string, quizID string) (*model.Session, error) {
+// StartSession implements service.SessionService.
+func (s *sessionService) StartSession(ctx context.Context, userID string, quizID string) (*model.Session, error) {
 	parsedUserID, err := uuid.Parse(userID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse user ID %q: %w", quizID, err)
@@ -131,4 +146,18 @@ func (s *sessionService) SubmitAnswer(
 		return false, fmt.Errorf("failed to update session: %w", err)
 	}
 	return isCompleted, nil
+}
+
+// GetResult implements service.SessionService.
+func (s *sessionService) GetResult(ctx context.Context, sessionID string) (*model.Result, error) {
+	panic("unimplemented")
+}
+
+// GetSessionByID implements service.SessionService.
+func (s *sessionService) GetSessionByID(ctx context.Context, sessionID string) (*model.Session, error) {
+	parsedSessionID, err := uuid.Parse(sessionID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse session ID: %w", err)
+	}
+	return s.sessionStore.FindByID(ctx, parsedSessionID)
 }
