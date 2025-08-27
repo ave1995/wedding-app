@@ -63,18 +63,18 @@ func (h *SessionHandler) submitAnswer(c *gin.Context) {
 	}
 
 	if isCompleted {
-		result, err := h.sessionService.GetResult(c, sessionID)
-		if err != nil {
-			c.Error(NewInternalAPIError(err))
-			return
-		}
+		// result, err := h.sessionService.GetResult(c, sessionID)
+		// if err != nil {
+		// 	c.Error(NewInternalAPIError(err))
+		// 	return
+		// }
 
 		c.JSON(http.StatusOK, gin.H{
 			"completed": true,
 			"result": gin.H{
-				"score":      result.Score,
-				"total":      result.Total,
-				"percentage": result.Percentage,
+				"score":      1,
+				"total":      1,
+				"percentage": 1,
 			},
 		})
 		return

@@ -2,6 +2,7 @@ package session
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"wedding-app/domain/apperrors"
 	"wedding-app/domain/model"
@@ -74,7 +75,7 @@ func (s *sessionService) StartSession(ctx context.Context, userID string, quizID
 		return nil, fmt.Errorf("failed to parse quiz ID %q: %w", quizID, err)
 	}
 	activeSession, err := s.sessionStore.FindActive(ctx, parsedUserID, parsedQuizID)
-	if err != nil {
+	if err != nil && !errors.Is(err, apperrors.ErrNotFound) {
 		return nil, err
 	}
 	if activeSession != nil {

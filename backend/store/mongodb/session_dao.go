@@ -50,7 +50,7 @@ func (s *sessionStore) FindByID(ctx context.Context, sessionID uuid.UUID) (*mode
 
 // UpdateSession implements store.SessionStore.
 func (s *sessionStore) UpdateSession(ctx context.Context, session *model.Session) error {
-	filter := bson.M{SessionFieldID: session.ID}
+	filter := bson.M{SessionFieldID: session.ID.String()}
 
 	update := bson.M{
 		"$set": bson.M{
@@ -58,10 +58,14 @@ func (s *sessionStore) UpdateSession(ctx context.Context, session *model.Session
 			SessionFieldCurrentQIndex: session.CurrentQIndex,
 		},
 	}
+	fmt.Printf("Type of session.ID: %T, value: %v\n", session.ID, session.ID)
 
-	_, err := s.sessionCollection().UpdateOne(ctx, filter, update)
+	res, err := s.sessionCollection().UpdateOne(ctx, filter, update)
 	if err != nil {
 		return fmt.Errorf("failed to update session: %w", err)
+	}
+	if res.MatchedCount == 0 {
+		return fmt.Errorf("no session found with id %v", session.ID)
 	}
 
 	return nil
