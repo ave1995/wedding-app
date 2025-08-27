@@ -5,6 +5,7 @@ import InvitePage from "./pages/InvitePage";
 import NotFoundPage from "./pages/NotFound";
 import LoginPage from "./pages/LoginPage";
 import QuizPage from "./pages/QuizPage";
+import SessionPage from "./pages/SessionPage";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/invite" element={<InvitePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/quiz/:quizId" element={<QuizPage />} />
+        <Route path="/session/:sessionId" element={<SessionPage />} />
 
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

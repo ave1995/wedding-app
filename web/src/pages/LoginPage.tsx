@@ -3,7 +3,7 @@ import InputText from "../components/input_text/InputText";
 import Button from "../components/Button";
 import { post } from "../functions/fetch";
 import { apiUrl } from "../functions/api";
-import type { SimpleResponse } from "../models/SimpleResponse";
+import type { SimpleResponse } from "../responses/SimpleResponse";
 
 function LoginPage() {
   // Input Text state
@@ -14,7 +14,7 @@ function LoginPage() {
   async function handleJoin() {
     const result = await post<SimpleResponse>(
       apiUrl("/auth/login"),
-      {},
+      null,
       {
         email: emailValue,
         password: passwordValue,

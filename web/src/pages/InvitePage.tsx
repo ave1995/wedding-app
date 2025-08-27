@@ -8,7 +8,7 @@ import IconSelector, {
 import Button from "../components/Button";
 import type { Quiz } from "../models/Quiz";
 import { apiUrl } from "../functions/api";
-import type { SimpleResponse } from "../models/SimpleResponse";
+import type { SimpleResponse } from "../responses/SimpleResponse";
 
 type InviteQuizResult = {
   quiz: Quiz;
@@ -66,7 +66,7 @@ function InvitePage() {
   async function handleJoin() {
     const result = await post<SimpleResponse>(
       apiUrl("/auth/create-guest"),
-      {},
+      null,
       {
         username: inputValue,
         iconurl: selectedIcon!.URL,

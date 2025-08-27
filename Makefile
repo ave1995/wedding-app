@@ -37,6 +37,18 @@ go-build:
 go-build-run:
 	cd backend && docker run --rm ${GO_BUILD_NAME}
 
+test: 
+	cd backend && go test ./...
+
+cover:
+	cd backend && go test -cover -coverprofile=coverage.txt -covermode=count ./...
+
+cover-tool:
+	cd backend && go tool cover -html=coverage.txt
+
+mockery:
+	cd backend && mockery
+
 ## Terraform basic
 TF_DIR 	:= ./terraform
 TF_VARS :=	terraform.tfvars

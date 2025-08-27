@@ -10,13 +10,13 @@ import (
 type quiz struct {
 	ID         string `bson:"_id"`
 	Name       string `bson:"name"`
-	InviteCode string `bson:"inviteCode"`
+	InviteCode string `bson:"invite_code"`
 }
 
 const (
 	QuizFieldID         = FieldID
 	QuizFieldName       = "name"
-	QuizFieldInviteCode = "inviteCode"
+	QuizFieldInviteCode = "invite_code"
 )
 
 func (m *quiz) ToDomain() (*model.Quiz, error) {

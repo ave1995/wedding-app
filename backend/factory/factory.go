@@ -64,6 +64,18 @@ type Factory struct {
 	answerServiceOnce sync.Once
 	answerServiceErr  error
 
+	attemptStore     store.AttemptStore
+	attemptStoreOnce sync.Once
+	attemptStoreErr  error
+
+	sessionStore     store.SessionStore
+	sessionStoreOnce sync.Once
+	sessionStoreErr  error
+
+	sessionService     service.SessionService
+	sessionServiceOnce sync.Once
+	sessionServiceErr  error
+
 	googleCloudClient *storage.Client
 	svgStore          store.SvgStore
 	svgStoreOnce      sync.Once
@@ -227,9 +239,19 @@ func (f *Factory) GinHandlers(ctx context.Context) (*restapi.GinHandlers, error)
 		}
 		answerHandler := restapi.NewAnswerHandler(answerService)
 
+		var sessionService service.SessionService
+		sessionService, f.ginHandlersError = f.SessionService(ctx)
+		if f.ginHandlersError != nil {
+			return
+		}
+		sessionHandler := restapi.NewSessionHandler(sessionService)
+
 		authMiddleware := restapi.AuthMiddleware(f.JWTService())
 
-		f.ginHandlers, f.ginHandlersError = restapi.NewGinHandlers(userHandler, basicHandler, quizHandler, questionHandler, answerHandler, authMiddleware)
+		f.ginHandlers, f.ginHandlersError = restapi.NewGinHandlers(
+			userHandler, basicHandler, quizHandler,
+			questionHandler, answerHandler, sessionHandler,
+			authMiddleware)
 	})
 	return f.ginHandlers, f.ginHandlersError
 }

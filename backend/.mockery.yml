@@ -1,0 +1,7 @@
+include-interface-regex: "[A-Z].*"
+dir: "mocks/{{.SrcPackagePath}}mock"
+filename: "{{.InterfaceName | snakecase}}.go"
+pkgname: '{{.SrcPackageName}}mock'
+structname: '{{.Mock}}{{.InterfaceName}}'
+packages:
+  wedding-app/domain/store:

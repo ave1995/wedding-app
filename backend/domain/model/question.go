@@ -1,9 +1,15 @@
 package model
 
-import "github.com/google/uuid"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Question struct {
-	ID     uuid.UUID
-	QuizID uuid.UUID
-	Text   string
+	ID        uuid.UUID
+	QuizID    uuid.UUID
+	Text      string
+	Answers   []*Answer
+	CreatedAt time.Time
 }

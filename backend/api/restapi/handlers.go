@@ -14,10 +14,11 @@ type GinHandlers struct {
 	Quiz           *QuizHandler
 	Question       *QuestionHandler
 	Answer         *AnswerHandler
+	Session        *SessionHandler
 	AuthMiddleware gin.HandlerFunc
 }
 
-func NewGinHandlers(user *UserHandler, basic *BasicHandler, quiz *QuizHandler, question *QuestionHandler, answer *AnswerHandler, authMiddleware gin.HandlerFunc) (*GinHandlers, error) {
+func NewGinHandlers(user *UserHandler, basic *BasicHandler, quiz *QuizHandler, question *QuestionHandler, answer *AnswerHandler, session *SessionHandler, authMiddleware gin.HandlerFunc) (*GinHandlers, error) {
 	if user == nil {
 		return nil, errors.New("user handler must not be nil")
 	}
@@ -33,6 +34,9 @@ func NewGinHandlers(user *UserHandler, basic *BasicHandler, quiz *QuizHandler, q
 	if answer == nil {
 		return nil, errors.New("answer handler must not be nil")
 	}
+	if session == nil {
+		return nil, errors.New("session handler must not be nil")
+	}
 	if authMiddleware == nil {
 		return nil, errors.New("auth middleware must not be nil")
 	}
@@ -43,6 +47,7 @@ func NewGinHandlers(user *UserHandler, basic *BasicHandler, quiz *QuizHandler, q
 		Quiz:           quiz,
 		Question:       question,
 		Answer:         answer,
+		Session:        session,
 		AuthMiddleware: authMiddleware,
 	}, nil
 }
@@ -50,11 +55,10 @@ func NewGinHandlers(user *UserHandler, basic *BasicHandler, quiz *QuizHandler, q
 func (h *GinHandlers) RegisterAll(router *gin.Engine) {
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	basic := router.Group("/")
-	basic.GET("/ping", func(c *gin.Context) {
+	router.GET("/ping", func(c *gin.Context) {
 		c.String(200, "pong")
 	})
-	basic.GET("/user-svgs", h.Basic.getUserSvgs)
+	router.GET("/user-svgs", h.Basic.getUserSvgs)
 
 	auth := router.Group("/auth")
 	auth.POST("/register", h.User.registerUser)
@@ -75,4 +79,23 @@ func (h *GinHandlers) RegisterAll(router *gin.Engine) {
 	api.POST("/create-answer", h.Answer.createAnswer)
 	api.GET("/answers/:id", h.Answer.getAnswerByID)
 	api.GET("/answers", h.Answer.getAnswersByQuestionID)
+
+	quiz := api.Group("/quizzes")
+	{
+		// vytvoření nové session pro daný quiz
+		quiz.POST("/:quiz_id/sessions", h.Session.startSession)
+	}
+
+	// Session endpoints
+	sessions := api.Group("/sessions")
+	{
+		// odeslání odpovědi
+		sessions.POST("/:session_id/answers", h.Session.submitAnswer)
+
+		// načtení aktuální otázky
+		sessions.GET("/:session_id/question", h.Session.getCurrentQuestion)
+
+		// získání výsledku
+		sessions.GET("/:session_id/result", h.Session.getResult)
+	}
 }

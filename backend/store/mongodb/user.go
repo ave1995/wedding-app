@@ -11,15 +11,15 @@ type user struct {
 	Username string `bson:"username"`
 	Email    string `bson:"email,omitempty"`
 	Password string `bson:"password"`
-	IconUrl  string `bson:"iconUrl"`
-	IsGuest  bool   `bson:"isGuest"`
-	QuizID   string `bson:"quizId,omitempty"`
+	IconUrl  string `bson:"icon_url"`
+	IsGuest  bool   `bson:"is_guest"`
+	QuizID   string `bson:"quiz_id,omitempty"`
 }
 
 const (
 	UserFieldID      = FieldID
 	UserFieldEmail   = "email"
-	UserFieldIsGuest = "isGuest"
+	UserFieldIsGuest = "is_guest"
 )
 
 func (m *user) ToDomain() (*model.User, error) {

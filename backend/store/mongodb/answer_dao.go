@@ -40,7 +40,12 @@ func (s *answerStore) GetAnswerByID(ctx context.Context, id uuid.UUID) (*model.A
 	return getByFilterAndConvert[*answer](ctx, s.answersCollection(), bson.M{AnswerFieldID: id.String()})
 }
 
+// GetAnswerByIDAndQuestionID implements store.AnswerStore.
+func (s *answerStore) GetAnswerByIDAndQuestionID(ctx context.Context, answerID uuid.UUID, questionID uuid.UUID) (*model.Answer, error) {
+	return getByFilterAndConvert[*answer](ctx, s.answersCollection(), bson.M{AnswerFieldID: answerID.String(), AnswerFieldQuestionID: questionID.String()})
+}
+
 // GetAnswersByQuestionID implements store.AnswerStore.
 func (s *answerStore) GetAnswersByQuestionID(ctx context.Context, questionID uuid.UUID) ([]*model.Answer, error) {
-	return getManyByFilterAndConvert[*answer](ctx, s.answersCollection(), bson.M{AnswerFieldQuestionID: questionID.String()})
+	return getManyByFilterAndConvert[*answer](ctx, s.answersCollection(), bson.M{AnswerFieldQuestionID: questionID.String()}, nil)
 }
