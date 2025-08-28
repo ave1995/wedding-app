@@ -9,6 +9,7 @@ import Button from "../components/Button";
 import type { Quiz } from "../models/Quiz";
 import { apiUrl } from "../functions/api";
 import type { SimpleResponse } from "../responses/SimpleResponse";
+import { useApiErrorHandler } from "../hooks/useApiErrorHandler";
 
 type InviteQuizResult = {
   quiz: Quiz;
@@ -16,6 +17,7 @@ type InviteQuizResult = {
 };
 
 function InvitePage() {
+  const { handleError } = useApiErrorHandler();
   const [searchParams] = useSearchParams();
   const code = searchParams.get("code");
   const navigate = useNavigate();
@@ -35,10 +37,8 @@ function InvitePage() {
           true
         );
         // Check If I didn't find quiz
-        if (result.error) {
-          console.error(result.error);
-          navigate("/not-found");
-        }
+        if (handleError(result.error, result.status)) return;
+
         // I know I find it so lets save it
         setQuiz(result.data!.quiz);
         // Check if I'm authenticated and if so, let's go straight to the quiz
@@ -48,6 +48,7 @@ function InvitePage() {
       }
       joinQuiz();
     } else {
+      // TODO: měl bych udělat možnost vyplnit code
       console.error("No code from you!");
       navigate("/not-found");
     }
@@ -72,15 +73,9 @@ function InvitePage() {
       },
       true
     );
+    if (handleError(result.error, result.status)) return;
 
-    if (result.error) {
-      console.error(result.error);
-    } else {
-      console.log(result.data);
-      navigate(`/quiz/${quiz!.ID}`, {
-        state: { quiz: quiz! },
-      });
-    }
+    navigate(`/quiz/${quiz!.ID}`);
   }
 
   return (

@@ -5,8 +5,10 @@ import { get, post } from "../functions/fetch";
 import { apiUrl } from "../functions/api";
 import type { StartSessionResponse } from "../responses/StartSessionResponse";
 import Button, { ButtonTypeEnum } from "../components/Button";
+import { useApiErrorHandler } from "../hooks/useApiErrorHandler";
 
 function QuizPage() {
+  const { handleError } = useApiErrorHandler();
   const navigate = useNavigate();
   const { quizId } = useParams();
   const [quiz, setQuiz] = useState<Quiz | null>(null);
@@ -15,11 +17,9 @@ function QuizPage() {
     if (!quiz) {
       async function fetchQuiz() {
         const result = await get<Quiz>(apiUrl(`/api/quiz/${quizId}`), {}, true);
-        if (result.error) {
-          console.error(result.error);
-        } else {
-          setQuiz(result.data);
-        }
+        if (handleError(result.error, result.status)) return;
+        
+        setQuiz(result.data);
       }
       fetchQuiz();
     }
@@ -32,11 +32,9 @@ function QuizPage() {
       null,
       true
     );
-    if (result.error) {
-      console.error(result.error);
-    } else {
-      navigate(`/session/${result.data?.session_id}`);
-    }
+    if (handleError(result.error, result.status)) return;
+
+    navigate(`/session/${result.data?.session_id}`);
   };
 
   // TODO: create loader

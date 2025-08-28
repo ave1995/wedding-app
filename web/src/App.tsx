@@ -6,6 +6,7 @@ import NotFoundPage from "./pages/NotFound";
 import LoginPage from "./pages/LoginPage";
 import QuizPage from "./pages/QuizPage";
 import SessionPage from "./pages/SessionPage";
+import UnauthorizedPage from "./pages/Unauthorized";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/quiz/:quizId" element={<QuizPage />} />
         <Route path="/session/:sessionId" element={<SessionPage />} />
 
+        <Route path="/unauthorized" element={<UnauthorizedPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>

@@ -9,9 +9,11 @@ import type {
   SubmitAnswerResponseCompleted,
 } from "../responses/SubmitAnswerResponse";
 import type { QuestionResponse } from "../responses/QuestionResponse";
+import { useApiErrorHandler } from "../hooks/useApiErrorHandler";
 
 export default function SessionPage() {
   const { sessionId } = useParams();
+  const { handleError } = useApiErrorHandler();
 
   const [question, setQuestion] = useState<Question | null>(null);
   const [completed, setCompleted] = useState(false);
@@ -25,10 +27,7 @@ export default function SessionPage() {
           null,
           true
         );
-        if (qResponse.error) {
-          console.error(qResponse.error);
-          return;
-        }
+        if (handleError(qResponse.error, qResponse.status)) return;
 
         if (qResponse.data!.completed === true) {
           setCompleted(qResponse.data!.completed ?? false);
@@ -37,12 +36,10 @@ export default function SessionPage() {
             null,
             true
           );
-          if (result.error) {
-            console.error(result.error);
-          } else {
-            console.log(result.data!.result);
-            setResult(result.data!.result);
-          }
+          if (handleError(result.error, result.status)) return;
+
+          console.log(result.data!.result);
+          setResult(result.data!.result);
         } else {
           setQuestion(qResponse.data!.question ?? null);
         }
@@ -61,10 +58,8 @@ export default function SessionPage() {
       },
       true
     );
-    if (result.error) {
-      console.error(result.error);
-      return;
-    }
+    if (handleError(result.error, result.status)) return;
+
     if (result.data!.completed === true) {
       setCompleted(true);
       setResult(result.data!.result);

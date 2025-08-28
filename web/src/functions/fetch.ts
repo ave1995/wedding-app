@@ -15,6 +15,7 @@ const _getTextHeaders = () => {
 type FetchResult<T> = {
   data: T | null;
   error: string | null;
+  status: number;
 };
 
 const _fetch = async <T>(req: {
@@ -52,13 +53,17 @@ const _fetch = async <T>(req: {
       } catch {
         // Ignore JSON parse error here
       }
-      return { data: null, error: errorText };
+      return { data: null, error: errorText, status: response.status };
     }
 
     const data = await response[req.func]();
-    return { data, error: null };
+    return { data, error: null, status: response.status };
   } catch (networkError: any) {
-    return { data: null, error: networkError.message || "Network error" };
+    return {
+      data: null,
+      error: networkError.message || "Network error",
+      status: -1,
+    };
   }
 };
 
@@ -79,7 +84,11 @@ const _parseQuery = (query: Record<any, any>) =>
 const _parseUrl = (url: string, query: TContent = null) =>
   query ? `${url}?${_parseQuery(query)}` : url;
 
-export const get = async <T>(url: string, query: TContent = null, setCredentials?: boolean,) =>
+export const get = async <T>(
+  url: string,
+  query: TContent = null,
+  setCredentials?: boolean
+) =>
   _fetch<T>({
     url: _parseUrl(url, query),
     method: "GET",
@@ -98,7 +107,7 @@ export const post = async <T>(
   url: string,
   query: TContent = null,
   content: TContent = null,
-  setCredentials?: boolean,
+  setCredentials?: boolean
 ) =>
   _fetch<T>({
     url: _parseUrl(url, query),
