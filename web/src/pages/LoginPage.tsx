@@ -4,8 +4,10 @@ import Button from "../components/Button";
 import { post } from "../functions/fetch";
 import { apiUrl } from "../functions/api";
 import type { SimpleResponse } from "../responses/SimpleResponse";
+import { useApiErrorHandler } from "../hooks/useApiErrorHandler";
 
 function LoginPage() {
+  const { handleError } = useApiErrorHandler();
   // Input Text state
   const [emailValue, setEmailValue] = useState("");
 
@@ -21,12 +23,9 @@ function LoginPage() {
       },
       true
     );
+    if (handleError(result.error, result.status)) return;
 
-    if (result.error) {
-      console.error(result.error);
-    } else {
-      console.log(result.data);
-    }
+    console.log(result.data);
   }
 
   return (
