@@ -6,10 +6,18 @@ import (
 	"github.com/google/uuid"
 )
 
+type QuestionType string
+
+const (
+	SingleChoice   QuestionType = "single_choice"
+	MultipleChoice QuestionType = "multiple_choice"
+)
+
 type Question struct {
 	ID        uuid.UUID
 	QuizID    uuid.UUID
 	Text      string
+	Type      QuestionType
 	Answers   []*Answer
 	CreatedAt time.Time
 }

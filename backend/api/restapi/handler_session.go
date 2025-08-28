@@ -56,7 +56,7 @@ func (h *SessionHandler) submitAnswer(c *gin.Context) {
 		return
 	}
 
-	isCompleted, err := h.sessionService.SubmitAnswer(c, sessionID, req.QuestionID, req.AnswerID)
+	isCompleted, err := h.sessionService.SubmitAnswer(c, sessionID, req.QuestionID, req.AnswerIDs)
 	if err != nil {
 		c.Error(NewInternalAPIError(err))
 		return

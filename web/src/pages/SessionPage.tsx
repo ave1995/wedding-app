@@ -57,7 +57,7 @@ export default function SessionPage() {
       null,
       {
         question_id: question?.ID,
-        answer_id: answerId,
+        answer_ids: [answerId],
       },
       true
     );

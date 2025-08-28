@@ -93,21 +93,30 @@ func (s *sessionService) SubmitAnswer(
 	ctx context.Context,
 	sessionID string,
 	questionID string,
-	answerID string,
+	answerIDs []string,
 ) (isCompleted bool, err error) {
+	// Parse session ID
 	parsedSessionID, err := uuid.Parse(sessionID)
 	if err != nil {
 		return false, fmt.Errorf("failed to parse session ID: %w", err)
 	}
+
+	// Parse question ID
 	parsedQuestionID, err := uuid.Parse(questionID)
 	if err != nil {
 		return false, fmt.Errorf("failed to parse question ID: %w", err)
 	}
-	parsedAnswerID, err := uuid.Parse(answerID)
-	if err != nil {
-		return false, fmt.Errorf("failed to parse answer ID: %w", err)
+
+	// Parse all answer IDs
+	parsedAnswerIDs := make([]uuid.UUID, len(answerIDs))
+	for i, id := range answerIDs {
+		parsedAnswerIDs[i], err = uuid.Parse(id)
+		if err != nil {
+			return false, fmt.Errorf("invalid answer ID: %s", id)
+		}
 	}
-	// Get session and check
+
+	// Load session
 	session, err := s.sessionStore.FindByID(ctx, parsedSessionID)
 	if err != nil {
 		return false, fmt.Errorf("failed to load session: %w", err)
@@ -115,12 +124,19 @@ func (s *sessionService) SubmitAnswer(
 	if session.IsCompleted {
 		return false, apperrors.ErrSessionCompleted
 	}
-	// Get answer for attempt
-	answer, err := s.answerStore.GetAnswerByIDAndQuestionID(ctx, parsedAnswerID, parsedQuestionID)
+
+	// Load question to check type
+	question, err := s.questionStore.GetQuestionByID(ctx, parsedQuestionID)
 	if err != nil {
-		return false, fmt.Errorf("failed to load answer: %w", err)
+		return false, fmt.Errorf("failed to load question: %w", err)
 	}
-	// Check if It's already answered
+
+	// Validation: single-choice questions must have exactly one answer
+	if question.Type == model.SingleChoice && len(parsedAnswerIDs) != 1 {
+		return false, fmt.Errorf("single-choice question must have exactly one selected answer")
+	}
+
+	// Check if question was already answered
 	answered, err := s.attemptAnswerStore.GetAnsweredBySessionIDAndQuestionID(ctx, session.ID, parsedQuestionID)
 	if answered != nil {
 		return false, fmt.Errorf("question is already answered")
@@ -128,24 +144,35 @@ func (s *sessionService) SubmitAnswer(
 	if err != nil && err != apperrors.ErrNotFound {
 		return false, err
 	}
-	// Creating attempt
-	if _, err := s.attemptAnswerStore.CreateAttemptAnswer(ctx, model.CreateAttemptParams{
-		SessionID:  session.ID,
-		QuestionID: parsedQuestionID,
-		AnswerID:   answer.ID,
-		IsCorrect:  answer.IsCorrect,
-	}); err != nil {
-		return false, fmt.Errorf("failed to save attempt answer: %w", err)
+
+	// Save all selected answers
+	for _, ansID := range parsedAnswerIDs {
+		answer, err := s.answerStore.GetAnswerByIDAndQuestionID(ctx, ansID, parsedQuestionID)
+		if err != nil {
+			return false, fmt.Errorf("failed to load answer: %w", err)
+		}
+
+		if _, err := s.attemptAnswerStore.CreateAttemptAnswer(ctx, model.CreateAttemptParams{
+			SessionID:  session.ID,
+			QuestionID: parsedQuestionID,
+			AnswerID:   answer.ID,
+			IsCorrect:  answer.IsCorrect,
+		}); err != nil {
+			return false, fmt.Errorf("failed to save attempt answer: %w", err)
+		}
 	}
+
 	// Move to next question
 	session.CurrentQIndex++
 	if session.CurrentQIndex >= session.TotalQCount {
 		session.IsCompleted = true
 		isCompleted = true
 	}
+
 	if err := s.sessionStore.UpdateSession(ctx, session); err != nil {
 		return false, fmt.Errorf("failed to update session: %w", err)
 	}
+
 	return isCompleted, nil
 }
 

@@ -34,6 +34,6 @@ type CreateAnswerRequest struct {
 }
 
 type SubmitAnswerRequest struct {
-	QuestionID string `json:"question_id" binding:"required,uuid"`
-	AnswerID   string `json:"answer_id" binding:"required,uuid"`
+	QuestionID string   `json:"question_id" binding:"required,uuid"`
+	AnswerIDs  []string `json:"answer_ids" binding:"required"`
 }
