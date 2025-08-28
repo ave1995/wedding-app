@@ -113,7 +113,7 @@ func (s *sessionService) SubmitAnswer(
 		return false, fmt.Errorf("failed to load session: %w", err)
 	}
 	if session.IsCompleted {
-		return false, fmt.Errorf("session already completed")
+		return false, apperrors.ErrSessionCompleted
 	}
 	// Get answer for attempt
 	answer, err := s.answerStore.GetAnswerByIDAndQuestionID(ctx, parsedAnswerID, parsedQuestionID)
@@ -151,7 +151,39 @@ func (s *sessionService) SubmitAnswer(
 
 // GetResult implements service.SessionService.
 func (s *sessionService) GetResult(ctx context.Context, sessionID string) (*model.Result, error) {
-	panic("unimplemented")
+	parsedSessionID, err := uuid.Parse(sessionID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse session ID: %w", err)
+	}
+	session, err := s.sessionStore.FindByID(ctx, parsedSessionID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get session: %w", err)
+	}
+
+	attempts, err := s.attemptAnswerStore.GetAnsweredBySessionID(ctx, parsedSessionID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get attempts: %w", err)
+	}
+
+	score := 0
+	for _, a := range attempts {
+		if a.IsCorrect {
+			score++
+		}
+	}
+
+	total := session.TotalQCount
+	percentage := 0
+	if total > 0 {
+		percentage = score * 100 / total
+	}
+
+	result := &model.Result{
+		Score:      score,
+		Total:      total,
+		Percentage: percentage,
+	}
+	return result, nil
 }
 
 // GetSessionByID implements service.SessionService.

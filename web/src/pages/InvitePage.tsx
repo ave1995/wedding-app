@@ -43,9 +43,7 @@ function InvitePage() {
         setQuiz(result.data!.quiz);
         // Check if I'm authenticated and if so, let's go straight to the quiz
         if (result.data!.authenticated) {
-          navigate(`/quiz/${result.data!.quiz!.ID}`, {
-            state: { quiz: result.data!.quiz! },
-          });
+          navigate(`/quiz/${result.data!.quiz!.ID}`);
         }
       }
       joinQuiz();

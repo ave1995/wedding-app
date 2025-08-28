@@ -1,31 +1,50 @@
-import { useParams, useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import type { Question } from "../models/Question";
 import { get, post } from "../functions/fetch";
 import { apiUrl } from "../functions/api";
 import type { Result } from "../models/Result";
-import type { SubmitAnswerResponse } from "../responses/SubmitAnswerResponse";
+import type {
+  SubmitAnswerResponse,
+  SubmitAnswerResponseCompleted,
+} from "../responses/SubmitAnswerResponse";
+import type { QuestionResponse } from "../responses/QuestionResponse";
 
 export default function SessionPage() {
-  const { state } = useLocation();
   const { sessionId } = useParams();
 
-  const [question, setQuestion] = useState<Question | null>(state?.question);
+  const [question, setQuestion] = useState<Question | null>(null);
   const [completed, setCompleted] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
 
   useEffect(() => {
     if (!question) {
       async function fetchQuestion() {
-        const result = await get<Question>(
+        const qResponse = await get<QuestionResponse>(
           apiUrl(`/api/sessions/${sessionId}/question`),
           null,
           true
         );
-        if (result.error) {
-          console.error(result.error);
+        if (qResponse.error) {
+          console.error(qResponse.error);
+          return;
+        }
+
+        if (qResponse.data!.completed === true) {
+          setCompleted(qResponse.data!.completed ?? false);
+          const result = await get<SubmitAnswerResponseCompleted>(
+            apiUrl(`/api/sessions/${sessionId}/result`),
+            null,
+            true
+          );
+          if (result.error) {
+            console.error(result.error);
+          } else {
+            console.log(result.data!.result);
+            setResult(result.data!.result);
+          }
         } else {
-          setQuestion(result.data);
+          setQuestion(qResponse.data!.question ?? null);
         }
       }
       fetchQuestion();
@@ -46,7 +65,7 @@ export default function SessionPage() {
       console.error(result.error);
       return;
     }
-    if (result.data?.completed === true) {
+    if (result.data!.completed === true) {
       setCompleted(true);
       setResult(result.data!.result);
     } else {
@@ -59,7 +78,7 @@ export default function SessionPage() {
       <div className="p-6">
         <h1 className="text-xl font-bold">Hotovo!</h1>
         <p>
-          Skóre: {result?.Score}/{result?.Total} ({result?.Percentage}%)
+          Skóre: {result?.score}/{result?.total} ({result?.percentage}%)
         </p>
       </div>
     );

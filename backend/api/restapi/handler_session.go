@@ -63,18 +63,18 @@ func (h *SessionHandler) submitAnswer(c *gin.Context) {
 	}
 
 	if isCompleted {
-		// result, err := h.sessionService.GetResult(c, sessionID)
-		// if err != nil {
-		// 	c.Error(NewInternalAPIError(err))
-		// 	return
-		// }
+		result, err := h.sessionService.GetResult(c, sessionID)
+		if err != nil {
+			c.Error(NewInternalAPIError(err))
+			return
+		}
 
 		c.JSON(http.StatusOK, gin.H{
 			"completed": true,
 			"result": gin.H{
-				"score":      1,
-				"total":      1,
-				"percentage": 1,
+				"score":      result.Score,
+				"total":      result.Total,
+				"percentage": result.Percentage,
 			},
 		})
 		return
@@ -98,7 +98,15 @@ func (h *SessionHandler) getCurrentQuestion(c *gin.Context) {
 	// načtení session a kontrola uživatele
 	session, err := h.sessionService.GetSessionByID(c, sessionID)
 	if err != nil {
+
 		c.Error(NewInternalAPIError(err))
+		return
+	}
+	if session.IsCompleted {
+		c.JSON(http.StatusOK, gin.H{
+			"completed": true,
+			"question":  nil,
+		})
 		return
 	}
 
@@ -118,7 +126,10 @@ func (h *SessionHandler) getCurrentQuestion(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, question)
+	c.JSON(http.StatusOK, gin.H{
+		"completed": false,
+		"question":  question,
+	})
 }
 
 func (h *SessionHandler) getResult(c *gin.Context) {

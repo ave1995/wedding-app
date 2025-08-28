@@ -1,5 +1,5 @@
 export type Result = {
-    Score: number;
-    Total: number;
-    Percentage: number;
+    score: number;
+    total: number;
+    percentage: number;
 }

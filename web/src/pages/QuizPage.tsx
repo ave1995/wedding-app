@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import type { Quiz } from "../models/Quiz";
 import { get, post } from "../functions/fetch";
 import { apiUrl } from "../functions/api";
@@ -8,9 +8,8 @@ import Button, { ButtonTypeEnum } from "../components/Button";
 
 function QuizPage() {
   const navigate = useNavigate();
-  const { state } = useLocation();
   const { quizId } = useParams();
-  const [quiz, setQuiz] = useState<Quiz | null>(state?.quiz || null);
+  const [quiz, setQuiz] = useState<Quiz | null>(null);
 
   useEffect(() => {
     if (!quiz) {
@@ -36,9 +35,7 @@ function QuizPage() {
     if (result.error) {
       console.error(result.error);
     } else {
-      navigate(`/session/${result.data?.session_id}`, {
-        state: { question: result.data?.question },
-      });
+      navigate(`/session/${result.data?.session_id}`);
     }
   };
 

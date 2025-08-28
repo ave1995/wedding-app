@@ -39,5 +39,9 @@ func (s *attemptStore) CreateAttemptAnswer(ctx context.Context, params model.Cre
 // GetAnsweredBySessionIDAndQuestionID implements store.AttemptStore.
 func (s *attemptStore) GetAnsweredBySessionIDAndQuestionID(ctx context.Context, sessionID uuid.UUID, questionID uuid.UUID) (*model.Attempt, error) {
 	return getByFilterAndConvert[*attempt](ctx, s.attemptCollection(), bson.M{AttemptFieldSessionID: sessionID.String(), AttemptFieldQuestionID: questionID.String()})
+}
 
+// GetAnsweredBySessionID implements store.AttemptStore.
+func (s *attemptStore) GetAnsweredBySessionID(ctx context.Context, sessionID uuid.UUID) ([]*model.Attempt, error) {
+	return getManyByFilterAndConvert[*attempt](ctx, s.attemptCollection(), bson.M{AttemptFieldSessionID: sessionID.String()}, nil)
 }
