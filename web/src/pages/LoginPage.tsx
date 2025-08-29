@@ -41,7 +41,7 @@ function LoginPage() {
         value={passwordValue}
         onChange={(e) => setPasswordValue(e.target.value)}
       />
-      <Button label="Login" onClick={handleJoin}></Button>
+      <Button label="Login" onClick={handleJoin}/>
     </div>
   );
 }

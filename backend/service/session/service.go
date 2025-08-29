@@ -4,10 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
+	"time"
 	"wedding-app/domain/apperrors"
+	"wedding-app/domain/event"
 	"wedding-app/domain/model"
 	"wedding-app/domain/service"
 	"wedding-app/domain/store"
+	"wedding-app/utils"
 
 	"github.com/google/uuid"
 )
@@ -17,10 +21,12 @@ type sessionService struct {
 	questionStore      store.QuestionStore
 	attemptAnswerStore store.AttemptStore
 	answerStore        store.AnswerStore
+	publisher          event.EventPublisher
+	logger             *slog.Logger
 }
 
-func NewSessionService(ss store.SessionStore, qs store.QuestionStore, aas store.AttemptStore, as store.AnswerStore) service.SessionService {
-	return &sessionService{sessionStore: ss, questionStore: qs, attemptAnswerStore: aas, answerStore: as}
+func NewSessionService(ss store.SessionStore, qs store.QuestionStore, aas store.AttemptStore, as store.AnswerStore, pub event.EventPublisher, logger *slog.Logger) service.SessionService {
+	return &sessionService{sessionStore: ss, questionStore: qs, attemptAnswerStore: aas, answerStore: as, publisher: pub, logger: logger}
 }
 
 // GetCurrentQuestion implements service.SessionService.
@@ -160,6 +166,17 @@ func (s *sessionService) SubmitAnswer(
 		}); err != nil {
 			return false, fmt.Errorf("failed to save attempt answer: %w", err)
 		}
+	}
+
+	if err := s.publisher.PublishAnswerSubmitted(event.AnswerSubmittedEvent{
+		SessionID:   session.ID,
+		UserID:      session.UserID,
+		QuizID:      session.QuizID,
+		QuestionID:  question.ID,
+		AnswerIDs:   parsedAnswerIDs,
+		SubmittedAt: time.Now(),
+	}); err != nil {
+		s.logger.Error("failed to publish AnswerSubmittedEvent: %v", utils.ErrAttr(err))
 	}
 
 	// Move to next question

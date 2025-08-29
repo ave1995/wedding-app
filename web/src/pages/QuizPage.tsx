@@ -18,7 +18,7 @@ function QuizPage() {
       async function fetchQuiz() {
         const result = await get<Quiz>(apiUrl(`/api/quiz/${quizId}`), {}, true);
         if (handleError(result.error, result.status)) return;
-        
+
         setQuiz(result.data);
       }
       fetchQuiz();
@@ -47,7 +47,7 @@ function QuizPage() {
         onClick={startSession}
         label="Start Quiz"
         type={ButtonTypeEnum.Basic}
-      ></Button>
+      />
     </div>
   );
 }

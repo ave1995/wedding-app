@@ -110,7 +110,7 @@ function InvitePage() {
           onChange={(e) => setInputValue(e.target.value)}
         />
       </div>
-      <Button label="Join" onClick={handleJoin}></Button>
+      <Button label="Join" onClick={handleJoin}/>
     </div>
   );
 }
