@@ -29,7 +29,7 @@ export default function QuestionForm({
     <div className="flex flex-col w-full h-full">
       <div className="flex-grow place-items-start p-6">
         <p className="text-xs italic">
-          Otázka {currentQIndex} ze {totalQCount}
+          Otázka <span className="text-pink-500">{currentQIndex}</span> ze  <span className="text-pink-500">{totalQCount}</span>
         </p>
         <h2 className="text-lg font-semibold">{text}</h2>
       </div>

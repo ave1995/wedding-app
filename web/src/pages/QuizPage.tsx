@@ -44,17 +44,17 @@ function QuizPage() {
     <div className="flex flex-col w-96 h-screen items-center justify-center p-6 gap-4">
       <h1 className="text-xl font-bold">{quiz.Name}</h1>
       <p className="text-left p-3 font-medium">
-        Milí <span className="font-semibold text-pink-500">hosté</span>, vítejte na naší <span className="font-semibold text-pink-500">svatbě</span>! Jsme moc rádi, že jste dnes tady s
-        námi a sdílíte s námi tenhle výjimečný den. Vaše přítomnost je pro nás
-        <span className="font-semibold text-pink-500"> největší dar</span> – děkujeme, že slavíte, smějete se a vytváříte s námi
+        Milí <span className="font-semibold text-pink-500">hoste</span>, vítej na naší <span className="font-semibold text-pink-500">svatbě</span>! Jsme moc rádi, že jsi dnes tady s
+        námi a sdílíš s námi tenhle výjimečný den. Tvoje přítomnost je pro nás
+        <span className="font-semibold text-pink-500"> největší dar</span> – děkujeme, že slavíš, směješ se a vytváříš s námi
         nezapomenutelné chvíle. A protože se chceme pobavit společně, připravili
-        jsme si pro vás <span className="font-semibold text-pink-500">malý svatební kvíz</span>. Přejeme vám hodně štěstí a hlavně
+        jsme si pro tebe <span className="font-semibold text-pink-500">malý svatební kvíz</span>. Přejeme ti hodně štěstí a hlavně
         spoustu zábavy!
       </p>
       <div className="w-full">
         <Button
           onClick={startSession}
-          label="Start Quiz"
+          label="Spustit kvíz"
           type={ButtonTypeEnum.Basic}
         ></Button>
       </div>

@@ -34,7 +34,7 @@ export default function IconSelector({ onSelect, onClose }: IconSelectorProps) {
 
   return (
     <div className="p-4 border-2 rounded-lg bg-white shadow-lg border-[#3D52D5]">
-      <h2 className="mb-2 font-semibold">Vyber svojí ikonku:</h2>
+      <h2 className="mb-2 font-semibold">Vyber si svojí ikonku:</h2>
       <div className="grid grid-cols-4 gap-4 items-center justify-center">
         {svgs.map((svg) => (
           <img

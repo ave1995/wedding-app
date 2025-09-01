@@ -122,7 +122,7 @@ function InvitePage() {
         </div>
         <input
           type="text"
-          placeholder="Zadej svojí přezdívku"
+          placeholder="Zadej si svojí přezdívku"
           value={inputValue}
           onChange={(e) => {
             setInputValue(e.target.value);
