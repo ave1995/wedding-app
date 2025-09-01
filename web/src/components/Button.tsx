@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { smallButtonBurst } from "../functions/success";
+import { useState } from "react";
+// import { smallButtonBurst } from "../functions/success";
 import Spinner from "./Spinner";
 
 interface ButtonProps<T = void> {
@@ -8,9 +8,13 @@ interface ButtonProps<T = void> {
   onClick: () => Promise<T> | void;
 }
 
-export default function Button<T = void>({ label, type, onClick }: ButtonProps<T>) {
+export default function Button<T = void>({
+  label,
+  type,
+  onClick,
+}: ButtonProps<T>) {
   const [loading, setLoading] = useState(false);
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  // const buttonRef = useRef<HTMLButtonElement>(null);
 
   const handleClick = async () => {
     if (loading) return;
@@ -20,25 +24,27 @@ export default function Button<T = void>({ label, type, onClick }: ButtonProps<T
       await Promise.resolve(onClick());
     } finally {
       setLoading(false);
-      if (buttonRef.current) {
-        smallButtonBurst(buttonRef.current);
-      }
+      // if (buttonRef.current) {
+      //   smallButtonBurst(buttonRef.current);
+      // }
     }
   };
 
   return (
     <button
-      ref={buttonRef}
-      className={`border px-3 py-2 rounded-lg text-white 
+      // ref={buttonRef}
+      className={`w-full px-3 py-2 text-center border-b-4 rounded-2xl text-white 
         ${GetButtonColor(type)}
         ${GetButtonHoverColor(type)}
-        hover:cursor-pointer`}
+        hover:cursor-pointer active:scale-95 active:shadow-sm
+        transition-all duration-150 ease-in-out
+        focus:outline-none font-semibold`}
       onClick={handleClick}
       disabled={loading}
     >
       <div className="relative flex items-center justify-center">
         <p
-          className={`font-bold text-sm/6 ${
+          className={`text-lg font-semibold ${
             loading ? "opacity-0" : "opacity-100"
           }`}
         >
@@ -59,9 +65,9 @@ type ButtonType = (typeof ButtonTypeEnum)[keyof typeof ButtonTypeEnum];
 function GetButtonColor(type?: ButtonType) {
   switch (type) {
     case ButtonTypeEnum.Basic:
-      return "bg-pink-500";
+      return "bg-pink-500 hover:bg-pink-600 hover:border-pink-400 border-pink-300";
     default:
-      return "bg-pink-500";
+      return "bg-pink-500 hover:bg-pink-600 hover:border-pink-400 border-pink-300";
   }
 }
 

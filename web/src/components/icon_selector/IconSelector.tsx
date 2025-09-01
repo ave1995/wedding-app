@@ -19,8 +19,8 @@ export default function IconSelector({ onSelect, onClose }: IconSelectorProps) {
     async function fetchIcons() {
       const svgItems = await get<SvgItem[]>(apiUrl("/user-svgs"));
       if (svgItems.error || svgItems.data == null) {
-        console.error(svgItems.error)
-      } 
+        console.error(svgItems.error);
+      }
 
       setSvgs(svgItems.data!);
     }
@@ -33,15 +33,16 @@ export default function IconSelector({ onSelect, onClose }: IconSelectorProps) {
   }
 
   return (
-    <div className="p-4 border rounded bg-white shadow-lg">
-      <h2 className="mb-2 font-bold">Choose an icon:</h2>
+    <div className="p-4 border-2 rounded-lg bg-white shadow-lg border-[#3D52D5]">
+      <h2 className="mb-2 font-semibold">Vyber svojí ikonku:</h2>
       <div className="grid grid-cols-4 gap-4 items-center justify-center">
         {svgs.map((svg) => (
           <img
             key={svg.Name}
             src={svg.URL}
             alt={svg.Name}
-            className={`w-12 h-12 cursor-pointer border-2 rounded-lg`}
+            className={`w-12 h-12 cursor-pointer border-2 rounded-lg border-gray-400 hover:border-[#3D52D5] active:scale-95 active:shadow-sm
+        transition-all duration-150 ease-in-out`}
             onClick={() => selectIcon(svg)}
           />
         ))}

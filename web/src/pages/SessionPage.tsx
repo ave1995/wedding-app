@@ -11,6 +11,8 @@ import type {
 import type { QuestionResponse } from "../responses/QuestionResponse";
 import { useApiErrorHandler } from "../hooks/useApiErrorHandler";
 import QuestionForm from "../components/question/QuestionForm";
+import ResultForm from "../components/ResultForm";
+
 
 export default function SessionPage() {
   const { sessionId } = useParams();
@@ -49,13 +51,13 @@ export default function SessionPage() {
     }
   }, [question, sessionId]);
 
-  const submitAnswer = async (answerId: string) => {
+  const submitAnswer = async (answerIds: string[]) => {
     const result = await post<SubmitAnswerResponse>(
       apiUrl(`/api/sessions/${sessionId}/answers`),
       null,
       {
         question_id: question?.ID,
-        answer_ids: [answerId],
+        answer_ids: answerIds,
       },
       true
     );
@@ -70,14 +72,7 @@ export default function SessionPage() {
   };
 
   if (completed) {
-    return (
-      <div className="p-6">
-        <h1 className="text-xl font-bold">Hotovo!</h1>
-        <p>
-          Skóre: {result?.score}/{result?.total} ({result?.percentage}%)
-        </p>
-      </div>
-    );
+    return <ResultForm sessionId={sessionId!} resultFrom={result}/>
   }
 
   if (!question) {
@@ -85,27 +80,14 @@ export default function SessionPage() {
   }
 
   return (
-    <div className="w-96 h-screen p-4">
+    <div className="w-96 h-screen">
       <QuestionForm
         text={question.Text}
         currentQIndex={2}
         totalQCount={40}
         answers={question.Answers}
+        submitAnswer={submitAnswer}
       />
     </div>
-    // <div className="p-6">
-    //   <h2 className="text-lg font-semibold">{question.Text}</h2>
-    //   <div className="mt-4 flex flex-col gap-2">
-    //     {question.Answers.map((a) => (
-    //       <button
-    //         key={a.ID}
-    //         onClick={() => submitAnswer(a.ID)}
-    //         className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
-    //       >
-    //         {a.Text}
-    //       </button>
-    //     ))}
-    //   </div>
-    // </div>
   );
 }

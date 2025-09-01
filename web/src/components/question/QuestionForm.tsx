@@ -1,11 +1,13 @@
 import { useState } from "react";
 import type { Answer } from "../../models/Answer";
+import Button from "../Button";
 
 interface QuestionForm {
   text: string;
   currentQIndex: number;
   totalQCount: number;
   answers: Answer[];
+  submitAnswer: (answerId: string[]) => Promise<void>;
 }
 
 export default function QuestionForm({
@@ -13,6 +15,7 @@ export default function QuestionForm({
   currentQIndex,
   totalQCount,
   answers,
+  submitAnswer
 }: QuestionForm) {
   const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
 
@@ -24,14 +27,14 @@ export default function QuestionForm({
 
   return (
     <div className="flex flex-col w-full h-full">
-      <div className="flex-grow place-items-start">
-        <p className="text-sm">
+      <div className="flex-grow place-items-start p-6">
+        <p className="text-xs italic">
           Otázka {currentQIndex} ze {totalQCount}
         </p>
         <h2 className="text-lg font-semibold">{text}</h2>
       </div>
-      <div className="flex-grow">
-        <div className="w-full flex flex-col gap-2 items-center justify-center">
+      <div className="flex-grow p-6">
+        <div className="w-full flex flex-col gap-2 items-center justify-center overflow-x-auto">
           {answers.map((a) => {
             const isSelected = selectedAnswers.includes(a.ID);
             return (
@@ -47,7 +50,7 @@ export default function QuestionForm({
         : " text-gray-800 border-gray-300 hover:bg-gray-100 hover:border-gray-400"
     }
     active:scale-95 active:shadow-sm
-    focus:outline-none
+    focus:outline-none font-semibold
   `}
               >
                 {a.Text}
@@ -56,14 +59,9 @@ export default function QuestionForm({
           })}
         </div>
       </div>
-      <button
-        className="w-full px-5 py-3 text-center border-2 border-b-4 rounded-lg text-white border-pink-300 bg-pink-500
-       active:scale-95 active:shadow-sm
-       transition-all duration-150 ease-in-out
-    focus:outline-none font-medium cursor-pointer"
-      >
-        Odpovědět
-      </button>
+      <div className="border-t-2 border-gray-300 p-6">
+        <Button label="Odpovědět" onClick={() => submitAnswer(selectedAnswers)} />
+      </div>
     </div>
   );
 }

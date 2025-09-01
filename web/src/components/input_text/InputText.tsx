@@ -11,7 +11,7 @@ export default function InputText({ placeholder, value, onChange }: InputTextPro
       placeholder={placeholder}
       value={value}
       onChange={onChange}
-      className="border-2 rounded-lg px-3 py-2 text-black"
+      className="w-full border-2 rounded-lg px-3 py-2 text-black"
     />
   );
 }
