@@ -107,6 +107,10 @@ func (s *sessionService) SubmitAnswer(
 		return false, fmt.Errorf("failed to parse question ID: %w", err)
 	}
 
+	if len(answerIDs) == 0 {
+		return false, apperrors.ErrAnswerNotSubmitted
+	}
+
 	// Parse all answer IDs
 	parsedAnswerIDs := make([]uuid.UUID, len(answerIDs))
 	for i, id := range answerIDs {

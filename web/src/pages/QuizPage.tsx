@@ -18,7 +18,7 @@ function QuizPage() {
       async function fetchQuiz() {
         const result = await get<Quiz>(apiUrl(`/api/quiz/${quizId}`), {}, true);
         if (handleError(result.error, result.status)) return;
-        
+
         setQuiz(result.data);
       }
       fetchQuiz();
@@ -41,13 +41,23 @@ function QuizPage() {
   if (!quiz) return <p>Loading quiz...</p>;
 
   return (
-    <div className="p-6">
-      <h1 className="text-xl font-bold">Quiz {quiz.Name}</h1>
-      <Button
-        onClick={startSession}
-        label="Start Quiz"
-        type={ButtonTypeEnum.Basic}
-      ></Button>
+    <div className="flex flex-col w-96 h-screen items-center justify-center p-6 gap-4">
+      <h1 className="text-xl font-bold">{quiz.Name}</h1>
+      <p className="text-left p-3 font-medium">
+        Milí <span className="font-semibold text-pink-500">hosté</span>, vítejte na naší <span className="font-semibold text-pink-500">svatbě</span>! Jsme moc rádi, že jste dnes tady s
+        námi a sdílíte s námi tenhle výjimečný den. Vaše přítomnost je pro nás
+        <span className="font-semibold text-pink-500"> největší dar</span> – děkujeme, že slavíte, smějete se a vytváříte s námi
+        nezapomenutelné chvíle. A protože se chceme pobavit společně, připravili
+        jsme si pro vás <span className="font-semibold text-pink-500">malý svatební kvíz</span>. Přejeme vám hodně štěstí a hlavně
+        spoustu zábavy!
+      </p>
+      <div className="w-full">
+        <Button
+          onClick={startSession}
+          label="Start Quiz"
+          type={ButtonTypeEnum.Basic}
+        ></Button>
+      </div>
     </div>
   );
 }
