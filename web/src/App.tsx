@@ -8,6 +8,7 @@ import QuizPage from "./pages/QuizPage";
 import SessionPage from "./pages/SessionPage";
 import UnauthorizedPage from "./pages/Unauthorized";
 import DashboardPage from "./pages/DashboardPage";
+import EventPage from "./pages/EventPage";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/session/:sessionId" element={<SessionPage />} />
 
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/events" element={<EventPage />} />
 
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
         <Route path="*" element={<NotFoundPage />} />

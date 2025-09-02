@@ -15,11 +15,23 @@ func NewPublisher(h *Hub) event.EventPublisher {
 	}
 }
 
+type envelope[T any] struct {
+	Topic string `json:"topic"`
+	Data  T      `json:"data"`
+}
+
+func wrapEvent[T any](topic string, e T) ([]byte, error) {
+	return json.Marshal(envelope[T]{
+		Topic: topic,
+		Data:  e,
+	})
+}
+
 const TopicAnswerSubmittedEvent = "answer_submit"
 
 // PublishAnswerSubmitted implements event.EventPublisher.
 func (p *publisher) PublishAnswerSubmitted(e *event.AnswerSubmittedEvent) error {
-	data, err := json.Marshal(e)
+	data, err := wrapEvent(TopicAnswerSubmittedEvent, e)
 	if err != nil {
 		return err
 	}
@@ -35,13 +47,13 @@ func (p *publisher) PublishAnswerSubmitted(e *event.AnswerSubmittedEvent) error 
 const TopicSessionStartEvent = "session_start"
 
 func (p *publisher) PublishSessionStarted(e *event.SessionStartEvent) error {
-	data, err := json.Marshal(e)
+	data, err := wrapEvent(TopicSessionStartEvent, e)
 	if err != nil {
 		return err
 	}
 
 	p.hub.broadcast <- broadcastMessage{
-		Topic: TopicAnswerSubmittedEvent,
+		Topic: TopicSessionStartEvent,
 		Data:  data,
 	}
 
@@ -51,13 +63,13 @@ func (p *publisher) PublishSessionStarted(e *event.SessionStartEvent) error {
 const TopicSessionEndEvent = "session_end"
 
 func (p *publisher) PublishSessionEnded(e *event.SessionEndEvent) error {
-	data, err := json.Marshal(e)
+	data, err := wrapEvent(TopicSessionEndEvent, e)
 	if err != nil {
 		return err
 	}
 
 	p.hub.broadcast <- broadcastMessage{
-		Topic: TopicAnswerSubmittedEvent,
+		Topic: TopicSessionEndEvent,
 		Data:  data,
 	}
 
