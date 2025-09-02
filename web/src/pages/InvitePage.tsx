@@ -89,7 +89,7 @@ function InvitePage() {
   }
 
   return (
-    <div className="flex flex-col w-96 h-screen items-center justify-center p-6 gap-6">
+    <div className="flex flex-col w-96 h-screen items-center justify-center p-6 gap-6 mx-auto">
       <h1 className="text-xl font-bold">Nový host</h1>
       <div
         className={`flex border-2 border-b-4 rounded-xl w-72 focus-within:border-[#3D52D5] bg-white/60 border-gray-400

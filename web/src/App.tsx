@@ -9,22 +9,72 @@ import SessionPage from "./pages/SessionPage";
 import UnauthorizedPage from "./pages/Unauthorized";
 import DashboardPage from "./pages/DashboardPage";
 import EventPage from "./pages/EventPage";
+import CenteredLayout from "./CenteredLayout";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/invite" element={<InvitePage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/quiz/:quizId" element={<QuizPage />} />
-        <Route path="/session/:sessionId" element={<SessionPage />} />
+        <Route
+          path="/"
+          element={
+            <CenteredLayout>
+              <HomePage />
+            </CenteredLayout>
+          }
+        />
+        <Route
+          path="/invite"
+          element={
+            <CenteredLayout>
+              <InvitePage />
+            </CenteredLayout>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <CenteredLayout>
+              <LoginPage />
+            </CenteredLayout>
+          }
+        />
+        <Route
+          path="/quiz/:quizId"
+          element={
+            <CenteredLayout>
+              <QuizPage />
+            </CenteredLayout>
+          }
+        />
+        <Route
+          path="/session/:sessionId"
+          element={
+            <CenteredLayout>
+              <SessionPage />
+            </CenteredLayout>
+          }
+        />
 
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/events" element={<EventPage />} />
 
-        <Route path="/unauthorized" element={<UnauthorizedPage />} />
-        <Route path="*" element={<NotFoundPage />} />
+        <Route
+          path="/unauthorized"
+          element={
+            <CenteredLayout>
+              <UnauthorizedPage />
+            </CenteredLayout>
+          }
+        />
+        <Route
+          path="*"
+          element={
+            <CenteredLayout>
+              <NotFoundPage />
+            </CenteredLayout>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
