@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"sync"
 	"wedding-app/api/restapi"
+	"wedding-app/assembler"
 	"wedding-app/config"
 	"wedding-app/domain/event"
 	"wedding-app/domain/service"
@@ -96,6 +97,10 @@ type Factory struct {
 
 	hub     *ws.Hub
 	hubOnce sync.Once
+
+	assembler      *assembler.Assembler
+	assemblerOnce  sync.Once
+	assemblerError error
 
 	publisher     event.EventPublisher
 	publisherOnce sync.Once
@@ -254,12 +259,14 @@ func (f *Factory) GinHandlers(ctx context.Context) (*restapi.GinHandlers, error)
 		}
 		sessionHandler := restapi.NewSessionHandler(sessionService)
 
+		wsHandler := restapi.NewWSHandler(f.Hub(), f.Logger(), f.config.ServerConfig())
+
 		authMiddleware := restapi.AuthMiddleware(f.JWTService())
 
 		f.ginHandlers, f.ginHandlersError = restapi.NewGinHandlers(
 			userHandler, basicHandler, quizHandler,
 			questionHandler, answerHandler, sessionHandler,
-			authMiddleware)
+			wsHandler, authMiddleware)
 	})
 	return f.ginHandlers, f.ginHandlersError
 }

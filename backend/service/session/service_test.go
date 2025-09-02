@@ -80,8 +80,8 @@ func TestGetCurrentQuestion(t *testing.T) {
 			qs := storemock.NewMockQuestionStore(t)
 
 			test.Mock(ss, qs)
-
-			svc := session.NewSessionService(ss, qs, nil, nil, nil, nil)
+			// TODO: opravit testy
+			svc := session.NewSessionService(ss, qs, nil, nil, nil, nil, nil)
 			actual, err := svc.GetCurrentQuestion(t.Context(), test.ArgSessionID)
 			if test.ExpectedResult != nil {
 				assert.Equal(t, test.ExpectedResult, actual)

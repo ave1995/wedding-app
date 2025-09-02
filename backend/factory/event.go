@@ -8,6 +8,7 @@ import (
 func (f *Factory) Hub() *ws.Hub {
 	f.hubOnce.Do(func() {
 		f.hub = ws.NewHub(f.Logger())
+		go f.hub.Run()
 	})
 	return f.hub
 }

@@ -31,7 +31,7 @@ func NewWSHandler(hub *ws.Hub, logger *slog.Logger, config config.ServerConfig) 
 		}}
 }
 
-func (h *WSHandler) ServeWS(c *gin.Context) {
+func (h *WSHandler) serveWS(c *gin.Context) {
 	conn, err := h.upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		h.logger.Error("Failed to upgrade connection", "error", err)
@@ -53,7 +53,7 @@ func (h *WSHandler) ServeWS(c *gin.Context) {
 	go client.WritePump()
 	go client.ReadPump(h.hub)
 
-	h.logger.Info("WebSocket client connected", "remote", conn.RemoteAddr(), "topics", client.Topics)
+	h.logger.Info("WebSocket client connected", "remote", conn.RemoteAddr(), "topics", client.Topics())
 }
 
 func splitTopics(q string) []string {
