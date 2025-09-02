@@ -15,10 +15,11 @@ type GinHandlers struct {
 	Question       *QuestionHandler
 	Answer         *AnswerHandler
 	Session        *SessionHandler
+	WS             *WSHandler
 	AuthMiddleware gin.HandlerFunc
 }
 
-func NewGinHandlers(user *UserHandler, basic *BasicHandler, quiz *QuizHandler, question *QuestionHandler, answer *AnswerHandler, session *SessionHandler, authMiddleware gin.HandlerFunc) (*GinHandlers, error) {
+func NewGinHandlers(user *UserHandler, basic *BasicHandler, quiz *QuizHandler, question *QuestionHandler, answer *AnswerHandler, session *SessionHandler, ws *WSHandler, authMiddleware gin.HandlerFunc) (*GinHandlers, error) {
 	if user == nil {
 		return nil, errors.New("user handler must not be nil")
 	}
@@ -37,6 +38,9 @@ func NewGinHandlers(user *UserHandler, basic *BasicHandler, quiz *QuizHandler, q
 	if session == nil {
 		return nil, errors.New("session handler must not be nil")
 	}
+	if ws == nil {
+		return nil, errors.New("ws handler must not be nil")
+	}
 	if authMiddleware == nil {
 		return nil, errors.New("auth middleware must not be nil")
 	}
@@ -48,6 +52,7 @@ func NewGinHandlers(user *UserHandler, basic *BasicHandler, quiz *QuizHandler, q
 		Question:       question,
 		Answer:         answer,
 		Session:        session,
+		WS:             ws,
 		AuthMiddleware: authMiddleware,
 	}, nil
 }
@@ -59,6 +64,8 @@ func (h *GinHandlers) RegisterAll(router *gin.Engine) {
 		c.String(200, "pong")
 	})
 	router.GET("/user-svgs", h.Basic.getUserSvgs)
+
+	router.GET("/ws", h.WS.serveWS)
 
 	auth := router.Group("/auth")
 	auth.POST("/register", h.User.registerUser)

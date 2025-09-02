@@ -25,11 +25,7 @@ function HomePage() {
       {message && (
         <Toast message={message} onClose={() => setMessage(null)}></Toast>
       )}
-      <Button
-        onClick={handleClick}
-        label="Ping"
-        type={ButtonTypeEnum.Basic}
-      ></Button>
+      <Button onClick={handleClick} label="Ping" type={ButtonTypeEnum.Basic} />
     </div>
   );
 }

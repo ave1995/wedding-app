@@ -4,11 +4,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
+	"wedding-app/assembler"
 	"wedding-app/domain/apperrors"
+	"wedding-app/domain/event"
 	"wedding-app/domain/model"
 	"wedding-app/domain/service"
 	"wedding-app/domain/store"
 	"wedding-app/dto"
+	"wedding-app/utils"
 
 	"github.com/google/uuid"
 )
@@ -18,10 +22,13 @@ type sessionService struct {
 	questionStore      store.QuestionStore
 	attemptAnswerStore store.AttemptStore
 	answerStore        store.AnswerStore
+	assembler          *assembler.Assembler
+	publisher          event.EventPublisher
+	logger             *slog.Logger
 }
 
-func NewSessionService(ss store.SessionStore, qs store.QuestionStore, aas store.AttemptStore, as store.AnswerStore) service.SessionService {
-	return &sessionService{sessionStore: ss, questionStore: qs, attemptAnswerStore: aas, answerStore: as}
+func NewSessionService(ss store.SessionStore, qs store.QuestionStore, aas store.AttemptStore, as store.AnswerStore, a *assembler.Assembler, pub event.EventPublisher, logger *slog.Logger) service.SessionService {
+	return &sessionService{sessionStore: ss, questionStore: qs, attemptAnswerStore: aas, answerStore: as, assembler: a, publisher: pub, logger: logger}
 }
 
 // GetCurrentQuestion implements service.SessionService.
@@ -69,6 +76,14 @@ func (s *sessionService) GetCurrentQuestion(ctx context.Context, sessionID strin
 		CurrentQIndex: session.CurrentQIndex + 1,
 		TotalQCount:   len(questions),
 	}
+
+	assembledEvent, err := s.assembler.ToQuestionOpenedEvent(ctx, session.ID, session.UserID, session.QuizID, question.ID)
+	if err != nil {
+		s.logger.Error("failed to assemble QuestionOpenedEvent: %v", utils.ErrAttr(err))
+	}
+	if err := s.publisher.PublishQuestionOpened(assembledEvent); err != nil {
+		s.logger.Error("failed to publish QuestionOpenedEvent: %v", utils.ErrAttr(err))
+	}
 	// Grab the current question by index
 	return response, nil
 }
@@ -94,7 +109,20 @@ func (s *sessionService) StartSession(ctx context.Context, userID string, quizID
 	if err != nil {
 		return nil, err
 	}
-	return s.sessionStore.CreateSession(ctx, parsedUserID, parsedQuizID, count)
+	newSession, err := s.sessionStore.CreateSession(ctx, parsedUserID, parsedQuizID, count)
+	if err != nil {
+		return nil, err
+	}
+
+	assembledEvent, err := s.assembler.ToSessionStartEvent(ctx, newSession.ID, parsedUserID, parsedQuizID)
+	if err != nil {
+		s.logger.Error("failed to assemble SessionStartEvent: %v", utils.ErrAttr(err))
+	}
+	if err := s.publisher.PublishSessionStarted(assembledEvent); err != nil {
+		s.logger.Error("failed to publish SessionStartEvent: %v", utils.ErrAttr(err))
+	}
+
+	return newSession, err
 }
 
 // SubmitAnswer implements service.SessionService.
@@ -175,6 +203,14 @@ func (s *sessionService) SubmitAnswer(
 		}
 	}
 
+	assembledEvent, err := s.assembler.ToAnswerSubmittedEvent(ctx, session.ID, session.UserID, session.QuizID, question.ID, parsedAnswerIDs)
+	if err != nil {
+		s.logger.Error("failed to assemble SessionStartEvent: %v", utils.ErrAttr(err))
+	}
+	if err := s.publisher.PublishAnswerSubmitted(assembledEvent); err != nil {
+		s.logger.Error("failed to publish AnswerSubmittedEvent: %v", utils.ErrAttr(err))
+	}
+
 	// Move to next question
 	session.CurrentQIndex++
 	if session.CurrentQIndex >= session.TotalQCount {
@@ -184,6 +220,16 @@ func (s *sessionService) SubmitAnswer(
 
 	if err := s.sessionStore.UpdateSession(ctx, session); err != nil {
 		return false, fmt.Errorf("failed to update session: %w", err)
+	}
+
+	if isCompleted {
+		assembledEvent, err := s.assembler.ToSessionEndEvent(ctx, session.ID, session.UserID, session.QuizID)
+		if err != nil {
+			s.logger.Error("failed to assemble SessionEndEvent: %v", utils.ErrAttr(err))
+		}
+		if err := s.publisher.PublishSessionEnded(assembledEvent); err != nil {
+			s.logger.Error("failed to publish SessionEndEvent: %v", utils.ErrAttr(err))
+		}
 	}
 
 	return isCompleted, nil

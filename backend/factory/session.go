@@ -2,6 +2,7 @@ package factory
 
 import (
 	"context"
+	"wedding-app/assembler"
 	"wedding-app/domain/service"
 	"wedding-app/domain/store"
 	"wedding-app/service/session"
@@ -56,7 +57,13 @@ func (f *Factory) SessionService(ctx context.Context) (service.SessionService, e
 		if f.sessionServiceErr != nil {
 			return
 		}
-		f.sessionService = session.NewSessionService(sessionStore, questionStore, attempStore, answerStore)
+		var assembler *assembler.Assembler
+		assembler, f.sessionServiceErr = f.Assembler(ctx)
+		if f.sessionServiceErr != nil {
+			return
+		}
+
+		f.sessionService = session.NewSessionService(sessionStore, questionStore, attempStore, answerStore, assembler, f.EventPublisher(), f.Logger())
 	})
 	return f.sessionService, f.sessionServiceErr
 }

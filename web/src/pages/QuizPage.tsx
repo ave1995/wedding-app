@@ -19,6 +19,7 @@ function QuizPage() {
         const result = await get<Quiz>(apiUrl(`/api/quiz/${quizId}`), {}, true);
         if (handleError(result.error, result.status)) return;
 
+
         setQuiz(result.data);
       }
       fetchQuiz();
