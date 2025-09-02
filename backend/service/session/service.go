@@ -76,6 +76,14 @@ func (s *sessionService) GetCurrentQuestion(ctx context.Context, sessionID strin
 		CurrentQIndex: session.CurrentQIndex + 1,
 		TotalQCount:   len(questions),
 	}
+
+	assembledEvent, err := s.assembler.ToQuestionOpenedEvent(ctx, session.ID, session.UserID, session.QuizID, question.ID)
+	if err != nil {
+		s.logger.Error("failed to assemble QuestionOpenedEvent: %v", utils.ErrAttr(err))
+	}
+	if err := s.publisher.PublishQuestionOpened(assembledEvent); err != nil {
+		s.logger.Error("failed to publish QuestionOpenedEvent: %v", utils.ErrAttr(err))
+	}
 	// Grab the current question by index
 	return response, nil
 }

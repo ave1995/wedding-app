@@ -33,6 +33,7 @@ func (a *Assembler) buildSessionBase(ctx context.Context, sessionID, userID, qui
 
 	return event.SessionBaseEvent{
 		SessionID:   sessionID,
+		UserID:      userID,
 		Username:    user.Username,
 		UserIconUrl: user.IconUrl,
 		Quizname:    quiz.Name,
@@ -87,6 +88,26 @@ func (a *Assembler) ToAnswerSubmittedEvent(ctx context.Context, sessionID, userI
 		SessionBaseEvent: base,
 		QuestionText:     question.Text,
 		Answers:          answers,
+		QuestionID:       quiestionID,
 		SubmittedAt:      time.Now(),
+	}, err
+}
+
+func (a *Assembler) ToQuestionOpenedEvent(ctx context.Context, sessionID, userID, quizID, quiestionID uuid.UUID) (*event.QuestionOpenedEvent, error) {
+	base, err := a.buildSessionBase(ctx, sessionID, userID, quizID)
+	if err != nil {
+		return nil, err
+	}
+
+	question, err := a.questionStore.GetQuestionByID(ctx, quiestionID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &event.QuestionOpenedEvent{
+		SessionBaseEvent: base,
+		QuestionText:     question.Text,
+		QuestionID:       quiestionID,
+		OpenedAt:         time.Now(),
 	}, err
 }

@@ -27,6 +27,23 @@ func wrapEvent[T any](topic string, e T) ([]byte, error) {
 	})
 }
 
+const TopicQuestionOpenedEvent = "question_open"
+
+// PublishQuestionOpened implements event.EventPublisher.
+func (p *publisher) PublishQuestionOpened(e *event.QuestionOpenedEvent) error {
+	data, err := wrapEvent(TopicQuestionOpenedEvent, e)
+	if err != nil {
+		return err
+	}
+
+	p.hub.broadcast <- broadcastMessage{
+		Topic: TopicQuestionOpenedEvent,
+		Data:  data,
+	}
+
+	return nil
+}
+
 const TopicAnswerSubmittedEvent = "answer_submit"
 
 // PublishAnswerSubmitted implements event.EventPublisher.

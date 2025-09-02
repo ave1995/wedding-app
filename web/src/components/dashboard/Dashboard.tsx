@@ -1,24 +1,21 @@
 import { useEffect, useState } from "react";
 import { apiUrl } from "../../functions/api";
 import DashboardHead from "./DashboardHead";
+import { useQuestions } from "../../hooks/useQuestionEventHandler";
+import DashboardQuestions from "./DashboardQuestions";
+import DashboardActive from "./DashboardActive";
 
-export type Status = "Online" | "Offline" | "Error";
-
-export type AnswerInfo = {
-  QuestionText: string;
-  UserIconUrl: string;
-  Username: string;
-};
+export type DashboardStatus = "Online" | "Offline" | "Error";
 
 export default function Dashboard() {
-  const [status, setStatus] = useState<Status>("Offline");
+  const [status, setStatus] = useState<DashboardStatus>("Offline");
   const [activeSessions, setActiveSessions] = useState(0);
-  const [answers, setAnswer] = useState<AnswerInfo[]>([]);
+  const { questions, upsertQuestion } = useQuestions();
 
   useEffect(() => {
     // Connect to WebSocket with desired topics
     const httpUrl = apiUrl(
-      "/ws?topics=answer_submit,session_start,session_end"
+      "/ws?topics=answer_submit,session_start,session_end,question_open"
     );
     const wsUrl = httpUrl.replace(/^http/, "ws");
 
@@ -38,12 +35,23 @@ export default function Dashboard() {
         } else if (eventData.topic === "session_end") {
           setActiveSessions((prev) => Math.max(prev - 1, 0)); // nikdy méně než 0
         } else if (eventData.topic === "answer_submit") {
-          const answerInfo: AnswerInfo = {
+          upsertQuestion({
+            UserID: eventData.data.UserID,
+            QuestionID: eventData.data.QuestionID,
             QuestionText: eventData.data.QuestionText,
             UserIconUrl: eventData.data.UserIconUrl,
             Username: eventData.data.Username,
-          };
-          setAnswer((prev) => [...prev, answerInfo]);
+            Status: "Odpověděl",
+          });
+        } else if (eventData.topic === "question_open") {
+          upsertQuestion({
+            UserID: eventData.data.UserID,
+            QuestionID: eventData.data.QuestionID,
+            QuestionText: eventData.data.QuestionText,
+            UserIconUrl: eventData.data.UserIconUrl,
+            Username: eventData.data.Username,
+            Status: "Přemýšlí",
+          });
         }
       } catch (e) {
         console.error("Chyba při parsování WebSocket zprávy:", e);
@@ -61,36 +69,13 @@ export default function Dashboard() {
     return () => {
       socket.close();
     };
-  }, []);
+  }, [upsertQuestion]);
 
   return (
     <div className="flex flex-col gap-8 p-6 w-full h-full">
-      <DashboardHead activeSessions={activeSessions} status={status} />
-      <div className="flex flex-col gap-2 border rounded-xl border-b-4 p-4 bg-white/60 border-gray-400 text-gray-800">
-        <h2 className="text-xl font-semibold">Odpovědi</h2>
-        <div className="grid grid-cols-[30%_70%] gap-4 font-semibold border-b border-pink-500 pb-2 mb-2">
-          <div>Uživatel</div>
-          <div>Otázka</div>
-        </div>
-        <ul className="space-y-2">
-          {answers.map((msg, idx) => (
-            <li
-              key={idx}
-              className="grid grid-cols-[40%_60%] gap-4 items-center place-items-start border rounded-xl border-b-4 p-1 bg-white/60 border-[#3D52D5] text-gray-800"
-            >
-              <div className="flex gap-2 items-center place-content-center">
-                <img
-                  className="w-11 h-11"
-                  src={msg.UserIconUrl}
-                  alt={msg.Username}
-                />
-                {msg.Username}
-              </div>
-              <div>{msg.QuestionText}</div>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <DashboardHead status={status} />
+      <DashboardActive activeSessions={activeSessions}></DashboardActive>
+      <DashboardQuestions questions={questions}></DashboardQuestions>
     </div>
   );
 }
