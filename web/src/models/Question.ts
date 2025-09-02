@@ -4,5 +4,5 @@ export type Question = {
     ID: string;
     Text: string;
     Type: string;
-    Answers: Answer[]
+    Answers: Answer[];
 };

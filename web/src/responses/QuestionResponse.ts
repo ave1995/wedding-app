@@ -1,6 +1,10 @@
 import type { Question } from "../models/Question";
 
+// TODO: duplicity with SubmitAnswerResponsePending
 export type QuestionResponse = {
-    completed: boolean;
-    question: Question;
-}
+  session_id: string;
+  completed: boolean;
+  question: Question;
+  currentQIndex: number;
+  totalQCount: number;
+};

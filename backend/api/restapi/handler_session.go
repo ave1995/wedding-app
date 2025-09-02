@@ -35,16 +35,13 @@ func (h *SessionHandler) startSession(c *gin.Context) {
 		return
 	}
 
-	question, err := h.sessionService.GetCurrentQuestion(c, session.ID.String())
+	questionDto, err := h.sessionService.GetCurrentQuestion(c, session.ID.String())
 	if err != nil {
 		c.Error(NewInternalAPIError(err))
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"session_id": session.ID,
-		"question":   question,
-	})
+	c.JSON(http.StatusOK, questionDto)
 }
 
 func (h *SessionHandler) submitAnswer(c *gin.Context) {
@@ -80,16 +77,13 @@ func (h *SessionHandler) submitAnswer(c *gin.Context) {
 		return
 	}
 
-	nextQuestion, err := h.sessionService.GetCurrentQuestion(c, sessionID)
+	nextQuestionDto, err := h.sessionService.GetCurrentQuestion(c, sessionID)
 	if err != nil {
 		c.Error(NewInternalAPIError(err))
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"completed": false,
-		"question":  nextQuestion,
-	})
+	c.JSON(http.StatusOK, nextQuestionDto)
 }
 
 func (h *SessionHandler) getCurrentQuestion(c *gin.Context) {
@@ -120,16 +114,13 @@ func (h *SessionHandler) getCurrentQuestion(c *gin.Context) {
 		return
 	}
 
-	question, err := h.sessionService.GetCurrentQuestion(c, sessionID)
+	questionDto, err := h.sessionService.GetCurrentQuestion(c, sessionID)
 	if err != nil {
 		c.Error(NewInternalAPIError(err))
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"completed": false,
-		"question":  question,
-	})
+	c.JSON(http.StatusOK, questionDto)
 }
 
 func (h *SessionHandler) getResult(c *gin.Context) {

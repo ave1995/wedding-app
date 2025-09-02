@@ -13,17 +13,20 @@ import { useApiErrorHandler } from "../hooks/useApiErrorHandler";
 import QuestionForm from "../components/question/QuestionForm";
 import ResultForm from "../components/ResultForm";
 
-
 export default function SessionPage() {
   const { sessionId } = useParams();
   const { handleError } = useApiErrorHandler();
 
-  const [question, setQuestion] = useState<Question | null>(null);
   const [completed, setCompleted] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
+  const [questionState, setQuestionState] = useState<{
+    question: Question | null;
+    currentQIndex: number;
+    totalQCount: number;
+  }>({ question: null, currentQIndex: 0, totalQCount: 0 });
 
   useEffect(() => {
-    if (!question) {
+    if (!questionState.question) {
       async function fetchQuestion() {
         const qResponse = await get<QuestionResponse>(
           apiUrl(`/api/sessions/${sessionId}/question`),
@@ -44,19 +47,23 @@ export default function SessionPage() {
           console.log(result.data!.result);
           setResult(result.data!.result);
         } else {
-          setQuestion(qResponse.data!.question ?? null);
+          setQuestionState({
+            question: qResponse.data!.question ?? null,
+            currentQIndex: qResponse.data!.currentQIndex ?? 0,
+            totalQCount: qResponse.data!.totalQCount ?? 0,
+          });
         }
       }
       fetchQuestion();
     }
-  }, [question, sessionId]);
+  }, [sessionId]);
 
   const submitAnswer = async (answerIds: string[]) => {
     const result = await post<SubmitAnswerResponse>(
       apiUrl(`/api/sessions/${sessionId}/answers`),
       null,
       {
-        question_id: question?.ID,
+        question_id: questionState.question?.ID,
         answer_ids: answerIds,
       },
       true
@@ -67,25 +74,29 @@ export default function SessionPage() {
       setCompleted(true);
       setResult(result.data!.result);
     } else {
-      setQuestion(result.data!.nextQuestion);
+      setQuestionState({
+        question: result.data!.question ?? null,
+        currentQIndex: result.data!.currentQIndex ?? 0,
+        totalQCount: result.data!.totalQCount ?? 0,
+      });
     }
   };
 
   if (completed) {
-    return <ResultForm sessionId={sessionId!} resultFrom={result}/>
+    return <ResultForm sessionId={sessionId!} resultFrom={result} />;
   }
 
-  if (!question) {
+  if (!questionState.question) {
     return <p>Načítám otázku...</p>;
   }
 
   return (
     <div className="w-96 h-screen">
       <QuestionForm
-        text={question.Text}
-        currentQIndex={2}
-        totalQCount={40}
-        answers={question.Answers}
+        text={questionState.question!.Text}
+        currentQIndex={questionState.currentQIndex ?? 0}
+        totalQCount={questionState.totalQCount ?? 0}
+        answers={questionState.question!.Answers}
         submitAnswer={submitAnswer}
       />
     </div>

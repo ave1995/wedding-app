@@ -8,6 +8,7 @@ import (
 	"wedding-app/domain/model"
 	"wedding-app/domain/service"
 	"wedding-app/domain/store"
+	"wedding-app/dto"
 
 	"github.com/google/uuid"
 )
@@ -24,7 +25,7 @@ func NewSessionService(ss store.SessionStore, qs store.QuestionStore, aas store.
 }
 
 // GetCurrentQuestion implements service.SessionService.
-func (s *sessionService) GetCurrentQuestion(ctx context.Context, sessionID string) (*model.Question, error) {
+func (s *sessionService) GetCurrentQuestion(ctx context.Context, sessionID string) (*dto.QuestionResponse, error) {
 	parsed, err := uuid.Parse(sessionID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse session ID %q: %w", sessionID, err)
@@ -60,8 +61,16 @@ func (s *sessionService) GetCurrentQuestion(ctx context.Context, sessionID strin
 	}
 
 	question.Answers = answers
+
+	response := &dto.QuestionResponse{
+		SessionID:     session.ID,
+		Completed:     session.IsCompleted,
+		Question:      question,
+		CurrentQIndex: session.CurrentQIndex + 1,
+		TotalQCount:   len(questions),
+	}
 	// Grab the current question by index
-	return question, nil
+	return response, nil
 }
 
 // StartSession implements service.SessionService.
