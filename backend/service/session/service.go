@@ -192,6 +192,17 @@ func (s *sessionService) SubmitAnswer(
 		s.logger.Error("failed to publish AnswerSubmittedEvent: %v", utils.ErrAttr(err))
 	}
 
+	if err := s.publisher.PublishAnswerSubmitted(event.AnswerSubmittedEvent{
+		SessionID:   session.ID,
+		UserID:      session.UserID,
+		QuizID:      session.QuizID,
+		QuestionID:  question.ID,
+		AnswerIDs:   parsedAnswerIDs,
+		SubmittedAt: time.Now(),
+	}); err != nil {
+		s.logger.Error("failed to publish AnswerSubmittedEvent: %v", utils.ErrAttr(err))
+	}
+
 	// Move to next question
 	session.CurrentQIndex++
 	if session.CurrentQIndex >= session.TotalQCount {
