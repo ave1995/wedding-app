@@ -56,7 +56,7 @@ func (f *Factory) SessionService(ctx context.Context) (service.SessionService, e
 		if f.sessionServiceErr != nil {
 			return
 		}
-		f.sessionService = session.NewSessionService(sessionStore, questionStore, attempStore, answerStore)
+		f.sessionService = session.NewSessionService(sessionStore, questionStore, attempStore, answerStore, f.EventPublisher(), f.Logger())
 	})
 	return f.sessionService, f.sessionServiceErr
 }

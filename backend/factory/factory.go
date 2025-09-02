@@ -8,6 +8,7 @@ import (
 	"sync"
 	"wedding-app/api/restapi"
 	"wedding-app/config"
+	"wedding-app/domain/event"
 	"wedding-app/domain/service"
 	"wedding-app/domain/store"
 	"wedding-app/service/jwt"
@@ -16,6 +17,7 @@ import (
 	"wedding-app/service/user"
 	googlecloud "wedding-app/store/googleCloud"
 	"wedding-app/store/mongodb"
+	"wedding-app/ws"
 
 	"cloud.google.com/go/storage"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -91,6 +93,12 @@ type Factory struct {
 	ginHandlers      *restapi.GinHandlers
 	ginHandlersOnce  sync.Once
 	ginHandlersError error
+
+	hub     *ws.Hub
+	hubOnce sync.Once
+
+	publisher     event.EventPublisher
+	publisherOnce sync.Once
 
 	server      *http.Server
 	serverOnce  sync.Once
