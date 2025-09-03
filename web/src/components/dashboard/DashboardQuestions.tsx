@@ -9,13 +9,13 @@ interface DashboardQuestions {
 
 export default function DashboardQuestions({ questions }: DashboardQuestions) {
   return (
-    <div className="flex flex-col gap-2 p-4 text-gray-800 text-left">
+    <div className="flex flex-col gap-2 p-4 text-gray-800 text-left h-[600px] overflow-auto">
       <h2 className="text-lg font-semibold">Aktivita</h2>
       <ul className="space-y-2">
         {questions.map((msg, idx) => (
           <li
             key={idx}
-            className={`grid grid-cols-3 gap-4 items-center border rounded-xl border-b-4 px-3 py-1 bg-white/60  text-gray-800
+            className={`flex gap-4 items-center place-content-between border rounded-xl border-b-4 px-3 py-1 bg-white/60  text-gray-800
                 ${idx % 2 === 0 ? "border-gray-300" : "border-gray-400"}`}
           >
             {/* Uživatel */}
@@ -28,7 +28,7 @@ export default function DashboardQuestions({ questions }: DashboardQuestions) {
               <span className="font-medium text-gray-800">{msg.Username}</span>
             </div>
             {/* Otázka */}
-            <p>
+            <p className="flex-grow">
               <span className="font-semibold">Otázka:</span> {msg.QuestionText}
             </p>
             {/* Status */}

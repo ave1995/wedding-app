@@ -24,9 +24,10 @@ export function useQuestions() {
   const upsertQuestion = useCallback((newQuestion: QuestionInfo) => {
     setQuestionsMap((prev) => {
       const newMap = new Map(prev);
+      const key = newQuestion.UserID + newQuestion.QuestionID;
       // remove existing so reinsertion updates order
-      newMap.delete(newQuestion.UserID);
-      newMap.set(newQuestion.UserID, newQuestion);
+      newMap.delete(key);
+      newMap.set(key, newQuestion);
       return newMap;
     });
   }, []);
