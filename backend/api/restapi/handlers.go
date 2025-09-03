@@ -2,6 +2,7 @@ package restapi
 
 import (
 	"errors"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -65,8 +66,6 @@ func (h *GinHandlers) RegisterAll(router *gin.Engine) {
 	})
 	router.GET("/user-svgs", h.Basic.getUserSvgs)
 
-	router.GET("/ws", h.WS.serveWS)
-
 	auth := router.Group("/auth")
 	auth.POST("/register", h.User.registerUser)
 	auth.POST("/login", h.User.loginUser)
@@ -75,6 +74,10 @@ func (h *GinHandlers) RegisterAll(router *gin.Engine) {
 
 	api := router.Group("/api")
 	api.Use(h.AuthMiddleware)
+
+	api.GET("/auth-check", func(c *gin.Context) { c.JSON(http.StatusOK, gin.H{"status": "ok"}) })
+	api.GET("/ws", h.WS.serveWS)
+
 	// Quiz endpoints
 	api.POST("/create-quiz", h.Quiz.createQuiz)
 	api.GET("/quiz/:id", h.Quiz.getQuiz)
