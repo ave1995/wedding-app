@@ -246,14 +246,30 @@ func (s *sessionService) GetResult(ctx context.Context, sessionID string) (*mode
 		return nil, fmt.Errorf("failed to get session: %w", err)
 	}
 
-	attempts, err := s.attemptAnswerStore.GetAnsweredBySessionID(ctx, parsedSessionID)
+	allUserAnswers, err := s.attemptAnswerStore.GetAnsweredBySessionID(ctx, parsedSessionID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get attempts: %w", err)
 	}
 
+	userAnswersByQuestion := make(map[uuid.UUID][]*model.Attempt)
+	for _, a := range allUserAnswers {
+		userAnswersByQuestion[a.QuestionID] = append(userAnswersByQuestion[a.QuestionID], a)
+	}
+
+	questions, err := s.questionStore.GetQuestionsByQuizID(ctx, session.QuizID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get questions: %w", err)
+	}
+
 	score := 0
-	for _, a := range attempts {
-		if a.IsCorrect {
+	for _, q := range questions {
+		userAnswers := userAnswersByQuestion[q.ID]
+
+		correct, err := s.isQuestionCorrect(ctx, q, userAnswers)
+		if err != nil {
+			return nil, err
+		}
+		if correct {
 			score++
 		}
 	}
@@ -270,6 +286,32 @@ func (s *sessionService) GetResult(ctx context.Context, sessionID string) (*mode
 		Percentage: percentage,
 	}
 	return result, nil
+}
+
+// Helper to check if a question is answered correctly
+func (s *sessionService) isQuestionCorrect(ctx context.Context, q *model.Question, userAnswers []*model.Attempt) (bool, error) {
+	switch q.Type {
+	case model.SingleChoice:
+		return len(userAnswers) == 1 && userAnswers[0].IsCorrect, nil
+	case model.MultipleChoice:
+		correctAnswers, err := s.answerStore.GetCorrectAnswersByQuestionID(ctx, q.ID) // TODO: měl bych využít MongoDB a i cache
+		if err != nil {
+			return false, fmt.Errorf("failed to get correct answers: %w", err)
+		}
+
+		if len(userAnswers) != len(correctAnswers) {
+			return false, nil // must select all correct answers
+		}
+
+		for _, ua := range userAnswers {
+			if !ua.IsCorrect {
+				return false, nil
+			}
+		}
+		return true, nil
+	default:
+		return false, nil
+	}
 }
 
 // GetSessionByID implements service.SessionService.

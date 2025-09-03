@@ -17,6 +17,7 @@ type answer struct {
 const (
 	AnswerFieldID         = FieldID
 	AnswerFieldQuestionID = "question_id"
+	AnswerFieldIsCorrect  = "is_correct"
 )
 
 func (a *answer) ToDomain() (*model.Answer, error) {

@@ -49,3 +49,8 @@ func (s *answerStore) GetAnswerByIDAndQuestionID(ctx context.Context, answerID u
 func (s *answerStore) GetAnswersByQuestionID(ctx context.Context, questionID uuid.UUID) ([]*model.Answer, error) {
 	return getManyByFilterAndConvert[*answer](ctx, s.answersCollection(), bson.M{AnswerFieldQuestionID: questionID.String()}, nil)
 }
+
+// GetCorrectAnswersByQuestionID implements store.AnswerStore.
+func (s *answerStore) GetCorrectAnswersByQuestionID(ctx context.Context, questionID uuid.UUID) ([]*model.Answer, error) {
+	return getManyByFilterAndConvert[*answer](ctx, s.answersCollection(), bson.M{AnswerFieldQuestionID: questionID.String(), AnswerFieldIsCorrect: true}, nil)
+}

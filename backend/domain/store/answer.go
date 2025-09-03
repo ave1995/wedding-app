@@ -12,4 +12,5 @@ type AnswerStore interface {
 	GetAnswerByID(ctx context.Context, id uuid.UUID) (*model.Answer, error)
 	GetAnswerByIDAndQuestionID(ctx context.Context, answerID uuid.UUID, questionID uuid.UUID) (*model.Answer, error)
 	GetAnswersByQuestionID(ctx context.Context, questionID uuid.UUID) ([]*model.Answer, error)
+	GetCorrectAnswersByQuestionID(ctx context.Context, questionID uuid.UUID) ([]*model.Answer, error)
 }
