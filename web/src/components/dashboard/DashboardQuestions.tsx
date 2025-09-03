@@ -32,9 +32,9 @@ export default function DashboardQuestions({ questions }: DashboardQuestions) {
               <span className="font-semibold">Otázka:</span> {msg.QuestionText}
             </p>
             {/* Status */}
-            <div className="flex justify-end">
+            <div className="flex">
               <span
-                className={`px-3 py-1 ${
+                className={`flex items-center place-content-center min-w-[102px] py-1 ${
                   questionStatusColors[msg.Status]
                 } rounded-xl`}
               >

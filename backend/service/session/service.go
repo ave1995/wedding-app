@@ -300,7 +300,7 @@ func (s *sessionService) isQuestionCorrect(ctx context.Context, q *model.Questio
 		}
 
 		if len(userAnswers) != len(correctAnswers) {
-			return false, nil // must select all correct answers
+			return false, nil // musí zvolit správný počet odpovědí, aby někdo nemohl zaklikávat všechno a mít plný počet bodů
 		}
 
 		for _, ua := range userAnswers {
