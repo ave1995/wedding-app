@@ -35,6 +35,14 @@ func (h *SessionHandler) startSession(c *gin.Context) {
 		return
 	}
 
+	if session.IsCompleted {
+		c.JSON(http.StatusOK, gin.H{
+			"session_id":   session.ID.String(),
+			"is_completed": true,
+		})
+		return
+	}
+
 	questionDto, err := h.sessionService.GetCurrentQuestion(c, session.ID.String())
 	if err != nil {
 		c.Error(NewInternalAPIError(err))
