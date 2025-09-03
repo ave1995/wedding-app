@@ -61,6 +61,23 @@ func (h *SessionHandler) submitAnswer(c *gin.Context) {
 		return
 	}
 
+	// TODO: tohle by se dalo promyslet lépe, abych nemusel načítat session pro kontrolu, ale co se dá dělat
+	session, err := h.sessionService.GetSessionByID(c, sessionID)
+	if err != nil {
+		c.Error(NewInternalAPIError(err))
+		return
+	}
+
+	_, err = GetUserIDForQuizFromContext(c, session.QuizID.String())
+	if err != nil {
+		if errors.Is(err, ErrUserIsNotAuthorizedForQuizInContext) {
+			c.Error(NewAPIError(http.StatusUnauthorized, "unauthorized for session!", err))
+			return
+		}
+		c.Error(NewInternalAPIError(err))
+		return
+	}
+
 	isCompleted, err := h.sessionService.SubmitAnswer(c, sessionID, req.QuestionID, req.AnswerIDs)
 	if err != nil {
 		c.Error(NewInternalAPIError(err))
@@ -100,7 +117,6 @@ func (h *SessionHandler) getCurrentQuestion(c *gin.Context) {
 	// načtení session a kontrola uživatele
 	session, err := h.sessionService.GetSessionByID(c, sessionID)
 	if err != nil {
-
 		c.Error(NewInternalAPIError(err))
 		return
 	}
