@@ -172,10 +172,11 @@ func (s *sessionService) SubmitAnswer(
 		return false, fmt.Errorf("failed to load question: %w", err)
 	}
 
+	// TODO: musíme si říct, jestli řekneme uživatelům jaké otázky jsou s více odpovědmi.
 	// Validation: single-choice questions must have exactly one answer
-	if question.Type == model.SingleChoice && len(parsedAnswerIDs) != 1 {
-		return false, fmt.Errorf("single-choice question must have exactly one selected answer")
-	}
+	// if question.Type == model.SingleChoice && len(parsedAnswerIDs) != 1 {
+	// 	return false, fmt.Errorf("single-choice question must have exactly one selected answer")
+	// }
 
 	// Check if question was already answered
 	answered, err := s.attemptAnswerStore.GetAnsweredBySessionIDAndQuestionID(ctx, session.ID, parsedQuestionID)
