@@ -27,11 +27,12 @@ func (s *attemptStore) attemptCollection() *mongo.Collection {
 // CreateAttemptAnswer implements store.AttemptStore.
 func (s *attemptStore) CreateAttemptAnswer(ctx context.Context, params model.CreateAttemptParams) (*model.Attempt, error) {
 	mongoAttempt := &attempt{
-		ID:         uuid.NewString(),
-		SessionID:  params.SessionID.String(),
-		QuestionID: params.QuestionID.String(),
-		AnswerID:   params.AnswerID.String(),
-		IsCorrect:  params.IsCorrect,
+		ID:           uuid.NewString(),
+		SessionID:    params.SessionID.String(),
+		QuestionID:   params.QuestionID.String(),
+		AnswerID:     params.AnswerID.String(),
+		IsCorrect:    params.IsCorrect,
+		QuestionType: string(params.Type),
 	}
 	return createAndConvert(ctx, s.attemptCollection(), mongoAttempt)
 }

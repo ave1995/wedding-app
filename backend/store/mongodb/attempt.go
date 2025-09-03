@@ -8,11 +8,12 @@ import (
 )
 
 type attempt struct {
-	ID         string `bson:"_id"`
-	SessionID  string `bson:"session_id"`
-	QuestionID string `bson:"question_id"`
-	AnswerID   string `bson:"answer_id"`
-	IsCorrect  bool   `bson:"is_correct"`
+	ID           string `bson:"_id"`
+	SessionID    string `bson:"session_id"`
+	QuestionID   string `bson:"question_id"`
+	AnswerID     string `bson:"answer_id"`
+	IsCorrect    bool   `bson:"is_correct"`
+	QuestionType string `bson:"question_type"`
 }
 
 const (

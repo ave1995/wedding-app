@@ -107,6 +107,74 @@ func (_c *MockAttemptStore_CreateAttemptAnswer_Call) RunAndReturn(run func(ctx c
 	return _c
 }
 
+// GetAnsweredBySessionID provides a mock function for the type MockAttemptStore
+func (_mock *MockAttemptStore) GetAnsweredBySessionID(ctx context.Context, sessionID uuid.UUID) ([]*model.Attempt, error) {
+	ret := _mock.Called(ctx, sessionID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetAnsweredBySessionID")
+	}
+
+	var r0 []*model.Attempt
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) ([]*model.Attempt, error)); ok {
+		return returnFunc(ctx, sessionID)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) []*model.Attempt); ok {
+		r0 = returnFunc(ctx, sessionID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*model.Attempt)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, sessionID)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// MockAttemptStore_GetAnsweredBySessionID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetAnsweredBySessionID'
+type MockAttemptStore_GetAnsweredBySessionID_Call struct {
+	*mock.Call
+}
+
+// GetAnsweredBySessionID is a helper method to define mock.On call
+//   - ctx context.Context
+//   - sessionID uuid.UUID
+func (_e *MockAttemptStore_Expecter) GetAnsweredBySessionID(ctx interface{}, sessionID interface{}) *MockAttemptStore_GetAnsweredBySessionID_Call {
+	return &MockAttemptStore_GetAnsweredBySessionID_Call{Call: _e.mock.On("GetAnsweredBySessionID", ctx, sessionID)}
+}
+
+func (_c *MockAttemptStore_GetAnsweredBySessionID_Call) Run(run func(ctx context.Context, sessionID uuid.UUID)) *MockAttemptStore_GetAnsweredBySessionID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 uuid.UUID
+		if args[1] != nil {
+			arg1 = args[1].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *MockAttemptStore_GetAnsweredBySessionID_Call) Return(attempts []*model.Attempt, err error) *MockAttemptStore_GetAnsweredBySessionID_Call {
+	_c.Call.Return(attempts, err)
+	return _c
+}
+
+func (_c *MockAttemptStore_GetAnsweredBySessionID_Call) RunAndReturn(run func(ctx context.Context, sessionID uuid.UUID) ([]*model.Attempt, error)) *MockAttemptStore_GetAnsweredBySessionID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetAnsweredBySessionIDAndQuestionID provides a mock function for the type MockAttemptStore
 func (_mock *MockAttemptStore) GetAnsweredBySessionIDAndQuestionID(ctx context.Context, sessionID uuid.UUID, questionID uuid.UUID) (*model.Attempt, error) {
 	ret := _mock.Called(ctx, sessionID, questionID)

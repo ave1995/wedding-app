@@ -8,7 +8,7 @@ import (
 )
 
 type QuestionStore interface {
-	CreateQuestion(ctx context.Context, text string, quizID uuid.UUID) (*model.Question, error)
+	CreateQuestion(ctx context.Context, text string, quizID uuid.UUID, questionType model.QuestionType) (*model.Question, error)
 	GetQuestionByID(ctx context.Context, id uuid.UUID) (*model.Question, error)
 	GetQuestionsByQuizID(ctx context.Context, quizID uuid.UUID) ([]*model.Question, error)
 	GetOrderedQuestionsByQuizID(ctx context.Context, quizID uuid.UUID) ([]*model.Question, error)

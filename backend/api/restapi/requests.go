@@ -1,5 +1,7 @@
 package restapi
 
+import "wedding-app/domain/model"
+
 type RegisterRequest struct {
 	Username string `json:"username" binding:"required"`
 	Email    string `json:"email" binding:"required,email"`
@@ -23,8 +25,9 @@ type CreateQuizRequest struct {
 }
 
 type CreateQuestionRequest struct {
-	Text   string `json:"text" binding:"required"`
-	QuizID string `json:"quiz_id" binding:"required,uuid"`
+	Text   string             `json:"text" binding:"required"`
+	QuizID string             `json:"quiz_id" binding:"required,uuid"`
+	Type   model.QuestionType `json:"type" binding:"required"`
 }
 
 type CreateAnswerRequest struct {

@@ -676,6 +676,15 @@ const docTemplate = `{
         "model.Question": {
             "type": "object",
             "properties": {
+                "answers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Answer"
+                    }
+                },
+                "createdAt": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
                 },
@@ -684,8 +693,22 @@ const docTemplate = `{
                 },
                 "text": {
                     "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/model.QuestionType"
                 }
             }
+        },
+        "model.QuestionType": {
+            "type": "string",
+            "enum": [
+                "single_choice",
+                "multiple_choice"
+            ],
+            "x-enum-varnames": [
+                "SingleChoice",
+                "MultipleChoice"
+            ]
         },
         "model.Quiz": {
             "type": "object",
@@ -746,7 +769,8 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "quiz_id",
-                "text"
+                "text",
+                "type"
             ],
             "properties": {
                 "quiz_id": {
@@ -754,6 +778,9 @@ const docTemplate = `{
                 },
                 "text": {
                     "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/model.QuestionType"
                 }
             }
         },

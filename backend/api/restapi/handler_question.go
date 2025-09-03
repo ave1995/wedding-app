@@ -38,7 +38,7 @@ func (h *QuestionHandler) createQuestion(c *gin.Context) {
 		return
 	}
 
-	question, err := h.questionService.CreateQuestion(c, req.Text, req.QuizID)
+	question, err := h.questionService.CreateQuestion(c, req.Text, req.QuizID, req.Type)
 	if err != nil {
 		c.Error(NewInternalAPIError(err))
 		return

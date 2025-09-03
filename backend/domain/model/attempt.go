@@ -9,6 +9,7 @@ type Attempt struct {
 	QuestionID uuid.UUID
 	AnswerID   uuid.UUID
 	IsCorrect  bool
+	Type       QuestionType
 }
 
 type CreateAttemptParams struct {
@@ -16,4 +17,5 @@ type CreateAttemptParams struct {
 	QuestionID uuid.UUID
 	AnswerID   uuid.UUID
 	IsCorrect  bool
+	Type       QuestionType
 }

@@ -12,13 +12,29 @@ definitions:
     type: object
   model.Question:
     properties:
+      answers:
+        items:
+          $ref: '#/definitions/model.Answer'
+        type: array
+      createdAt:
+        type: string
       id:
         type: string
       quizID:
         type: string
       text:
         type: string
+      type:
+        $ref: '#/definitions/model.QuestionType'
     type: object
+  model.QuestionType:
+    enum:
+    - single_choice
+    - multiple_choice
+    type: string
+    x-enum-varnames:
+    - SingleChoice
+    - MultipleChoice
   model.Quiz:
     properties:
       id:
@@ -61,9 +77,12 @@ definitions:
         type: string
       text:
         type: string
+      type:
+        $ref: '#/definitions/model.QuestionType'
     required:
     - quiz_id
     - text
+    - type
     type: object
   restapi.CreateQuizRequest:
     properties:

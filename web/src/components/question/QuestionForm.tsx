@@ -15,7 +15,7 @@ export default function QuestionForm({
   currentQIndex,
   totalQCount,
   answers,
-  submitAnswer
+  submitAnswer,
 }: QuestionForm) {
   const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
 
@@ -29,7 +29,8 @@ export default function QuestionForm({
     <div className="flex flex-col w-full h-full">
       <div className="flex-grow place-items-start p-6">
         <p className="text-xs italic">
-          Otázka <span className="text-pink-500">{currentQIndex}</span> ze  <span className="text-pink-500">{totalQCount}</span>
+          Otázka <span className="text-pink-500">{currentQIndex}</span> ze{" "}
+          <span className="text-pink-500">{totalQCount}</span>
         </p>
         <h2 className="text-lg font-semibold">{text}</h2>
       </div>
@@ -60,7 +61,13 @@ export default function QuestionForm({
         </div>
       </div>
       <div className="border-t-2 border-gray-300 p-6">
-        <Button label="Odpovědět" onClick={() => submitAnswer(selectedAnswers)} />
+        <Button
+          label="Odpovědět"
+          onClick={() => {
+            submitAnswer(selectedAnswers);
+            setSelectedAnswers([]);
+          }}
+        />
       </div>
     </div>
   );

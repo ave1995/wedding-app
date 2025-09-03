@@ -12,6 +12,7 @@ type question struct {
 	ID        string    `bson:"_id"`
 	QuizID    string    `bson:"quiz_id"`
 	Text      string    `bson:"text"`
+	Type      string    `bson:"type"`
 	CreatedAt time.Time `bson:"created_at"`
 }
 
@@ -37,5 +38,6 @@ func (q *question) ToDomain() (*model.Question, error) {
 		QuizID:    quizID,
 		Text:      q.Text,
 		CreatedAt: q.CreatedAt,
+		Type:      model.QuestionType(q.Type),
 	}, nil
 }
