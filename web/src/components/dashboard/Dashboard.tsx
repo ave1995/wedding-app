@@ -101,7 +101,10 @@ export default function Dashboard() {
       <div className="flex-none pb-8">
         <DashboardActive activeSessions={activeSessions}></DashboardActive>
       </div>
-      <h2 className="text-lg font-semibold text-left px-6 pb-2">Aktivita</h2>
+      <h2 className="text-lg font-semibold text-left mx-6 mb-2 relative inline-block">
+        <span className="relative z-10 pr-4 bg-[#f6f4f3]">Aktivita</span>
+        <span className="absolute left-0 top-1/2 w-full h-px bg-gray-300 -z-10"></span>
+      </h2>
       <div className="flex-grow overflow-auto">
         <DashboardQuestions questions={questions}></DashboardQuestions>
       </div>

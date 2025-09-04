@@ -13,7 +13,7 @@ export default function DashboardHead({ status }: DashboardHead) {
 
   return (
     <div className="flex items-center place-content-between p-4 text-gray-800">
-      <h1 className="text-2xl font-bold">Nástěnka Kvízu</h1>
+      <h1 className="text-2xl font-bold">Nástěnka</h1>
       <div className="flex items-center gap-2">
         <span className={`h-3 w-3 rounded-full animate-pulse ${statusColors[status]}`}></span>
         <span className="text-sm font-medium">{status}</span>
