@@ -9,8 +9,7 @@ interface DashboardQuestions {
 
 export default function DashboardQuestions({ questions }: DashboardQuestions) {
   return (
-    <div className="flex flex-col gap-2 p-4 text-gray-800 text-left h-[600px] overflow-auto">
-      <h2 className="text-lg font-semibold">Aktivita</h2>
+    <div className="flex flex-col gap-2 p-4 text-gray-800 overflow-auto h-fit">
       <ul className="space-y-2">
         {questions.map((msg, idx) => (
           <li

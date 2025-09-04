@@ -60,7 +60,7 @@ export default function Dashboard() {
             const pong = {
               topic: "heartbeat",
               data: "pong!",
-            }
+            };
             // send pong back to server
             const pongMessage = JSON.stringify(pong);
 
@@ -94,10 +94,17 @@ export default function Dashboard() {
   }, [upsertQuestion]);
 
   return (
-    <div className="flex flex-col gap-8 p-6 w-full h-full">
-      <DashboardHead status={status} />
-      <DashboardActive activeSessions={activeSessions}></DashboardActive>
-      <DashboardQuestions questions={questions}></DashboardQuestions>
+    <div className="flex flex-col p-6 w-1/2 h-screen">
+      <div className="flex-none pb-8">
+        <DashboardHead status={status} />
+      </div>
+      <div className="flex-none pb-8">
+        <DashboardActive activeSessions={activeSessions}></DashboardActive>
+      </div>
+      <h2 className="text-lg font-semibold text-left px-6 pb-2">Aktivita</h2>
+      <div className="flex-grow overflow-auto">
+        <DashboardQuestions questions={questions}></DashboardQuestions>
+      </div>
     </div>
   );
 }
