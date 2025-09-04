@@ -147,7 +147,9 @@ terraform-destroy:
 	gcloud run services delete $(IMAGE) --region=$(REGION) --project=$(GCP_PROJECT_ID);
 
 ## Run everything in order
-deploy: create-service-account create-credentials create-backend-bucket terraform-init build push terraform-apply upload-icons
+init: create-service-account create-credentials create-backend-bucket terraform-init build push terraform-apply upload-icons
+
+deploy: build push terraform-apply
 
 CREDENTIALS_PATH := /Users/ave/wedding-app/credentials.json
 

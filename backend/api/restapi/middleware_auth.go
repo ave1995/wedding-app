@@ -3,6 +3,7 @@ package restapi
 import (
 	"errors"
 	"net/http"
+	"slices"
 	"wedding-app/domain/model"
 	"wedding-app/domain/service"
 
@@ -13,6 +14,14 @@ import (
 const CookieAccessTokenName = "access_token"
 
 const ContextAccessTokenKey = CookieAccessTokenName
+const ContextAccessRoleKey = "access_role"
+
+type Role string
+
+const (
+	RoleGuest Role = "Guest"
+	RoleUser  Role = "User"
+)
 
 func AuthMiddleware(jwtService service.JWTService) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -24,12 +33,42 @@ func AuthMiddleware(jwtService service.JWTService) gin.HandlerFunc {
 
 		accessToken, err := jwtService.Verify(tokenString)
 		if err != nil {
-			ctx.AbortWithStatusJSON(401, gin.H{"error": "Invalid or expired token"})
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})
 			return
 		}
 
-		// TODO: I have to know how to control if user is guest
 		ctx.Set(ContextAccessTokenKey, accessToken)
+		// TODO: používat roles rovnou místo IsGuest
+		var role Role
+		if accessToken.IsGuest {
+			role = RoleGuest
+		} else {
+			role = RoleUser
+		}
+		ctx.Set(ContextAccessRoleKey, role)
+
+		ctx.Next()
+	}
+}
+
+func Require(roles ...Role) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		val, exists := ctx.Get(ContextAccessRoleKey)
+		if !exists {
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+			return
+		}
+
+		role, ok := val.(Role)
+		if !ok {
+			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Invalid role type"})
+			return
+		}
+
+		if !slices.Contains(roles, role) {
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+			return
+		}
 
 		ctx.Next()
 	}

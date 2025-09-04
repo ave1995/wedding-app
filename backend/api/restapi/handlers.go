@@ -75,8 +75,8 @@ func (h *GinHandlers) RegisterAll(router *gin.Engine) {
 	api := router.Group("/api")
 	api.Use(h.AuthMiddleware)
 
-	api.GET("/auth-check", func(c *gin.Context) { c.JSON(http.StatusOK, gin.H{"status": "ok"}) })
-	api.GET("/ws", h.WS.serveWS)
+	api.GET("/auth-check", Require(RoleUser), func(c *gin.Context) { c.JSON(http.StatusOK, gin.H{"status": "ok"}) })
+	api.GET("/ws", Require(RoleUser), h.WS.serveWS)
 
 	// Quiz endpoints
 	api.POST("/create-quiz", h.Quiz.createQuiz)

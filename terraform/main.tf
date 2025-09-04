@@ -52,7 +52,7 @@ resource "google_cloud_run_service" "backend" {
 
           env {
             name = "WEB_ORIGIN"
-            value = "https://bednarovi.today"
+            value = "https://bednarovi.today,https://www.bednarovi.today"
           }
 
           env {
@@ -63,6 +63,16 @@ resource "google_cloud_run_service" "backend" {
           env {
             name  = "REDEPLOY_TRIGGER"
             value = timestamp() # updates every apply
+          }
+
+          env {
+            name = "USERICONS_BUCKET"
+            value = "wedding-user-icons"
+          }
+
+          env {
+            name = "DURATION"
+            value = "24h"
           }
         }
       }
