@@ -68,6 +68,7 @@ func (h *SessionHandler) submitAnswer(c *gin.Context) {
 		return
 	}
 
+	// TODO: když je uživatel za hosta a přihlásí se za admina, tak stejně může vyplnit kvíz. Zjistit proč
 	_, err = GetUserIDForQuizFromContext(c, session.QuizID.String())
 	if err != nil {
 		if errors.Is(err, ErrUserIsNotAuthorizedForQuizInContext) {
