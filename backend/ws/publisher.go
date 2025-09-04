@@ -1,7 +1,6 @@
 package ws
 
 import (
-	"encoding/json"
 	"wedding-app/domain/event"
 )
 
@@ -13,18 +12,6 @@ func NewPublisher(h *Hub) event.EventPublisher {
 	return &publisher{
 		hub: h,
 	}
-}
-
-type envelope[T any] struct {
-	Topic string `json:"topic"`
-	Data  T      `json:"data"`
-}
-
-func wrapEvent[T any](topic string, e T) ([]byte, error) {
-	return json.Marshal(envelope[T]{
-		Topic: topic,
-		Data:  e,
-	})
 }
 
 const TopicQuestionOpenedEvent = "question_open"

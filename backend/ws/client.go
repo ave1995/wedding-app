@@ -11,7 +11,7 @@ import (
 const (
 	writeWait      = 10 * time.Second
 	pongWait       = 60 * time.Second
-	pingPeriod     = (pongWait * 9) / 10
+	pingPeriod     = 5 * time.Second
 	maxMessageSize = 512
 )
 
@@ -41,23 +41,40 @@ func (c *Client) ReadPump(h *Hub) {
 
 	c.conn.SetReadLimit(maxMessageSize)
 	c.conn.SetReadDeadline(time.Now().Add(pongWait))
-	c.conn.SetPongHandler(func(string) error {
-		c.conn.SetReadDeadline(time.Now().Add(pongWait))
-		return nil
-	})
+	// c.conn.SetPongHandler(func(appData string) error {
+	// 	c.logger.Info("Received pong", "remote", c.conn.RemoteAddr())
+	// 	c.conn.SetReadDeadline(time.Now().Add(pongWait)) // extend deadline
+	// 	return nil
+	// })
 
 	for {
 		_, msg, err := c.conn.ReadMessage()
 		if err != nil {
-			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				c.logger.Warn("Read error", "error", err, "remote", c.conn.RemoteAddr())
+			if websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseGoingAway) {
+				c.logger.Info("Client closed connection normally", "error", err, "remote", c.conn.RemoteAddr())
+			} else if websocket.IsUnexpectedCloseError(err, websocket.CloseAbnormalClosure) {
+				c.logger.Warn("Unexpected close error", "error", err, "remote", c.conn.RemoteAddr())
+			} else {
+				c.logger.Warn("ReadMessage error", "error", err, "remote", c.conn.RemoteAddr())
 			}
 			break
 		}
-		// Optional: handle messages sent by the client
-		_ = msg
+
+		env, err := unwrapEvent[any](msg) // assuming you have wrapEvent/unwrapEvent
+		if err != nil {
+			c.logger.Warn("Failed to parse message", "error", err)
+			continue
+		}
+
+		switch env.Topic {
+		case TopicHeartbeatEvent:
+			c.logger.Info("Received pong", "remote", c.conn.RemoteAddr())
+			c.conn.SetReadDeadline(time.Now().Add(pongWait)) // extend deadline
+		}
 	}
 }
+
+const TopicHeartbeatEvent = "heartbeat"
 
 // WritePump writes messages from the Send channel to the WebSocket
 func (c *Client) WritePump() {
@@ -86,10 +103,18 @@ func (c *Client) WritePump() {
 		case <-ticker.C:
 			// send ping to client
 			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
-			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+
+			data, err := wrapEvent(TopicHeartbeatEvent, "ping!")
+			if err != nil {
+				c.logger.Warn("failed wrap data for heartbeat", "error", err, "remote", c.conn.RemoteAddr())
+				return
+			}
+
+			if err := c.conn.WriteMessage(websocket.TextMessage, data); err != nil {
 				c.logger.Warn("Ping error", "error", err, "remote", c.conn.RemoteAddr())
 				return
 			}
+			c.logger.Info("Sent ping", "remote", c.conn.RemoteAddr())
 		}
 	}
 }

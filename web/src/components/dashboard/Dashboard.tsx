@@ -54,6 +54,20 @@ export default function Dashboard() {
               Username: eventData.data.Username,
               Status: "Přemýšlí",
             });
+          } else if (eventData.topic === "heartbeat") {
+            console.log("Received:", eventData.data);
+
+            const pong = {
+              topic: "heartbeat",
+              data: "pong!",
+            }
+            // send pong back to server
+            const pongMessage = JSON.stringify(pong);
+
+            if (socket.readyState === WebSocket.OPEN) {
+              socket.send(pongMessage);
+              console.log("Sent:", pong.data);
+            }
           }
         } catch (e) {
           console.error("Chyba při parsování WebSocket zprávy:", e);
