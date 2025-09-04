@@ -19,12 +19,12 @@ func NewQuestionService(questionStore store.QuestionStore) service.QuestionServi
 }
 
 // CreateQuestion implements service.QuestionService.
-func (q *questionService) CreateQuestion(ctx context.Context, text string, quizID string, questionType model.QuestionType) (*model.Question, error) {
+func (q *questionService) CreateQuestion(ctx context.Context, text string, quizID string, questionType model.QuestionType, photoPath *string) (*model.Question, error) {
 	parsed, err := uuid.Parse(quizID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse quiz ID %q: %w", quizID, err)
 	}
-	return q.questionStore.CreateQuestion(ctx, text, parsed, questionType)
+	return q.questionStore.CreateQuestion(ctx, text, parsed, questionType, photoPath)
 }
 
 // GetQuestionByID implements service.QuestionService.

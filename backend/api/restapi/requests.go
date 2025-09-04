@@ -25,9 +25,10 @@ type CreateQuizRequest struct {
 }
 
 type CreateQuestionRequest struct {
-	Text   string             `json:"text" binding:"required"`
-	QuizID string             `json:"quiz_id" binding:"required,uuid"`
-	Type   model.QuestionType `json:"type" binding:"required"`
+	Text      string             `json:"text" binding:"required"`
+	QuizID    string             `json:"quiz_id" binding:"required,uuid"`
+	Type      model.QuestionType `json:"type" binding:"required"`
+	PhotoPath *string            `json:"photo_path,omitempty"`
 }
 
 type CreateAnswerRequest struct {

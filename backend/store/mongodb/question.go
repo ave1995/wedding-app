@@ -13,6 +13,7 @@ type question struct {
 	QuizID    string    `bson:"quiz_id"`
 	Text      string    `bson:"text"`
 	Type      string    `bson:"type"`
+	PhotoPath *string   `bson:"photo_path,omitempty"`
 	CreatedAt time.Time `bson:"created_at"`
 }
 

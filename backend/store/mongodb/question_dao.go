@@ -27,13 +27,14 @@ func (s *questionStore) questionsCollection() *mongo.Collection {
 }
 
 // CreateQuestion implements store.QuestionStore.
-func (s *questionStore) CreateQuestion(ctx context.Context, text string, quizID uuid.UUID, questionType model.QuestionType) (*model.Question, error) {
+func (s *questionStore) CreateQuestion(ctx context.Context, text string, quizID uuid.UUID, questionType model.QuestionType, photoPath *string) (*model.Question, error) {
 	mongoQuestion := &question{
 		ID:        uuid.NewString(),
 		QuizID:    quizID.String(),
 		Text:      text,
 		Type:      string(questionType),
 		CreatedAt: time.Now(),
+		PhotoPath: photoPath,
 	}
 	return createAndConvert(ctx, s.questionsCollection(), mongoQuestion)
 }

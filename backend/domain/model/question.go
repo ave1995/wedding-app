@@ -18,6 +18,7 @@ type Question struct {
 	QuizID    uuid.UUID
 	Text      string
 	Type      QuestionType
+	PhotoPath string
 	Answers   []*Answer
 	CreatedAt time.Time
 }

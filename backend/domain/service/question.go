@@ -6,7 +6,7 @@ import (
 )
 
 type QuestionService interface {
-	CreateQuestion(ctx context.Context, text, quizID string, questionType model.QuestionType) (*model.Question, error)
+	CreateQuestion(ctx context.Context, text, quizID string, questionType model.QuestionType, photoPath *string) (*model.Question, error)
 	GetQuestionByID(ctx context.Context, id string) (*model.Question, error)
 	GetQuestionsByQuizID(ctx context.Context, quizID string) ([]*model.Question, error)
 }

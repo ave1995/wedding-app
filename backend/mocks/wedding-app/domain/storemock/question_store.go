@@ -40,8 +40,8 @@ func (_m *MockQuestionStore) EXPECT() *MockQuestionStore_Expecter {
 }
 
 // CreateQuestion provides a mock function for the type MockQuestionStore
-func (_mock *MockQuestionStore) CreateQuestion(ctx context.Context, text string, quizID uuid.UUID, questionType model.QuestionType) (*model.Question, error) {
-	ret := _mock.Called(ctx, text, quizID, questionType)
+func (_mock *MockQuestionStore) CreateQuestion(ctx context.Context, text string, quizID uuid.UUID, questionType model.QuestionType, photoPath *string) (*model.Question, error) {
+	ret := _mock.Called(ctx, text, quizID, questionType, photoPath)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateQuestion")
@@ -49,18 +49,18 @@ func (_mock *MockQuestionStore) CreateQuestion(ctx context.Context, text string,
 
 	var r0 *model.Question
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, string, uuid.UUID, model.QuestionType) (*model.Question, error)); ok {
-		return returnFunc(ctx, text, quizID, questionType)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string, uuid.UUID, model.QuestionType, *string) (*model.Question, error)); ok {
+		return returnFunc(ctx, text, quizID, questionType, photoPath)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, string, uuid.UUID, model.QuestionType) *model.Question); ok {
-		r0 = returnFunc(ctx, text, quizID, questionType)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string, uuid.UUID, model.QuestionType, *string) *model.Question); ok {
+		r0 = returnFunc(ctx, text, quizID, questionType, photoPath)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.Question)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, string, uuid.UUID, model.QuestionType) error); ok {
-		r1 = returnFunc(ctx, text, quizID, questionType)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, string, uuid.UUID, model.QuestionType, *string) error); ok {
+		r1 = returnFunc(ctx, text, quizID, questionType, photoPath)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -77,11 +77,12 @@ type MockQuestionStore_CreateQuestion_Call struct {
 //   - text string
 //   - quizID uuid.UUID
 //   - questionType model.QuestionType
-func (_e *MockQuestionStore_Expecter) CreateQuestion(ctx interface{}, text interface{}, quizID interface{}, questionType interface{}) *MockQuestionStore_CreateQuestion_Call {
-	return &MockQuestionStore_CreateQuestion_Call{Call: _e.mock.On("CreateQuestion", ctx, text, quizID, questionType)}
+//   - photoPath *string
+func (_e *MockQuestionStore_Expecter) CreateQuestion(ctx interface{}, text interface{}, quizID interface{}, questionType interface{}, photoPath interface{}) *MockQuestionStore_CreateQuestion_Call {
+	return &MockQuestionStore_CreateQuestion_Call{Call: _e.mock.On("CreateQuestion", ctx, text, quizID, questionType, photoPath)}
 }
 
-func (_c *MockQuestionStore_CreateQuestion_Call) Run(run func(ctx context.Context, text string, quizID uuid.UUID, questionType model.QuestionType)) *MockQuestionStore_CreateQuestion_Call {
+func (_c *MockQuestionStore_CreateQuestion_Call) Run(run func(ctx context.Context, text string, quizID uuid.UUID, questionType model.QuestionType, photoPath *string)) *MockQuestionStore_CreateQuestion_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -99,11 +100,16 @@ func (_c *MockQuestionStore_CreateQuestion_Call) Run(run func(ctx context.Contex
 		if args[3] != nil {
 			arg3 = args[3].(model.QuestionType)
 		}
+		var arg4 *string
+		if args[4] != nil {
+			arg4 = args[4].(*string)
+		}
 		run(
 			arg0,
 			arg1,
 			arg2,
 			arg3,
+			arg4,
 		)
 	})
 	return _c
@@ -114,7 +120,7 @@ func (_c *MockQuestionStore_CreateQuestion_Call) Return(question *model.Question
 	return _c
 }
 
-func (_c *MockQuestionStore_CreateQuestion_Call) RunAndReturn(run func(ctx context.Context, text string, quizID uuid.UUID, questionType model.QuestionType) (*model.Question, error)) *MockQuestionStore_CreateQuestion_Call {
+func (_c *MockQuestionStore_CreateQuestion_Call) RunAndReturn(run func(ctx context.Context, text string, quizID uuid.UUID, questionType model.QuestionType, photoPath *string) (*model.Question, error)) *MockQuestionStore_CreateQuestion_Call {
 	_c.Call.Return(run)
 	return _c
 }
