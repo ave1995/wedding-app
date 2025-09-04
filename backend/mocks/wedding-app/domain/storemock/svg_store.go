@@ -39,23 +39,23 @@ func (_m *MockSvgStore) EXPECT() *MockSvgStore_Expecter {
 }
 
 // GetUserSvgs provides a mock function for the type MockSvgStore
-func (_mock *MockSvgStore) GetUserSvgs(ctx context.Context) ([]*model.SVG, error) {
+func (_mock *MockSvgStore) GetUserSvgs(ctx context.Context) ([]*model.BucketItemUrl, error) {
 	ret := _mock.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetUserSvgs")
 	}
 
-	var r0 []*model.SVG
+	var r0 []*model.BucketItemUrl
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context) ([]*model.SVG, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context) ([]*model.BucketItemUrl, error)); ok {
 		return returnFunc(ctx)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context) []*model.SVG); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context) []*model.BucketItemUrl); ok {
 		r0 = returnFunc(ctx)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*model.SVG)
+			r0 = ret.Get(0).([]*model.BucketItemUrl)
 		}
 	}
 	if returnFunc, ok := ret.Get(1).(func(context.Context) error); ok {
@@ -90,12 +90,12 @@ func (_c *MockSvgStore_GetUserSvgs_Call) Run(run func(ctx context.Context)) *Moc
 	return _c
 }
 
-func (_c *MockSvgStore_GetUserSvgs_Call) Return(sVGs []*model.SVG, err error) *MockSvgStore_GetUserSvgs_Call {
+func (_c *MockSvgStore_GetUserSvgs_Call) Return(sVGs []*model.BucketItemUrl, err error) *MockSvgStore_GetUserSvgs_Call {
 	_c.Call.Return(sVGs, err)
 	return _c
 }
 
-func (_c *MockSvgStore_GetUserSvgs_Call) RunAndReturn(run func(ctx context.Context) ([]*model.SVG, error)) *MockSvgStore_GetUserSvgs_Call {
+func (_c *MockSvgStore_GetUserSvgs_Call) RunAndReturn(run func(ctx context.Context) ([]*model.BucketItemUrl, error)) *MockSvgStore_GetUserSvgs_Call {
 	_c.Call.Return(run)
 	return _c
 }

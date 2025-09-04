@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { get } from "../../functions/fetch";
 import { apiUrl } from "../../functions/api";
+import { useApiErrorHandler } from "../../hooks/useApiErrorHandler";
 
 export type SvgItem = {
   Name: string;
@@ -14,15 +15,22 @@ interface IconSelectorProps {
 
 export default function IconSelector({ onSelect, onClose }: IconSelectorProps) {
   const [svgs, setSvgs] = useState<SvgItem[]>([]);
+  const { handleError } = useApiErrorHandler();
 
   useEffect(() => {
     async function fetchIcons() {
-      const svgItems = await get<SvgItem[]>(apiUrl("/user-svgs"));
-      if (svgItems.error || svgItems.data == null) {
-        console.error(svgItems.error);
-      }
+      const result = await get<SvgItem[]>(apiUrl("/bucket-urls"), {
+        bucket: "wedding-user-icons",
+        suffix: ".svg",
+      });
+      if (handleError(result.error, result.status)) return;
 
-      setSvgs(svgItems.data!);
+      const updatedSvgItems = result.data!.map((item) => ({
+        ...item,
+        URL: apiUrl(item.URL),
+      }));
+
+      setSvgs(updatedSvgItems);
     }
     fetchIcons();
   }, []);

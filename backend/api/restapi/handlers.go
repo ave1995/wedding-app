@@ -11,7 +11,7 @@ import (
 
 type GinHandlers struct {
 	User           *UserHandler
-	Basic          *BasicHandler
+	Basic          *StorageHandler
 	Quiz           *QuizHandler
 	Question       *QuestionHandler
 	Answer         *AnswerHandler
@@ -20,7 +20,7 @@ type GinHandlers struct {
 	AuthMiddleware gin.HandlerFunc
 }
 
-func NewGinHandlers(user *UserHandler, basic *BasicHandler, quiz *QuizHandler, question *QuestionHandler, answer *AnswerHandler, session *SessionHandler, ws *WSHandler, authMiddleware gin.HandlerFunc) (*GinHandlers, error) {
+func NewGinHandlers(user *UserHandler, basic *StorageHandler, quiz *QuizHandler, question *QuestionHandler, answer *AnswerHandler, session *SessionHandler, ws *WSHandler, authMiddleware gin.HandlerFunc) (*GinHandlers, error) {
 	if user == nil {
 		return nil, errors.New("user handler must not be nil")
 	}
@@ -65,6 +65,9 @@ func (h *GinHandlers) RegisterAll(router *gin.Engine) {
 		c.String(200, "pong")
 	})
 	router.GET("/user-svgs", h.Basic.getUserSvgs)
+
+	router.GET(BucketUrlsEndpoint, h.Basic.getBucketUrls)
+	router.GET(BucketDataEndpoint, h.Basic.getBucketItemData)
 
 	auth := router.Group("/auth")
 	auth.POST("/register", h.User.registerUser)

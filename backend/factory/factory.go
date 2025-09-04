@@ -84,7 +84,7 @@ type Factory struct {
 	svgStoreOnce      sync.Once
 	svgStoreErr       error
 
-	svgService     service.SvgService
+	svgService     service.StorageService
 	svgServiceOnce sync.Once
 	svgServiceErr  error
 
@@ -196,7 +196,7 @@ func (f *Factory) SvgStore(ctx context.Context) (store.SvgStore, error) {
 	return f.svgStore, f.svgStoreErr
 }
 
-func (f *Factory) SvgService(ctx context.Context) (service.SvgService, error) {
+func (f *Factory) SvgService(ctx context.Context) (service.StorageService, error) {
 	f.svgServiceOnce.Do(func() {
 		store, err := f.SvgStore(ctx)
 		if err != nil {
@@ -217,7 +217,7 @@ func (f *Factory) JWTService() service.JWTService {
 
 func (f *Factory) GinHandlers(ctx context.Context) (*restapi.GinHandlers, error) {
 	f.ginHandlersOnce.Do(func() {
-		var svgService service.SvgService
+		var svgService service.StorageService
 		svgService, f.ginHandlersError = f.SvgService(ctx)
 		if f.ginHandlersError != nil {
 			return
