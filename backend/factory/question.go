@@ -29,12 +29,22 @@ func (f *Factory) QuestionService(ctx context.Context) (service.QuestionService,
 		if f.questionServiceErr != nil {
 			return
 		}
+		var sessionStore store.SessionStore
+		sessionStore, f.questionServiceErr = f.SessionStore(ctx)
+		if f.questionServiceErr != nil {
+			return
+		}
 		var answerStore store.AnswerStore
 		answerStore, f.questionServiceErr = f.AnswerStore(ctx)
 		if f.questionServiceErr != nil {
 			return
 		}
-		f.questionService = question.NewQuestionService(questionStore, answerStore)
+		var attemptStore store.AttemptStore
+		attemptStore, f.questionServiceErr = f.AttemptStore(ctx)
+		if f.questionServiceErr != nil {
+			return
+		}
+		f.questionService = question.NewQuestionService(questionStore, sessionStore, answerStore, attemptStore)
 	})
 	return f.questionService, f.questionServiceErr
 }

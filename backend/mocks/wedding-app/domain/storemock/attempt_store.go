@@ -176,23 +176,23 @@ func (_c *MockAttemptStore_GetAnsweredBySessionID_Call) RunAndReturn(run func(ct
 }
 
 // GetAnsweredBySessionIDAndQuestionID provides a mock function for the type MockAttemptStore
-func (_mock *MockAttemptStore) GetAnsweredBySessionIDAndQuestionID(ctx context.Context, sessionID uuid.UUID, questionID uuid.UUID) (*model.Attempt, error) {
+func (_mock *MockAttemptStore) GetAnsweredBySessionIDAndQuestionID(ctx context.Context, sessionID uuid.UUID, questionID uuid.UUID) ([]*model.Attempt, error) {
 	ret := _mock.Called(ctx, sessionID, questionID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetAnsweredBySessionIDAndQuestionID")
 	}
 
-	var r0 *model.Attempt
+	var r0 []*model.Attempt
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) (*model.Attempt, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) ([]*model.Attempt, error)); ok {
 		return returnFunc(ctx, sessionID, questionID)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) *model.Attempt); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) []*model.Attempt); ok {
 		r0 = returnFunc(ctx, sessionID, questionID)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*model.Attempt)
+			r0 = ret.Get(0).([]*model.Attempt)
 		}
 	}
 	if returnFunc, ok := ret.Get(1).(func(context.Context, uuid.UUID, uuid.UUID) error); ok {
@@ -239,12 +239,12 @@ func (_c *MockAttemptStore_GetAnsweredBySessionIDAndQuestionID_Call) Run(run fun
 	return _c
 }
 
-func (_c *MockAttemptStore_GetAnsweredBySessionIDAndQuestionID_Call) Return(attempt *model.Attempt, err error) *MockAttemptStore_GetAnsweredBySessionIDAndQuestionID_Call {
-	_c.Call.Return(attempt, err)
+func (_c *MockAttemptStore_GetAnsweredBySessionIDAndQuestionID_Call) Return(attempts []*model.Attempt, err error) *MockAttemptStore_GetAnsweredBySessionIDAndQuestionID_Call {
+	_c.Call.Return(attempts, err)
 	return _c
 }
 
-func (_c *MockAttemptStore_GetAnsweredBySessionIDAndQuestionID_Call) RunAndReturn(run func(ctx context.Context, sessionID uuid.UUID, questionID uuid.UUID) (*model.Attempt, error)) *MockAttemptStore_GetAnsweredBySessionIDAndQuestionID_Call {
+func (_c *MockAttemptStore_GetAnsweredBySessionIDAndQuestionID_Call) RunAndReturn(run func(ctx context.Context, sessionID uuid.UUID, questionID uuid.UUID) ([]*model.Attempt, error)) *MockAttemptStore_GetAnsweredBySessionIDAndQuestionID_Call {
 	_c.Call.Return(run)
 	return _c
 }

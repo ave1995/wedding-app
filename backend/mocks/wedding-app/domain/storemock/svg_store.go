@@ -38,6 +38,154 @@ func (_m *MockSvgStore) EXPECT() *MockSvgStore_Expecter {
 	return &MockSvgStore_Expecter{mock: &_m.Mock}
 }
 
+// GetBucketData provides a mock function for the type MockSvgStore
+func (_mock *MockSvgStore) GetBucketData(ctx context.Context, bucketName string, bucketItemName string) (*model.BucketItemData, error) {
+	ret := _mock.Called(ctx, bucketName, bucketItemName)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetBucketData")
+	}
+
+	var r0 *model.BucketItemData
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string, string) (*model.BucketItemData, error)); ok {
+		return returnFunc(ctx, bucketName, bucketItemName)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string, string) *model.BucketItemData); ok {
+		r0 = returnFunc(ctx, bucketName, bucketItemName)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*model.BucketItemData)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, string, string) error); ok {
+		r1 = returnFunc(ctx, bucketName, bucketItemName)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// MockSvgStore_GetBucketData_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetBucketData'
+type MockSvgStore_GetBucketData_Call struct {
+	*mock.Call
+}
+
+// GetBucketData is a helper method to define mock.On call
+//   - ctx context.Context
+//   - bucketName string
+//   - bucketItemName string
+func (_e *MockSvgStore_Expecter) GetBucketData(ctx interface{}, bucketName interface{}, bucketItemName interface{}) *MockSvgStore_GetBucketData_Call {
+	return &MockSvgStore_GetBucketData_Call{Call: _e.mock.On("GetBucketData", ctx, bucketName, bucketItemName)}
+}
+
+func (_c *MockSvgStore_GetBucketData_Call) Run(run func(ctx context.Context, bucketName string, bucketItemName string)) *MockSvgStore_GetBucketData_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
+		var arg2 string
+		if args[2] != nil {
+			arg2 = args[2].(string)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *MockSvgStore_GetBucketData_Call) Return(bucketItemData *model.BucketItemData, err error) *MockSvgStore_GetBucketData_Call {
+	_c.Call.Return(bucketItemData, err)
+	return _c
+}
+
+func (_c *MockSvgStore_GetBucketData_Call) RunAndReturn(run func(ctx context.Context, bucketName string, bucketItemName string) (*model.BucketItemData, error)) *MockSvgStore_GetBucketData_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetBucketUrls provides a mock function for the type MockSvgStore
+func (_mock *MockSvgStore) GetBucketUrls(ctx context.Context, bucketName string, suffix string) ([]*model.BucketItemUrl, error) {
+	ret := _mock.Called(ctx, bucketName, suffix)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetBucketUrls")
+	}
+
+	var r0 []*model.BucketItemUrl
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string, string) ([]*model.BucketItemUrl, error)); ok {
+		return returnFunc(ctx, bucketName, suffix)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string, string) []*model.BucketItemUrl); ok {
+		r0 = returnFunc(ctx, bucketName, suffix)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*model.BucketItemUrl)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, string, string) error); ok {
+		r1 = returnFunc(ctx, bucketName, suffix)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// MockSvgStore_GetBucketUrls_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetBucketUrls'
+type MockSvgStore_GetBucketUrls_Call struct {
+	*mock.Call
+}
+
+// GetBucketUrls is a helper method to define mock.On call
+//   - ctx context.Context
+//   - bucketName string
+//   - suffix string
+func (_e *MockSvgStore_Expecter) GetBucketUrls(ctx interface{}, bucketName interface{}, suffix interface{}) *MockSvgStore_GetBucketUrls_Call {
+	return &MockSvgStore_GetBucketUrls_Call{Call: _e.mock.On("GetBucketUrls", ctx, bucketName, suffix)}
+}
+
+func (_c *MockSvgStore_GetBucketUrls_Call) Run(run func(ctx context.Context, bucketName string, suffix string)) *MockSvgStore_GetBucketUrls_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
+		var arg2 string
+		if args[2] != nil {
+			arg2 = args[2].(string)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *MockSvgStore_GetBucketUrls_Call) Return(bucketItemUrls []*model.BucketItemUrl, err error) *MockSvgStore_GetBucketUrls_Call {
+	_c.Call.Return(bucketItemUrls, err)
+	return _c
+}
+
+func (_c *MockSvgStore_GetBucketUrls_Call) RunAndReturn(run func(ctx context.Context, bucketName string, suffix string) ([]*model.BucketItemUrl, error)) *MockSvgStore_GetBucketUrls_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetUserSvgs provides a mock function for the type MockSvgStore
 func (_mock *MockSvgStore) GetUserSvgs(ctx context.Context) ([]*model.BucketItemUrl, error) {
 	ret := _mock.Called(ctx)
@@ -90,8 +238,8 @@ func (_c *MockSvgStore_GetUserSvgs_Call) Run(run func(ctx context.Context)) *Moc
 	return _c
 }
 
-func (_c *MockSvgStore_GetUserSvgs_Call) Return(sVGs []*model.BucketItemUrl, err error) *MockSvgStore_GetUserSvgs_Call {
-	_c.Call.Return(sVGs, err)
+func (_c *MockSvgStore_GetUserSvgs_Call) Return(bucketItemUrls []*model.BucketItemUrl, err error) *MockSvgStore_GetUserSvgs_Call {
+	_c.Call.Return(bucketItemUrls, err)
 	return _c
 }
 

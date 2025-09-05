@@ -7,6 +7,7 @@ import { useParams } from "react-router-dom";
 import type { Question } from "../models/Question";
 import type { RevealResponse } from "../responses/RevealResponse";
 import QuestionReveal from "../components/question/QuestionReveal";
+import QuestionStats from "../components/question/QuestionStats";
 
 function RevelationPage() {
   const { handleError } = useApiErrorHandler();
@@ -64,15 +65,18 @@ function RevelationPage() {
   }
 
   return (
-    <div className="w-96 h-screen">
-      <QuestionReveal
-        text={questionState.question.Text}
-        type={questionState.question.Type}
-        currentQIndex={questionState.nextIndex}
-        totalQCount={questionState.totalQCount}
-        answers={questionState.question.Answers}
-        nextQuestion={fetchResultOfQuestion}
-      ></QuestionReveal>
+    <div className="flex">
+      <div className="w-96 h-screen">
+        <QuestionReveal
+          text={questionState.question.Text}
+          type={questionState.question.Type}
+          currentQIndex={questionState.nextIndex}
+          totalQCount={questionState.totalQCount}
+          answers={questionState.question.Answers}
+          nextQuestion={fetchResultOfQuestion}
+        ></QuestionReveal>
+      </div>
+      <QuestionStats id={questionState.question.ID}></QuestionStats>
     </div>
   );
 }

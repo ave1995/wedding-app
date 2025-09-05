@@ -11,4 +11,5 @@ type QuestionService interface {
 	GetQuestionByID(ctx context.Context, id string) (*model.Question, error)
 	GetQuestionsByQuizID(ctx context.Context, quizID string) ([]*model.Question, error)
 	RevealQuestionByQuizIDAndIndex(ctx context.Context, quizID string, index int) (*dto.RevealResponse, error)
+	RevealQuestionStatsByID(ctx context.Context, id string) (*dto.StatsResponse, error)
 }

@@ -84,11 +84,12 @@ func (h *GinHandlers) RegisterAll(router *gin.Engine) {
 	// Quiz endpoints
 	api.POST("/create-quiz", h.Quiz.createQuiz)
 	api.GET("/quiz/:id", h.Quiz.getQuiz)
-	api.GET("/quiz/:id/reveal", h.Question.revealQuestionByQuizID)
+	api.GET("/quiz/:id/reveal", h.Question.revealQuestionByQuizIDAndIndex)
 	// Questions endpoints
 	api.POST("/create-question", h.Question.createQuestion)
 	api.GET("/questions/:id", h.Question.getQuestionByID)
 	api.GET("/questions", h.Question.getQuestionsByQuizID)
+	api.GET("/questions/:id/stats", h.Question.revealQuestionStatsByID)
 	// Answers endpoints
 	api.POST("/create-answer", h.Answer.createAnswer)
 	api.GET("/answers/:id", h.Answer.getAnswerByID)

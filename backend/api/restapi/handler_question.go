@@ -103,7 +103,7 @@ func (h *QuestionHandler) getQuestionsByQuizID(c *gin.Context) {
 	c.JSON(http.StatusOK, questions)
 }
 
-func (h *QuestionHandler) revealQuestionByQuizID(c *gin.Context) {
+func (h *QuestionHandler) revealQuestionByQuizIDAndIndex(c *gin.Context) {
 	quizID := c.Param("id")
 	index := c.Query("index")
 
@@ -125,4 +125,16 @@ func (h *QuestionHandler) revealQuestionByQuizID(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, reveal)
+}
+
+func (h *QuestionHandler) revealQuestionStatsByID(c *gin.Context) {
+	id := c.Param("id")
+
+	stats, err := h.questionService.RevealQuestionStatsByID(c, id)
+	if err != nil {
+		c.Error(NewInternalAPIError(err))
+		return
+	}
+
+	c.JSON(http.StatusOK, stats)
 }

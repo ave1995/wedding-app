@@ -70,3 +70,8 @@ func (s *sessionStore) UpdateSession(ctx context.Context, session *model.Session
 
 	return nil
 }
+
+// GetSessionsByQuizID implements store.SessionStore.
+func (s *sessionStore) GetSessionsByQuizID(ctx context.Context, quizID uuid.UUID) ([]*model.Session, error) {
+	return getManyByFilterAndConvert[*session](ctx, s.sessionCollection(), bson.M{SessionFieldQuizID: quizID.String()}, nil)
+}

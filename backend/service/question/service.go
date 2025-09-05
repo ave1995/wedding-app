@@ -7,17 +7,20 @@ import (
 	"wedding-app/domain/service"
 	"wedding-app/domain/store"
 	"wedding-app/dto"
+	"wedding-app/utils"
 
 	"github.com/google/uuid"
 )
 
 type questionService struct {
-	questionStore store.QuestionStore
-	answerStore   store.AnswerStore
+	questionStore      store.QuestionStore
+	sessionStore       store.SessionStore
+	answerStore        store.AnswerStore
+	attemptAnswerStore store.AttemptStore
 }
 
-func NewQuestionService(questionStore store.QuestionStore, asnwerStore store.AnswerStore) service.QuestionService {
-	return &questionService{questionStore: questionStore, answerStore: asnwerStore}
+func NewQuestionService(questionStore store.QuestionStore, sessionStore store.SessionStore, answerStore store.AnswerStore, attemptAnswerStore store.AttemptStore) service.QuestionService {
+	return &questionService{questionStore: questionStore, sessionStore: sessionStore, answerStore: answerStore, attemptAnswerStore: attemptAnswerStore}
 }
 
 // CreateQuestion implements service.QuestionService.
@@ -85,4 +88,51 @@ func (q *questionService) RevealQuestionByQuizIDAndIndex(ctx context.Context, qu
 	}
 
 	return reveal, nil
+}
+
+func (q *questionService) RevealQuestionStatsByID(ctx context.Context, id string) (*dto.StatsResponse, error) {
+	parsed, err := uuid.Parse(id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse question ID %q: %w", id, err)
+	}
+
+	question, err := q.questionStore.GetQuestionByID(ctx, parsed)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load question %w", err)
+	}
+
+	sessions, err := q.sessionStore.GetSessionsByQuizID(ctx, question.QuizID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load sessions %w", err)
+	}
+
+	correctAnswers, err := q.answerStore.GetCorrectAnswersByQuestionID(ctx, question.ID) // TODO: měl bych využít MongoDB a i cache
+	if err != nil {
+		return nil, fmt.Errorf("failed to get correct answers: %w", err)
+	}
+
+	right := 0
+	wrong := 0
+	for _, s := range sessions {
+		if !s.IsCompleted {
+			continue
+		}
+		answered, err := q.attemptAnswerStore.GetAnsweredBySessionIDAndQuestionID(ctx, s.ID, question.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		correct, err := utils.IsQuestionCorrect(question, answered, correctAnswers)
+		if err != nil {
+			return nil, err
+		}
+		if correct {
+			right++
+		} else {
+			wrong++
+		}
+	}
+
+	return &dto.StatsResponse{Right: right, Wrong: wrong}, nil
+
 }
