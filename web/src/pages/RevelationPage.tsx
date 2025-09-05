@@ -9,6 +9,28 @@ import type { RevealResponse } from "../responses/RevealResponse";
 import QuestionReveal from "../components/question/QuestionReveal";
 import QuestionStats from "../components/question/QuestionStats";
 import QuestionPhoto from "../components/question/QuestionPhoto";
+import FullscreenImageButton from "../components/FullScreenImageButton.tsx";
+
+type QuestionPhotoImg = {
+  src: string;
+  name: string;
+};
+
+function pathToBucketQuery(path: string): QuestionPhotoImg | null {
+  if (!path) return null;
+
+  const parts = path.split("/");
+  const name = parts.pop() || "";
+  const bucket = parts.join("/");
+
+  const src = apiUrl(
+      `/bucket-data?bucket=${encodeURIComponent(
+          bucket
+      )}&name=${encodeURIComponent(name)}`
+  );
+
+  return { src, name };
+}
 
 function RevelationPage() {
   const { handleError } = useApiErrorHandler();
@@ -65,6 +87,8 @@ function RevelationPage() {
     return <p>Načítám otázku...</p>;
   }
 
+  const questionPhotoImg = pathToBucketQuery(questionState.question.PhotoPath);
+
   return (
     <div className="flex flex-row h-screen w-screen items-center place-content-center">
       <div className="w-96 h-2/3">
@@ -79,7 +103,10 @@ function RevelationPage() {
       </div>
       <div className="w-[768px] grid grid-rows-2 items-center place-content-center h-2/3">
         <div className="h-full w-full">
-          <QuestionPhoto path={questionState.question.PhotoPath} />
+          {questionPhotoImg && <QuestionPhoto src={questionPhotoImg.src} alt={questionPhotoImg.name} />}
+          <div className="py-4">
+            {questionPhotoImg && <FullscreenImageButton src={questionPhotoImg.src} label="Zvětšit" />}
+          </div>
         </div>
         <QuestionStats id={questionState.question.ID} />
       </div>
