@@ -80,3 +80,8 @@ func (s *sessionStore) GetSessionsByQuizID(ctx context.Context, quizID uuid.UUID
 func (s *sessionStore) GetActiveSessionsByQuizID(ctx context.Context, quizID uuid.UUID) ([]*model.Session, error) {
 	return getManyByFilterAndConvert[*session](ctx, s.sessionCollection(), bson.M{SessionFieldQuizID: quizID.String(), SessionFieldIsCompleted: false}, nil)
 }
+
+// GetCompletedSessionsByQuizID implements store.SessionStore.
+func (s *sessionStore) GetCompletedSessionsByQuizID(ctx context.Context, quizID uuid.UUID) ([]*model.Session, error) {
+	return getManyByFilterAndConvert[*session](ctx, s.sessionCollection(), bson.M{SessionFieldQuizID: quizID.String(), SessionFieldIsCompleted: true}, nil)
+}

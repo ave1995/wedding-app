@@ -22,13 +22,14 @@ type sessionService struct {
 	questionStore      store.QuestionStore
 	attemptAnswerStore store.AttemptStore
 	answerStore        store.AnswerStore
+	userStore          store.UserStore
 	assembler          *assembler.Assembler
 	publisher          event.EventPublisher
 	logger             *slog.Logger
 }
 
-func NewSessionService(ss store.SessionStore, qs store.QuestionStore, aas store.AttemptStore, as store.AnswerStore, a *assembler.Assembler, pub event.EventPublisher, logger *slog.Logger) service.SessionService {
-	return &sessionService{sessionStore: ss, questionStore: qs, attemptAnswerStore: aas, answerStore: as, assembler: a, publisher: pub, logger: logger}
+func NewSessionService(ss store.SessionStore, qs store.QuestionStore, aas store.AttemptStore, as store.AnswerStore, us store.UserStore, a *assembler.Assembler, pub event.EventPublisher, logger *slog.Logger) service.SessionService {
+	return &sessionService{sessionStore: ss, questionStore: qs, attemptAnswerStore: aas, answerStore: as, userStore: us, assembler: a, publisher: pub, logger: logger}
 }
 
 // GetCurrentQuestion implements service.SessionService.
@@ -309,4 +310,38 @@ func (s *sessionService) GetActiveSessionsByQuizID(ctx context.Context, quizID s
 		return nil, fmt.Errorf("failed to parse session ID: %w", err)
 	}
 	return s.sessionStore.GetActiveSessionsByQuizID(ctx, parsed)
+}
+
+// GetResultsByQuizID implements service.SessionService.
+func (s *sessionService) GetResultsByQuizID(ctx context.Context, quizID string) ([]*dto.UserResult, error) {
+	parsed, err := uuid.Parse(quizID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse session ID: %w", err)
+	}
+
+	completed, err := s.sessionStore.GetCompletedSessionsByQuizID(ctx, parsed)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get sessions: %w", err)
+	}
+
+	var userResults []*dto.UserResult
+	for _, session := range completed {
+		result, err := s.GetResult(ctx, session.ID.String())
+		if err != nil {
+			return nil, fmt.Errorf("failed to get result: %w", err)
+		}
+		user, err := s.userStore.GetUserByID(ctx, session.UserID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get user: %w", err)
+		}
+
+		userResult := &dto.UserResult{
+			Result: result,
+			User:   user,
+		}
+
+		userResults = append(userResults, userResult)
+	}
+
+	return userResults, nil
 }

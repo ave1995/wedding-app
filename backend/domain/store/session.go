@@ -14,4 +14,5 @@ type SessionStore interface {
 	UpdateSession(ctx context.Context, session *model.Session) error
 	GetSessionsByQuizID(ctx context.Context, quizID uuid.UUID) ([]*model.Session, error)
 	GetActiveSessionsByQuizID(ctx context.Context, quizID uuid.UUID) ([]*model.Session, error)
+	GetCompletedSessionsByQuizID(ctx context.Context, quizID uuid.UUID) ([]*model.Session, error)
 }

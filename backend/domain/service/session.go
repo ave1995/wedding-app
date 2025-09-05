@@ -13,4 +13,5 @@ type SessionService interface {
 	GetResult(ctx context.Context, sessionID string) (*model.Result, error)
 	GetSessionByID(ctx context.Context, sessionID string) (*model.Session, error)
 	GetActiveSessionsByQuizID(ctx context.Context, quizID string) ([]*model.Session, error)
+	GetResultsByQuizID(ctx context.Context, quizID string) ([]*dto.UserResult, error)
 }

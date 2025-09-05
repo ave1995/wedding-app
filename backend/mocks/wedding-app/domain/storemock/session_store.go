@@ -329,6 +329,74 @@ func (_c *MockSessionStore_GetActiveSessionsByQuizID_Call) RunAndReturn(run func
 	return _c
 }
 
+// GetCompletedSessionsByQuizID provides a mock function for the type MockSessionStore
+func (_mock *MockSessionStore) GetCompletedSessionsByQuizID(ctx context.Context, quizID uuid.UUID) ([]*model.Session, error) {
+	ret := _mock.Called(ctx, quizID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetCompletedSessionsByQuizID")
+	}
+
+	var r0 []*model.Session
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) ([]*model.Session, error)); ok {
+		return returnFunc(ctx, quizID)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) []*model.Session); ok {
+		r0 = returnFunc(ctx, quizID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*model.Session)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, quizID)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// MockSessionStore_GetCompletedSessionsByQuizID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetCompletedSessionsByQuizID'
+type MockSessionStore_GetCompletedSessionsByQuizID_Call struct {
+	*mock.Call
+}
+
+// GetCompletedSessionsByQuizID is a helper method to define mock.On call
+//   - ctx context.Context
+//   - quizID uuid.UUID
+func (_e *MockSessionStore_Expecter) GetCompletedSessionsByQuizID(ctx interface{}, quizID interface{}) *MockSessionStore_GetCompletedSessionsByQuizID_Call {
+	return &MockSessionStore_GetCompletedSessionsByQuizID_Call{Call: _e.mock.On("GetCompletedSessionsByQuizID", ctx, quizID)}
+}
+
+func (_c *MockSessionStore_GetCompletedSessionsByQuizID_Call) Run(run func(ctx context.Context, quizID uuid.UUID)) *MockSessionStore_GetCompletedSessionsByQuizID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 uuid.UUID
+		if args[1] != nil {
+			arg1 = args[1].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *MockSessionStore_GetCompletedSessionsByQuizID_Call) Return(sessions []*model.Session, err error) *MockSessionStore_GetCompletedSessionsByQuizID_Call {
+	_c.Call.Return(sessions, err)
+	return _c
+}
+
+func (_c *MockSessionStore_GetCompletedSessionsByQuizID_Call) RunAndReturn(run func(ctx context.Context, quizID uuid.UUID) ([]*model.Session, error)) *MockSessionStore_GetCompletedSessionsByQuizID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetSessionsByQuizID provides a mock function for the type MockSessionStore
 func (_mock *MockSessionStore) GetSessionsByQuizID(ctx context.Context, quizID uuid.UUID) ([]*model.Session, error) {
 	ret := _mock.Called(ctx, quizID)

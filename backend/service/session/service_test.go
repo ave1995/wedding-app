@@ -81,7 +81,7 @@ func TestGetCurrentQuestion(t *testing.T) {
 
 			test.Mock(ss, qs)
 			// TODO: opravit testy
-			svc := session.NewSessionService(ss, qs, nil, nil, nil, nil, nil)
+			svc := session.NewSessionService(ss, qs, nil, nil, nil, nil, nil, nil)
 			actual, err := svc.GetCurrentQuestion(t.Context(), test.ArgSessionID)
 			if test.ExpectedResult != nil {
 				assert.Equal(t, test.ExpectedResult, actual)

@@ -11,6 +11,7 @@ import DashboardPage from "./pages/DashboardPage";
 // import EventPage from "./pages/EventPage";
 import CenteredLayout from "./CenteredLayout";
 import RevelationPage from "./pages/RevelationPage";
+import ResultsPage from "./pages/ResultsPage";
 
 function App() {
   return (
@@ -61,6 +62,8 @@ function App() {
         />
 
         <Route path="/dashboard/:quizId" element={<DashboardPage />} />
+        <Route path="/results/:quizId" element={<ResultsPage />} />
+
         {/* <Route path="/events" element={<EventPage />} /> */}
 
         <Route
