@@ -73,8 +73,6 @@ export default function QuestionStats({ id }: QuestionStatsComp) {
           width: 18,
         },
       }}
-      width={200}
-      height={200}
     />
   );
 }

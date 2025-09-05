@@ -24,9 +24,9 @@ function pathToBucketQuery(path: string): QuestionPhotoImg | null {
   const bucket = parts.join("/");
 
   const src = apiUrl(
-      `/bucket-data?bucket=${encodeURIComponent(
-          bucket
-      )}&name=${encodeURIComponent(name)}`
+    `/bucket-data?bucket=${encodeURIComponent(
+      bucket
+    )}&name=${encodeURIComponent(name)}`
   );
 
   return { src, name };
@@ -101,14 +101,23 @@ function RevelationPage() {
           nextQuestion={fetchResultOfQuestion}
         ></QuestionReveal>
       </div>
-      <div className="w-[768px] grid grid-rows-2 items-center place-content-center h-2/3 gap-2">
-        <div className="h-full w-full flex flex-col items-center">
-          {questionPhotoImg && <QuestionPhoto src={questionPhotoImg.src} alt={questionPhotoImg.name} />}
-          <div className="py-4 w-40">
-            {questionPhotoImg && <FullscreenImageButton src={questionPhotoImg.src} label="Zvětšit" />}
-          </div>
+      <div className="w-[768px] grid grid-rows-11 items-center place-items-center h-2/3 gap-2">
+        <div className="h-full w-full flex flex-col items-center row-span-5">
+          {questionPhotoImg && (
+            <QuestionPhoto
+              src={questionPhotoImg.src}
+              alt={questionPhotoImg.name}
+            />
+          )}
         </div>
-        <QuestionStats id={questionState.question.ID} />
+        <div className="w-1/6 row-span-1">
+          {questionPhotoImg && (
+            <FullscreenImageButton src={questionPhotoImg.src} label="Zvětšit" />
+          )}
+        </div>
+        <div className="row-span-5 w-1/2 h-3/4">
+          <QuestionStats id={questionState.question.ID} />
+        </div>
       </div>
     </div>
   );

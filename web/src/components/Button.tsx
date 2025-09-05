@@ -33,7 +33,7 @@ export default function Button<T = void>({
   return (
     <button
       // ref={buttonRef}
-      className={`w-full px-3 py-2 text-center border-b-4 rounded-2xl 
+      className={`w-full text-center border-b-4 rounded-2xl 
         ${GetButtonColor(type)}
         ${GetButtonHoverColor(type)}
         ${
@@ -69,11 +69,11 @@ type ButtonType = (typeof ButtonTypeEnum)[keyof typeof ButtonTypeEnum];
 function GetButtonColor(type?: ButtonType) {
   switch (type) {
     case ButtonTypeEnum.Basic:
-      return "text-white bg-pink-500 hover:bg-pink-600 hover:border-pink-400 border-pink-300";
+      return "text-white bg-pink-500 hover:bg-pink-600 hover:border-pink-400 border-pink-300 px-3 py-2 ";
     case ButtonTypeEnum.Blue:
-      return "border-2 text-gray-800 border-gray-300 ";
+      return "border-2 text-gray-800 border-gray-300";
     default:
-      return "text-white bg-pink-500 hover:bg-pink-600 hover:border-pink-400 border-pink-300";
+      return "text-white bg-pink-500 hover:bg-pink-600 hover:border-pink-400 border-pink-300 px-3 py-2";
   }
 }
 
