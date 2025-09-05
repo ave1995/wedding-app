@@ -2,9 +2,11 @@ import { useState } from "react";
 import type { Answer } from "../../models/Answer";
 import Button from "../Button";
 import QuestionSkeleton from "./QuestionSkeleton";
+import type { QuestionType } from "../../models/Question";
 
 interface QuestionForm {
   text: string;
+  type: QuestionType;
   currentQIndex: number;
   totalQCount: number;
   answers: Answer[];
@@ -13,6 +15,7 @@ interface QuestionForm {
 
 export default function QuestionForm({
   text,
+  type,
   currentQIndex,
   totalQCount,
   answers,
@@ -29,6 +32,7 @@ export default function QuestionForm({
   return (
     <QuestionSkeleton
       text={text}
+      type={type}
       currentQIndex={currentQIndex}
       totalQCount={totalQCount}
       answers={answers}

@@ -93,7 +93,8 @@ export default function SessionPage() {
   return (
     <div className="w-96 h-screen">
       <QuestionForm
-        text={questionState.question!.Text}
+        text={questionState.question.Text}
+        type={questionState.question.Type}
         currentQIndex={questionState.currentQIndex ?? 0}
         totalQCount={questionState.totalQCount ?? 0}
         answers={questionState.question!.Answers}

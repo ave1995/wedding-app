@@ -59,13 +59,18 @@ function RevelationPage() {
     return <div></div>;
   }
 
+  if (!questionState.question) {
+    return <p>Načítám otázku...</p>;
+  }
+
   return (
     <div className="w-96 h-screen">
       <QuestionReveal
-        text={questionState.question?.Text ?? ""}
+        text={questionState.question.Text}
+        type={questionState.question.Type}
         currentQIndex={questionState.nextIndex}
         totalQCount={questionState.totalQCount}
-        answers={questionState.question?.Answers ?? []}
+        answers={questionState.question.Answers}
         nextQuestion={fetchResultOfQuestion}
       ></QuestionReveal>
     </div>

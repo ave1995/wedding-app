@@ -1,9 +1,11 @@
 import type { Answer } from "../../models/Answer";
+import type { QuestionType } from "../../models/Question";
 import Button from "../Button";
 import QuestionSkeleton from "./QuestionSkeleton";
 
 interface QuestionReveal {
   text: string;
+  type: QuestionType;
   currentQIndex: number;
   totalQCount: number;
   answers: Answer[];
@@ -12,6 +14,7 @@ interface QuestionReveal {
 
 export default function QuestionReveal({
   text,
+  type,
   currentQIndex,
   totalQCount,
   answers,
@@ -20,6 +23,7 @@ export default function QuestionReveal({
   return (
     <QuestionSkeleton
       text={text}
+      type={type}
       currentQIndex={currentQIndex}
       totalQCount={totalQCount}
       answers={answers}
