@@ -49,14 +49,7 @@ function App() {
           }
         />
 
-        <Route
-          path="/quiz/:quizId/reveal"
-          element={
-            <CenteredLayout>
-              <RevelationPage />
-            </CenteredLayout>
-          }
-        />
+        <Route path="/quiz/:quizId/reveal" element={<RevelationPage />} />
 
         <Route
           path="/session/:sessionId"

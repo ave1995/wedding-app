@@ -36,7 +36,7 @@ export default function QuestionPhoto({ path }: QuestionPhoto) {
     <img
       src={questionPhotoImg.src}
       alt={questionPhotoImg.name}
-      className="w-full h-full object-contain"
+      className="h-full w-full object-scale-down"
     />
   );
 }

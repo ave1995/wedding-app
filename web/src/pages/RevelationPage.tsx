@@ -67,7 +67,7 @@ function RevelationPage() {
 
   return (
     <div className="flex flex-row h-screen w-screen items-center place-content-center">
-      <div className="w-96 h-full">
+      <div className="w-96 h-2/3">
         <QuestionReveal
           text={questionState.question.Text}
           type={questionState.question.Type}
@@ -77,10 +77,10 @@ function RevelationPage() {
           nextQuestion={fetchResultOfQuestion}
         ></QuestionReveal>
       </div>
-      <div className="p-6 w-1/3 h-full">
-        <QuestionPhoto path={questionState.question.PhotoPath} />
-      </div>
-      <div className="p-6">
+      <div className="w-[768px] grid grid-rows-2 items-center place-content-center h-2/3">
+        <div className="h-full w-full">
+          <QuestionPhoto path={questionState.question.PhotoPath} />
+        </div>
         <QuestionStats id={questionState.question.ID} />
       </div>
     </div>
