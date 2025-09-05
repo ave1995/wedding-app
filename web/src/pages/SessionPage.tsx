@@ -91,7 +91,7 @@ export default function SessionPage() {
   }
 
   return (
-    <div className="w-96 h-screen">
+    <div className="w-96">
       <QuestionForm
         text={questionState.question.Text}
         type={questionState.question.Type}

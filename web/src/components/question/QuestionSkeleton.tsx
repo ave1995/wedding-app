@@ -21,7 +21,7 @@ export default function QuestionSkeleton({
   renderAnswer,
 }: QuestionSkeleton) {
   return (
-    <div className="flex flex-col w-full h-full">
+    <div className="flex flex-col h-screen">
       <div className="flex-grow p-6">
         <div className="flex place-content-between items-center pb-1">
           <p className="text-xs italic">
