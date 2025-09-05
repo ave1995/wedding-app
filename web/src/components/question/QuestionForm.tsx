@@ -32,15 +32,21 @@ export default function QuestionForm({
   return (
     <QuestionSkeleton
       text={text}
-      type={type}
+      info={
+        <p className=" bg-pink-500 text-white text-xs rounded-full flex items-center justify-center py-0.5 px-1.5">
+          {type === "multiple_choice"
+            ? "Zvolte více odpovědí"
+            : "Zvolte jednu odpověď"}
+        </p>
+      }
       currentQIndex={currentQIndex}
       totalQCount={totalQCount}
       answers={answers}
       button={
         <Button
           label="Odpovědět"
-          onClick={() => {
-            submitAnswer(selectedAnswers);
+          onClick={async () => {
+            await submitAnswer(selectedAnswers);
             setSelectedAnswers([]);
           }}
         />

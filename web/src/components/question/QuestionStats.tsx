@@ -43,16 +43,16 @@ export default function QuestionStats({ id }: QuestionStatsComp) {
         {
           data: [
             {
-              value: stats.right,
-              label: "Správně",
-              labelMarkType: "circle",
-              color: "#38C172",
-            },
-            {
               value: stats.wrong,
               label: "Špatně",
               labelMarkType: "circle",
               color: "#f6339a",
+            },
+            {
+              value: stats.right,
+              label: "Správně",
+              labelMarkType: "circle",
+              color: "#38C172",
             },
           ],
           arcLabel: (item) => `${item.value}`,

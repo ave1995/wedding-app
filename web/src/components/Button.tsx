@@ -36,8 +36,11 @@ export default function Button<T = void>({
       className={`w-full px-3 py-2 text-center border-b-4 rounded-2xl text-white 
         ${GetButtonColor(type)}
         ${GetButtonHoverColor(type)}
-        hover:cursor-pointer active:scale-95 active:shadow-sm
-        transition-all duration-150 ease-in-out
+        ${
+          loading
+            ? ""
+            : "hover:cursor-pointer active:scale-95 active:shadow-sm transition-all duration-150 ease-in-out"
+        }
         focus:outline-none font-semibold`}
       onClick={handleClick}
       disabled={loading}
