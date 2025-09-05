@@ -24,9 +24,13 @@ export default function QuestionForm({
   const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
 
   const toggleAnswer = (id: string) => {
-    setSelectedAnswers((prev) =>
-      prev.includes(id) ? prev.filter((a) => a !== id) : [...prev, id]
-    );
+    setSelectedAnswers((prev) => {
+      if (type === "multiple_choice") {
+        return prev.includes(id) ? prev.filter((a) => a !== id) : [...prev, id];
+      } else {
+        return prev.includes(id) ? [] : [id];
+      }
+    });
   };
 
   return (
