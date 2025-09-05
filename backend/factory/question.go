@@ -24,12 +24,17 @@ func (f *Factory) QuestionStore(ctx context.Context) (store.QuestionStore, error
 
 func (f *Factory) QuestionService(ctx context.Context) (service.QuestionService, error) {
 	f.questionServiceOnce.Do(func() {
-		var store store.QuestionStore
-		store, f.questionServiceErr = f.QuestionStore(ctx)
+		var questionStore store.QuestionStore
+		questionStore, f.questionServiceErr = f.QuestionStore(ctx)
 		if f.questionServiceErr != nil {
 			return
 		}
-		f.questionService = question.NewQuestionService(store)
+		var answerStore store.AnswerStore
+		answerStore, f.questionServiceErr = f.AnswerStore(ctx)
+		if f.questionServiceErr != nil {
+			return
+		}
+		f.questionService = question.NewQuestionService(questionStore, answerStore)
 	})
 	return f.questionService, f.questionServiceErr
 }

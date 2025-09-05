@@ -2,6 +2,7 @@ package restapi
 
 import (
 	"net/http"
+	"strconv"
 	"wedding-app/domain/service"
 
 	"github.com/gin-gonic/gin"
@@ -100,4 +101,28 @@ func (h *QuestionHandler) getQuestionsByQuizID(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, questions)
+}
+
+func (h *QuestionHandler) revealQuestionByQuizID(c *gin.Context) {
+	quizID := c.Param("id")
+	index := c.Query("index")
+
+	if index == "" {
+		c.Error(NewAPIError(http.StatusBadRequest, "missing index query parameter", nil))
+		return
+	}
+
+	num, err := strconv.Atoi(index)
+	if err != nil {
+		c.Error(NewInternalAPIError(err))
+		return
+	}
+
+	reveal, err := h.questionService.RevealQuestionByQuizIDAndIndex(c, quizID, num)
+	if err != nil {
+		c.Error(NewInternalAPIError(err))
+		return
+	}
+
+	c.JSON(http.StatusOK, reveal)
 }

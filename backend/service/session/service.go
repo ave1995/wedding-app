@@ -53,18 +53,18 @@ func (s *sessionService) GetCurrentQuestion(ctx context.Context, sessionID strin
 	if session.CurrentQIndex < 0 || session.CurrentQIndex >= len(questions) {
 		return nil, fmt.Errorf("current question index %d out of range (0-%d)", session.CurrentQIndex, len(questions)-1)
 	}
-	// TODO: zeptat se Radka
-	originalQuestion := questions[session.CurrentQIndex]
-	question := &model.Question{
-		ID:        originalQuestion.ID,
-		QuizID:    originalQuestion.QuizID,
-		Text:      originalQuestion.Text,
-		CreatedAt: originalQuestion.CreatedAt,
-	}
+
+	question := questions[session.CurrentQIndex]
 
 	answers, err := s.answerStore.GetAnswersByQuestionID(ctx, question.ID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load answers for question %q: %w", question.Text, err)
+	}
+
+	// TODO: udělat DTO
+	// Without reveal
+	for _, a := range answers {
+		a.IsCorrect = false
 	}
 
 	question.Answers = answers

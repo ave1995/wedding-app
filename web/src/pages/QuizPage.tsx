@@ -19,7 +19,6 @@ function QuizPage() {
         const result = await get<Quiz>(apiUrl(`/api/quiz/${quizId}`), {}, true);
         if (handleError(result.error, result.status)) return;
 
-
         setQuiz(result.data);
       }
       fetchQuiz();
@@ -45,12 +44,15 @@ function QuizPage() {
     <div className="flex flex-col w-96 h-screen items-center justify-center p-6 gap-4">
       <h1 className="text-xl font-bold">{quiz.Name}</h1>
       <p className="text-left p-3 font-medium">
-        Milí <span className="font-semibold text-pink-500">hoste</span>, vítej na naší <span className="font-semibold text-pink-500">svatbě</span>! Jsme moc rádi, že jsi dnes tady s
-        námi a sdílíš s námi tenhle výjimečný den. Tvoje přítomnost je pro nás
-        <span className="font-semibold text-pink-500"> největší dar</span> – děkujeme, že slavíš, směješ se a vytváříš s námi
-        nezapomenutelné chvíle. A protože se chceme pobavit společně, připravili
-        jsme si pro tebe <span className="font-semibold text-pink-500">malý svatební kvíz</span>. Přejeme ti hodně štěstí a hlavně
-        spoustu zábavy!
+        Milí <span className="font-semibold text-pink-500">hoste</span>, vítej
+        na naší <span className="font-semibold text-pink-500">svatbě</span>!
+        Jsme moc rádi, že jsi dnes tady s námi a sdílíš s námi tenhle výjimečný
+        den. Tvoje přítomnost je pro nás
+        <span className="font-semibold text-pink-500"> největší dar</span> –
+        děkujeme, že slavíš, směješ se a vytváříš s námi nezapomenutelné chvíle.
+        A protože se chceme pobavit společně, připravili jsme si pro tebe{" "}
+        <span className="font-semibold text-pink-500">malý svatební kvíz</span>.
+        Přejeme ti hodně štěstí a hlavně spoustu zábavy!
       </p>
       <div className="w-full">
         <Button

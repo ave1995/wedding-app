@@ -8,8 +8,9 @@ import QuizPage from "./pages/QuizPage";
 import SessionPage from "./pages/SessionPage";
 import UnauthorizedPage from "./pages/Unauthorized";
 import DashboardPage from "./pages/DashboardPage";
-import EventPage from "./pages/EventPage";
+// import EventPage from "./pages/EventPage";
 import CenteredLayout from "./CenteredLayout";
+import RevelationPage from "./pages/RevelationPage";
 
 function App() {
   return (
@@ -47,6 +48,16 @@ function App() {
             </CenteredLayout>
           }
         />
+
+        <Route
+          path="/quiz/:quizId/reveal"
+          element={
+            <CenteredLayout>
+              <RevelationPage />
+            </CenteredLayout>
+          }
+        />
+
         <Route
           path="/session/:sessionId"
           element={
@@ -57,7 +68,7 @@ function App() {
         />
 
         <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/events" element={<EventPage />} />
+        {/* <Route path="/events" element={<EventPage />} /> */}
 
         <Route
           path="/unauthorized"
