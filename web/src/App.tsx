@@ -60,7 +60,7 @@ function App() {
           }
         />
 
-        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/dashboard/:quizId" element={<DashboardPage />} />
         {/* <Route path="/events" element={<EventPage />} /> */}
 
         <Route

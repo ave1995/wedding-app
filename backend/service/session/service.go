@@ -301,3 +301,12 @@ func (s *sessionService) GetSessionByID(ctx context.Context, sessionID string) (
 	}
 	return s.sessionStore.FindByID(ctx, parsedSessionID)
 }
+
+// GetActiveSessionsByQuizID implements service.SessionService.
+func (s *sessionService) GetActiveSessionsByQuizID(ctx context.Context, quizID string) ([]*model.Session, error) {
+	parsed, err := uuid.Parse(quizID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse session ID: %w", err)
+	}
+	return s.sessionStore.GetActiveSessionsByQuizID(ctx, parsed)
+}

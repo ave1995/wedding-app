@@ -5,10 +5,21 @@ import { useQuestions } from "../../hooks/useQuestionEventHandler";
 import DashboardQuestions from "./DashboardQuestions";
 import DashboardActive from "./DashboardActive";
 import { useAuthCheck } from "../../hooks/useAuthCheck";
+import { get } from "../../functions/fetch";
+import { useApiErrorHandler } from "../../hooks/useApiErrorHandler";
 
 export type DashboardStatus = "Online" | "Offline" | "Error";
 
-export default function Dashboard() {
+type ActiveSessions = {
+  count: number;
+};
+
+interface Dashboard {
+  quizID: string;
+}
+
+export default function Dashboard({ quizID }: Dashboard) {
+  const { handleError } = useApiErrorHandler();
   const [status, setStatus] = useState<DashboardStatus>("Offline");
   const [activeSessions, setActiveSessions] = useState(0);
   const { questions, upsertQuestion } = useQuestions();
@@ -16,6 +27,16 @@ export default function Dashboard() {
   const fetchAuthCheck = useAuthCheck();
 
   useEffect(() => {
+    const active = async () => {
+      const result = await get<ActiveSessions>(
+        apiUrl(`/api/quiz/${quizID}/active`),
+        null,
+        true
+      );
+      if (handleError(result.error, result.status)) return;
+
+      setActiveSessions(result.data?.count!);
+    };
     const init = async () => {
       const authorized = await fetchAuthCheck();
       if (!authorized) return;
@@ -90,6 +111,7 @@ export default function Dashboard() {
       };
     };
 
+    active();
     init();
   }, [upsertQuestion]);
 

@@ -182,3 +182,15 @@ func (h *SessionHandler) getResult(c *gin.Context) {
 		},
 	})
 }
+
+func (h *SessionHandler) getActiveSessionsByQuizID(c *gin.Context) {
+	quizID := c.Param("id")
+
+	active, err := h.sessionService.GetActiveSessionsByQuizID(c, quizID)
+	if err != nil {
+		c.Error(NewInternalAPIError(err))
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"count": len(active)})
+}

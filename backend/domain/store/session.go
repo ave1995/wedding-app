@@ -13,4 +13,5 @@ type SessionStore interface {
 	FindByID(ctx context.Context, sessionID uuid.UUID) (*model.Session, error)
 	UpdateSession(ctx context.Context, session *model.Session) error
 	GetSessionsByQuizID(ctx context.Context, quizID uuid.UUID) ([]*model.Session, error)
+	GetActiveSessionsByQuizID(ctx context.Context, quizID uuid.UUID) ([]*model.Session, error)
 }

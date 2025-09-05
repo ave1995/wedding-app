@@ -85,6 +85,7 @@ func (h *GinHandlers) RegisterAll(router *gin.Engine) {
 	api.POST("/create-quiz", h.Quiz.createQuiz)
 	api.GET("/quiz/:id", h.Quiz.getQuiz)
 	api.GET("/quiz/:id/reveal", Require(RoleUser), h.Question.revealQuestionByQuizIDAndIndex)
+	api.GET("/quiz/:id/active", Require(RoleUser), h.Session.getActiveSessionsByQuizID)
 	// Questions endpoints
 	api.POST("/create-question", h.Question.createQuestion)
 	api.GET("/questions/:id", h.Question.getQuestionByID)
