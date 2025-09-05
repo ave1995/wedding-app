@@ -43,7 +43,7 @@ export default function QuestionSkeleton({
           })}
         </div>
       </div>
-      <div className="border-t-2 border-gray-300 p-6">{button}</div>
+      <div className="border-t-2 border-gray-300 p-6 sticky">{button}</div>
     </div>
   );
 }
