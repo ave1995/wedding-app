@@ -7,4 +7,5 @@ export type Question = {
   Text: string;
   Type: QuestionType;
   Answers: Answer[];
+  PhotoPath: string;
 };

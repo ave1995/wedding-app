@@ -8,6 +8,7 @@ import type { Question } from "../models/Question";
 import type { RevealResponse } from "../responses/RevealResponse";
 import QuestionReveal from "../components/question/QuestionReveal";
 import QuestionStats from "../components/question/QuestionStats";
+import QuestionPhoto from "../components/question/QuestionPhoto";
 
 function RevelationPage() {
   const { handleError } = useApiErrorHandler();
@@ -65,8 +66,8 @@ function RevelationPage() {
   }
 
   return (
-    <div className="flex">
-      <div className="w-96 h-screen">
+    <div className="flex flex-row h-screen w-screen items-center place-content-center">
+      <div className="w-96 h-full">
         <QuestionReveal
           text={questionState.question.Text}
           type={questionState.question.Type}
@@ -76,7 +77,12 @@ function RevelationPage() {
           nextQuestion={fetchResultOfQuestion}
         ></QuestionReveal>
       </div>
-      <QuestionStats id={questionState.question.ID}></QuestionStats>
+      <div className="p-6 w-1/3 h-full">
+        <QuestionPhoto path={questionState.question.PhotoPath} />
+      </div>
+      <div className="p-6">
+        <QuestionStats id={questionState.question.ID} />
+      </div>
     </div>
   );
 }

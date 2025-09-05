@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { get, post } from "../functions/fetch";
 import IconSelector, {
-  type SvgItem,
+  type BucketItem,
 } from "../components/icon_selector/IconSelector";
 import Button from "../components/Button";
 import type { Quiz } from "../models/Quiz";
@@ -55,7 +55,7 @@ function InvitePage() {
   }, [code, navigate]);
 
   // Icon state
-  const [selectedIcon, setSelectedIcon] = useState<SvgItem | null>(null);
+  const [selectedIcon, setSelectedIcon] = useState<BucketItem | null>(null);
   const [showSelector, setShowSelector] = useState(false);
 
   // Input Text state

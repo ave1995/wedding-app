@@ -40,5 +40,6 @@ func (q *question) ToDomain() (*model.Question, error) {
 		Text:      q.Text,
 		CreatedAt: q.CreatedAt,
 		Type:      model.QuestionType(q.Type),
+		PhotoPath: q.PhotoPath,
 	}, nil
 }

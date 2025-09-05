@@ -71,7 +71,7 @@ func (s *storageStore) GetUserSvgs(ctx context.Context) ([]*model.BucketItemUrl,
 
 // GetBucketUrls implements store.SvgStore.
 func (s *storageStore) GetBucketUrls(ctx context.Context, bucketName string, suffix string) ([]*model.BucketItemUrl, error) {
-	bucket := s.store.Bucket(s.bucketName)
+	bucket := s.store.Bucket(bucketName)
 	items := bucket.Objects(ctx, nil)
 
 	var bucketItems []*model.BucketItemUrl
@@ -99,7 +99,7 @@ func (s *storageStore) GetBucketUrls(ctx context.Context, bucketName string, suf
 
 // GetBucketData implements store.SvgStore.
 func (s *storageStore) GetBucketData(ctx context.Context, bucketName string, bucketItemName string) (*model.BucketItemData, error) {
-	bucket := s.store.Bucket(s.bucketName)
+	bucket := s.store.Bucket(bucketName)
 	item := bucket.Object(bucketItemName)
 
 	rc, err := item.NewReader(ctx)

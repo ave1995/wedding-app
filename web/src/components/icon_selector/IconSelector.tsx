@@ -3,23 +3,23 @@ import { get } from "../../functions/fetch";
 import { apiUrl } from "../../functions/api";
 import { useApiErrorHandler } from "../../hooks/useApiErrorHandler";
 
-export type SvgItem = {
+export type BucketItem = {
   Name: string;
   URL: string;
 };
 
 interface IconSelectorProps {
-  onSelect: (icon: SvgItem) => void;
+  onSelect: (icon: BucketItem) => void;
   onClose: () => void;
 }
 
 export default function IconSelector({ onSelect, onClose }: IconSelectorProps) {
-  const [svgs, setSvgs] = useState<SvgItem[]>([]);
+  const [svgs, setSvgs] = useState<BucketItem[]>([]);
   const { handleError } = useApiErrorHandler();
 
   useEffect(() => {
     async function fetchIcons() {
-      const result = await get<SvgItem[]>(apiUrl("/bucket-urls"), {
+      const result = await get<BucketItem[]>(apiUrl("/bucket-urls"), {
         bucket: "wedding-user-icons",
         suffix: ".svg",
       });
@@ -35,7 +35,7 @@ export default function IconSelector({ onSelect, onClose }: IconSelectorProps) {
     fetchIcons();
   }, []);
 
-  function selectIcon(icon: SvgItem) {
+  function selectIcon(icon: BucketItem) {
     onSelect(icon);
     onClose();
   }
