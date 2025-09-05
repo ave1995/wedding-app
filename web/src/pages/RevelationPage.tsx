@@ -101,10 +101,10 @@ function RevelationPage() {
           nextQuestion={fetchResultOfQuestion}
         ></QuestionReveal>
       </div>
-      <div className="w-[768px] grid grid-rows-2 items-center place-content-center h-2/3">
-        <div className="h-full w-full">
+      <div className="w-[768px] grid grid-rows-2 items-center place-content-center h-2/3 gap-2">
+        <div className="h-full w-full flex flex-col items-center">
           {questionPhotoImg && <QuestionPhoto src={questionPhotoImg.src} alt={questionPhotoImg.name} />}
-          <div className="py-4">
+          <div className="py-4 w-40">
             {questionPhotoImg && <FullscreenImageButton src={questionPhotoImg.src} label="Zvětšit" />}
           </div>
         </div>
