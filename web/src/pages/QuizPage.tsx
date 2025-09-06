@@ -44,7 +44,7 @@ function QuizPage() {
     <div className="flex flex-col w-96 h-screen items-center justify-center p-6 gap-4">
       <h1 className="text-xl font-bold">{quiz.Name}</h1>
       <p className="text-left p-3 font-medium">
-        Milí <span className="font-semibold text-pink-500">hoste</span>, vítej
+        Milý <span className="font-semibold text-pink-500">hoste</span>, vítej
         na naší <span className="font-semibold text-pink-500">svatbě</span>!
         Jsme moc rádi, že jsi dnes tady s námi a sdílíš s námi tenhle výjimečný
         den. Tvoje přítomnost je pro nás
