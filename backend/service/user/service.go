@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"fmt"
+
 	"wedding-app/domain/model"
 	"wedding-app/domain/service"
 	"wedding-app/domain/store"
@@ -19,6 +20,7 @@ func NewUserService(store store.UserStore) service.UserService {
 }
 
 func (s *userService) RegisterUser(ctx context.Context, params model.RegisterUserParams) (*model.User, error) {
+	// RADEK: chápu že biding v RESTAPI kontroluje email, ale až si tohle zavoláš přes GRPC tak do emailu narveš cokoliv. Validace má být tady.
 	return s.store.RegisterUser(ctx, params)
 }
 

@@ -2,6 +2,7 @@ package restapi
 
 import (
 	"net/http"
+
 	"wedding-app/domain/service"
 
 	"github.com/gin-gonic/gin"
@@ -68,6 +69,13 @@ func (h *AnswerHandler) getAnswerByID(c *gin.Context) {
 
 	answer, err := h.answerService.GetAnswerByID(c, id)
 	if err != nil {
+		// RADEK: mě se popravdě tohle nelíbí, je to hrozně netransparentní a nikdy jsem neměl rád předávání errorů v kontextu.
+		// Vím, že je to podle dokumentace (https://gin-gonic.com/en/docs/examples/error-handling-middleware/).
+		// Ale tahle funkce něco vrací a níc s tím neděláš, nejhorší pattern bych řekl v GO :D
+		// Minimálně by to mělo být aspon takto, aby si věděl, že to neco vrací _ = c.Error(NewInternalAPIError(err))
+		// Dle dokumentace, to je na to aby si mohl posbírat všechny errory a v jednom kroku je vratil, logoval, atd.
+		// Ty po každém erroru děláš return, což je správně, nevím proč by si měl přeskočit error aby si dostal další :D.
+		// Error handeling dál někomentuju... :D
 		c.Error(NewInternalAPIError(err))
 		return
 	}

@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"net/http"
 	"sync"
+
 	"wedding-app/api/restapi"
 	"wedding-app/assembler"
 	"wedding-app/config"
@@ -24,6 +25,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+// RADEK: ta faktorka je dlouhá, otázkou je zda jde napsat líp,
+// minimálně ty errory je podle mě zbytečné ukládat do té faktory, když ti vznikne error ve faktorce, tak pravděpodobně nespustíš aplikaci, takže hned vracíš error a ukončuješ aplikaci = není třeba ukládat errory do structu
+// my jsme vždycky ten sync.One používali jako globální proměnné (nebyl ve faktorce) takhle bych se bál, že ti bude vznikat kopie protože to nemáš jako pointery, to znamená že to vlastně nebude funovat správně, píšou to i v dokumentaci
+// // A Once must not be copied after first use.
 type Factory struct {
 	config config.Config
 
@@ -123,6 +128,20 @@ func (f *Factory) Logger() *slog.Logger {
 	return f.logger
 }
 
+// RADEK: Takhle by to vypadalo, aby si nepotřeboval ty errory
+//func (f *Factory) MongoDatabase(ctx context.Context) (*mongo.Database, error) {
+//	var err error
+//	f.mongoOnce.Do(func() {
+//		f.mongoClient, err = mongodb.ConnectClient(ctx, f.Logger(), f.config.StoreConfig())
+//		if err != nil {
+//			return
+//		}
+//		f.mongoDatabase = mongodb.GetDatabase(f.mongoClient, f.config.StoreConfig().DbName)
+//	})
+//
+//	return f.mongoDatabase, err
+//}
+
 func (f *Factory) MongoDatabase(ctx context.Context) (*mongo.Database, error) {
 	f.mongoOnce.Do(func() {
 		f.mongoClient, f.mongoError = mongodb.ConnectClient(ctx, f.Logger(), f.config.StoreConfig())
@@ -149,6 +168,7 @@ func (f *Factory) UserStore(ctx context.Context) (store.UserStore, error) {
 
 func (f *Factory) UserService(ctx context.Context) (service.UserService, error) {
 	f.userServiceOnce.Do(func() {
+		// RADEK: neměl by si proměnné pojmenovávat jako se jmenuje package (IDE by ti to mělo ukazovat), je to po celém projektu vícekrát
 		var store store.UserStore
 		store, f.userServiceErr = f.UserStore(ctx)
 		if f.userServiceErr != nil {

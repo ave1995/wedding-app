@@ -7,6 +7,7 @@ import (
 	"io"
 	"log/slog"
 	"strings"
+
 	"wedding-app/api/restapi"
 	"wedding-app/config"
 	"wedding-app/domain/model"
@@ -22,6 +23,8 @@ type storageStore struct {
 	logger     *slog.Logger
 }
 
+// RADEK: Tenhle návrh se mi nelíbí, ty vytvořiš google storage clienta aby si ho potom passnul do tohodle tvého storage. Proč ho rovnou nevytvoříš v tomhle konstruktoru?
+// Pokud jde o clenup tak tvuj storage může mít cleanup funkci, která zavře toho klienta.
 func NewCloud(store *storage.Client, config config.BucketConfig, logger *slog.Logger) store.SvgStore {
 	return &storageStore{store: store, bucketName: config.UserIconsBucket, logger: logger}
 }
@@ -34,6 +37,7 @@ func (s *storageStore) GetUserSvgs(ctx context.Context) ([]*model.BucketItemUrl,
 	var svgs []*model.BucketItemUrl
 	for {
 		item, err := items.Next()
+		// RADEK: switch je znovu kamarad...
 		if errors.Is(err, iterator.Done) {
 			break
 		}
@@ -56,11 +60,14 @@ func (s *storageStore) GetUserSvgs(ctx context.Context) ([]*model.BucketItemUrl,
 			}
 
 			data, err := io.ReadAll(rc)
+			// RADEK ty tohle nemůžeš prakticky zavolat v deferu, protože jsi v cyklu. Ale je to standard dělat, i když dokumentace, říká něco jiného :D
+			// To se potom řeší anonymní funkcí, kdyžtak, kde můžeš ten defer zavolat bez starostí, očividně by ta jejich knihovna potřebovala update, takhle napsaný kod v GO jen tak nenajdeš.
 			rc.Close()
 			if err != nil {
 				return nil, fmt.Errorf("failed to read object: %w", err)
 			}
 
+			// RADEK: Speciální význam tohoto logu?
 			s.logger.Info("svg file read", slog.String("name", item.Name), slog.Int("lenght", len(data)))
 
 		}
@@ -77,6 +84,7 @@ func (s *storageStore) GetBucketUrls(ctx context.Context, bucketName string, suf
 	var bucketItems []*model.BucketItemUrl
 	for {
 		item, err := items.Next()
+		// RADEK: tyhle 3 ify taky dokážeš napsat do jednoho switche
 		if errors.Is(err, iterator.Done) {
 			break
 		}

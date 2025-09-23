@@ -3,6 +3,7 @@ package restapi
 import (
 	"errors"
 	"net/http"
+
 	"wedding-app/domain/service"
 
 	"github.com/gin-gonic/gin"
@@ -29,6 +30,9 @@ func (h *SessionHandler) startSession(c *gin.Context) {
 		return
 	}
 
+	// RADEK: Příjde mi tohle trochu jako business logika. Představi si, že budeš chtít implementovat
+	// grpc server, tak tam budeš znovu dělat kontrolu na session is completed, a další načítání
+	// lepší by bylo, kdyby ti to naservírovala celý service s parametry (bool, currentQuestion, error)
 	session, err := h.sessionService.StartSession(c, userID.String(), quizID)
 	if err != nil {
 		c.Error(NewInternalAPIError(err))
@@ -36,6 +40,9 @@ func (h *SessionHandler) startSession(c *gin.Context) {
 	}
 
 	if session.IsCompleted {
+		// RADEK: Já bych zase radši viděl, že ta session má metodu, která se bude umět převést do JSONU, který vrátíš pohodlně.
+		// Návrh máš v modelu, nebo dost možná stačí předat objekt, který se umí převíst do JSONu, ale nejsem si jistý, nezkoušel jsem.
+		// c.JSON(http.StatusOK, session)
 		c.JSON(http.StatusOK, gin.H{
 			"session_id":   session.ID.String(),
 			"is_completed": true,
@@ -43,16 +50,26 @@ func (h *SessionHandler) startSession(c *gin.Context) {
 		return
 	}
 
+	// RADEK: Tady moc nechápu nechápu, proč skoro celá služba vrací pěkně domain model, a najednou tohle vrací nějaké dto objekt
+	// což dto je vlastně domain model
 	questionDto, err := h.sessionService.GetCurrentQuestion(c, session.ID.String())
 	if err != nil {
 		c.Error(NewInternalAPIError(err))
 		return
 	}
 
+	// RADEK: tady je vidět že můžeš posalt objekt a bude to fungovat.
 	c.JSON(http.StatusOK, questionDto)
 }
 
 func (h *SessionHandler) submitAnswer(c *gin.Context) {
+	// RADEK: znovu tenhle handler nese logiku:
+	// Kontrola parametru a requestu - to sem správně patří
+
+	//  getUserIDForQuizFromContext - tady by si iděálně měl ještě než něco začneš dělat načíst user id z kontextu
+	// protože to je API domená (cooki) a až potom s tím nějak dělat, ty uděláš zase XYZ akcí, a potom zjistíš, že není přihlášenej
+	// tak to zabiješ
+	// má to být parse REST API input ===> call service ==> return result from service.
 	sessionID := c.Param("session_id")
 
 	var req SubmitAnswerRequest
@@ -79,6 +96,10 @@ func (h *SessionHandler) submitAnswer(c *gin.Context) {
 		return
 	}
 
+	// RADEK: tohle je si myslím špatný návrh REST API
+	// REST API by mělo být bezstavové a vracet vždycky stejné výsledky, ale ty jakmile je ten dotazník vyplněný tak vrátíš
+	// úplně jinou JSON strukturu
+	// Správný design můžeme probrat potom na callu.
 	isCompleted, err := h.sessionService.SubmitAnswer(c, sessionID, req.QuestionID, req.AnswerIDs)
 	if err != nil {
 		c.Error(NewInternalAPIError(err))

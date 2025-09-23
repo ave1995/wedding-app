@@ -8,6 +8,7 @@ type publisher struct {
 	hub *Hub
 }
 
+// RADEK: nejlepší by bylo, kdyby tohle byl jediný objekt, který má public funkce na venek, příjde mi nepraktické aby byl publisher a hub rozdělený
 func NewPublisher(h *Hub) event.EventPublisher {
 	return &publisher{
 		hub: h,

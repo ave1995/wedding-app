@@ -6,6 +6,8 @@ import (
 	"github.com/google/uuid"
 )
 
+// RADEK: čím si event modely zasloužily vlastní package a nejsou v modelu jako všechny ostaní modely?
+
 type SessionBaseEvent struct {
 	SessionID   uuid.UUID
 	Username    string

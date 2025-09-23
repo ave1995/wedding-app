@@ -3,6 +3,7 @@ package restapi
 import (
 	"net/http"
 	"net/url"
+
 	"wedding-app/domain/service"
 
 	"github.com/gin-gonic/gin"
@@ -30,6 +31,7 @@ func (h *StorageHandler) getBucketUrls(c *gin.Context) {
 	bucketName := c.Query(QueryBucket)
 	suffix := c.Query(QuerySuffix)
 
+	// RADEK: Já bych tohle taky nechal na té službě (pořád stejný důvod)
 	if bucketName == "" || suffix == "" {
 		c.Error(NewAPIError(http.StatusBadRequest, "missing bucket or suffix query parameter", nil))
 		return
@@ -62,6 +64,7 @@ func (h *StorageHandler) getBucketItemData(c *gin.Context) {
 	c.Data(http.StatusOK, item.CType, item.Data)
 }
 
+// RADEK: konstanty vždycky nahoru.
 const (
 	BucketUrlsEndpoint = "/bucket-urls"
 	BucketDataEndpoint = "/bucket-data"
@@ -70,6 +73,7 @@ const (
 	QuerySuffix        = "suffix"
 )
 
+// RADEK: tohle by se už nemělo použíavt doufám ne?
 func MakeBucketDataURL(bucketName, itemName string) string {
 	values := url.Values{}
 	values.Set(QueryBucket, bucketName)

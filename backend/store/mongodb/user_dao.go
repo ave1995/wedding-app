@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+
 	"wedding-app/domain/model"
 	"wedding-app/domain/store"
 	"wedding-app/utils"
@@ -29,6 +30,7 @@ func (s *userStore) usersCollection() *mongo.Collection {
 }
 
 func (s *userStore) RegisterUser(ctx context.Context, params model.RegisterUserParams) (*model.User, error) {
+	// RADEK: Zase tohle je spíš zase businnes logika, když změníš storage, můžeš zapomenout na podstatnou věc jako je hash hesla.
 	hashedPass, err := utils.HashPassword(params.Password)
 	if err != nil {
 		return nil, err
@@ -63,6 +65,7 @@ func (s *userStore) LoginUser(ctx context.Context, email string, password string
 	var mongoUser user
 	err := collection.FindOne(ctx, bson.M{"email": email}).Decode(&mongoUser)
 	if err != nil {
+		// RADEK: ŠPATNÁ KONTROLA.
 		if err == mongo.ErrNoDocuments {
 			// User not found
 			return nil, fmt.Errorf("invalid email")

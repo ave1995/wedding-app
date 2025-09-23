@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"context"
+
 	"wedding-app/domain/model"
 	"wedding-app/domain/store"
 
@@ -26,6 +27,7 @@ func (s *quizStore) quizzesCollection() *mongo.Collection {
 
 // CreateQuiz implements store.QuizStore.
 func (s *quizStore) CreateQuiz(ctx context.Context, name string) (*model.Quiz, error) {
+	// RADEK: mě by se líbilo aby uuid vytvářela spíš služba, ale asi to není tak zásadní
 	mongoQuiz := &quiz{
 		ID:         uuid.NewString(),
 		Name:       name,

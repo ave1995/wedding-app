@@ -12,6 +12,7 @@ type Attempt struct {
 	Type       QuestionType
 }
 
+// RADEK: jeden soubor jeden model...
 type CreateAttemptParams struct {
 	SessionID  uuid.UUID
 	QuestionID uuid.UUID

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+
 	"wedding-app/assembler"
 	"wedding-app/domain/apperrors"
 	"wedding-app/domain/event"
@@ -44,6 +45,10 @@ func (s *sessionService) GetCurrentQuestion(ctx context.Context, sessionID strin
 		return nil, fmt.Errorf("failed to load session: %w", err)
 	}
 	// Get All Questions for Quiz
+	// RADEK: data stojí většinou peníze a čas,
+	// Tady bych udělal metodu, která ti vráti konkrétní otázku pro index, pokud neexistuje nebo je mimo range, tak to bych kontroloval před nebo při načítání
+	// Samozřejmě potom ti bude chybět počet otázek, což je informace, kterou můžeš vědět při spuštění session a mit jí uloženou tam, nemusíš pokaždé načítat stejné číslo
+	// Co když se v průběhu změní počet otázek? To bych rozdoně nepovoloval, to znamená quiz by měl mít nějaké stavy, jakmile se stav změní na "publikovaný" nelze upravovat, pokud není "publikovaný" nelze vyplnovat.
 	questions, err := s.questionStore.GetOrderedQuestionsByQuizID(ctx, session.QuizID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load questions: %w", err)
@@ -64,6 +69,8 @@ func (s *sessionService) GetCurrentQuestion(ctx context.Context, sessionID strin
 
 	// TODO: udělat DTO
 	// Without reveal
+	// RADEK: toto je hack aby uživatel neviděl odpovědi co?
+	// Takže mít answer model a potom nějaký model, který to oseká pro uživatele a nad answer mít metodu, která udělá convert do nového modelu. žádný DTO :(
 	for _, a := range answers {
 		a.IsCorrect = false
 	}
@@ -100,6 +107,7 @@ func (s *sessionService) StartSession(ctx context.Context, userID string, quizID
 		return nil, fmt.Errorf("failed to parse quiz ID %q: %w", quizID, err)
 	}
 	activeSession, err := s.sessionStore.FindActive(ctx, parsedUserID, parsedQuizID)
+	// RADEK: dva ify za sebou většinou znaměnají "přepiš to do switche" je to více čitelné potom :D
 	if err != nil && !errors.Is(err, apperrors.ErrNotFound) {
 		return nil, err
 	}
@@ -110,11 +118,13 @@ func (s *sessionService) StartSession(ctx context.Context, userID string, quizID
 	if err != nil {
 		return nil, err
 	}
+	// RADEK: ta session dokonce už obsahuje kolik je tam otázek :D takže to co jsem psal výše dáva ještě větší smysl.
 	newSession, err := s.sessionStore.CreateSession(ctx, parsedUserID, parsedQuizID, count)
 	if err != nil {
 		return nil, err
 	}
 
+	// RADEK: nelíbí se mi tenhle sestavovač :D
 	assembledEvent, err := s.assembler.ToSessionStartEvent(ctx, newSession.ID, parsedUserID, parsedQuizID)
 	if err != nil {
 		s.logger.Error("failed to assemble SessionStartEvent: %v", utils.ErrAttr(err))
@@ -198,7 +208,7 @@ func (s *sessionService) SubmitAnswer(
 			SessionID:  session.ID,
 			QuestionID: parsedQuestionID,
 			AnswerID:   answer.ID,
-			IsCorrect:  answer.IsCorrect,
+			IsCorrect:  answer.IsCorrect, // RADEK: Za mě je tohle redundantní informace, zase na druhou stranu tohle se v documents dbs dělá asi no
 		}); err != nil {
 			return false, fmt.Errorf("failed to save attempt answer: %w", err)
 		}
@@ -266,10 +276,19 @@ func (s *sessionService) GetResult(ctx context.Context, sessionID string) (*mode
 	for _, q := range questions {
 		userAnswers := userAnswersByQuestion[q.ID]
 
+		// RADEK: tady jak mluvíš o te cache, tak to by na urovni service vlastně nemělo být vidět, stačí ti vyměnit kdyžtak ten answerStore
+		// Jediné, kde by to mohlo být třeba vidět je při invalidaci cache, takže tam kde by si něco měnil.
 		correctAnswers, err := s.answerStore.GetCorrectAnswersByQuestionID(ctx, q.ID) // TODO: měl bych využít MongoDB a i cache
 		if err != nil {
+			// RADEK: je také takové pravidlo, že error neobsahuje takové ty slova "failed", "error", ...
+			// Takže takový error by vypadal takto: "get correct answers"
 			return nil, fmt.Errorf("failed to get correct answers: %w", err)
 		}
+
+		// RADEK: zbytečný kod, error nikdy nevznikne. potom můžeš krásně přepsat:
+		//if correct := utils.IsQuestionCorrect(q, userAnswers, correctAnswers); correct {
+		//	score++
+		//}
 
 		correct, err := utils.IsQuestionCorrect(q, userAnswers, correctAnswers)
 		if err != nil {
@@ -280,6 +299,7 @@ func (s *sessionService) GetResult(ctx context.Context, sessionID string) (*mode
 		}
 	}
 
+	// RADEK: tohle bych klidně taky zabalil do utils aby si mohl jednoduše pokrýt testy.
 	total := session.TotalQCount
 	percentage := 0
 	if total > 0 {
@@ -324,17 +344,33 @@ func (s *sessionService) GetResultsByQuizID(ctx context.Context, quizID string) 
 		return nil, fmt.Errorf("failed to get sessions: %w", err)
 	}
 
+	// RADEK: Tady by si asi měl vědět kolik jích bude žejo?
+	// userResults := make([]*dto.UserResult, 0, len(completed))
 	var userResults []*dto.UserResult
 	for _, session := range completed {
+		// RADEK: Tohle je zase velká vykřičník = špatný návrh
+		// 1. Volat public metodu služby z jiné public metody znamená, že je něco špatně
+		// 2. GetResult načítá session podle sessionID, ale session tady už máš takže tady 4 řádky nazpátek načteš 100 sessions z databáze aby si pro každou session zavolal načtení sesssion? (chudák databáze)
+		// 3. Načítání probíhá pro quiz ID takže si dopředu můžeš načíst quiz, jeho otázky a odpovědi to je to co pro každé volání dělá GetResult - pokud správně počítám tak tahle funkce
+		// by mohla volat tak 5x databázi a potom všechno dopočítat :D za to volá 5 x počet session při 1_000 sessions to je 5_000 :) 5 vs 5_000 - v distribuovaných systémech a v cloudu je nejdražší a nejvíc spomalující věc databáze tak na to mysli
 		result, err := s.GetResult(ctx, session.ID.String())
 		if err != nil {
 			return nil, fmt.Errorf("failed to get result: %w", err)
 		}
+
+		// RADEK: tohle se vlastně používalo na vypsání toho žebříčku ne? Tak to se už nedivím, že to trvalo tak dlouho :D
+		// Velký vykřičník je vždycky když se store volá v cyklu - to většinou znamená že to pujde udělat líp, v tomhle případě si dopředu jedním dotazem můžeš zavolat všechny uživatele pro ten quiiz nebo pro ty sessionsIDs když si je dáš do pole
+		// Takže ty uživatele načteš jedním příkazem, uděláš si z toho mapu do které už tady jen lezeš - úspora obrovská
 		user, err := s.userStore.GetUserByID(ctx, session.UserID)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get user: %w", err)
 		}
 
+		// RADEK: Na co je tahle proměnná dobrá?
+		// userResults = append(userResults, &dto.UserResult{
+		//			Result: result,
+		//			User:   user,
+		//		})
 		userResult := &dto.UserResult{
 			Result: result,
 			User:   user,
@@ -343,5 +379,6 @@ func (s *sessionService) GetResultsByQuizID(ctx context.Context, quizID string) 
 		userResults = append(userResults, userResult)
 	}
 
+	// RADEK: Z tehle funkce mám pocit, že si jí dodělával narychlo, den před svatbou ne? :D
 	return userResults, nil
 }

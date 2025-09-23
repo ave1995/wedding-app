@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 	"time"
+
 	"wedding-app/config"
 
 	"github.com/gin-contrib/cors"
@@ -29,6 +30,7 @@ func NewGinServer(handlers *GinHandlers, logger *slog.Logger, config config.Serv
 		MaxAge:           12 * time.Hour,
 	}))
 
+	// RADE: Tohle bych nechal už tady aby byla definice celé REST API na jednom míste - je to líp čitelné potom, když něco hledáš.
 	handlers.RegisterAll(router)
 
 	s := &http.Server{

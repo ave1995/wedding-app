@@ -3,6 +3,7 @@ package mongodb
 import (
 	"fmt"
 	"time"
+
 	"wedding-app/domain/model"
 
 	"github.com/google/uuid"
@@ -39,6 +40,8 @@ func (q *question) ToDomain() (*model.Question, error) {
 		QuizID:    quizID,
 		Text:      q.Text,
 		CreatedAt: q.CreatedAt,
+		// RADEK: co se stane, když v DB někdo změní typ na něco co neznáš?
+		// Tady by si měl v modelu pro QuestionType mít validaci, že ti tam nepříjde něco co neznáš.
 		Type:      model.QuestionType(q.Type),
 		PhotoPath: q.PhotoPath,
 	}, nil

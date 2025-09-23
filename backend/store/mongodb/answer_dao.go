@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"context"
+
 	"wedding-app/domain/model"
 	"wedding-app/domain/store"
 
@@ -18,6 +19,7 @@ func NewAnswerStore(database *mongo.Database) store.AnswerStore {
 	return &answerStore{database: database}
 }
 
+// RADEK: malé písmeno, nepotřebuješ exportovat
 const AnswerCollection = "answers"
 
 func (s *answerStore) answersCollection() *mongo.Collection {
@@ -32,11 +34,15 @@ func (s *answerStore) CreateAnswer(ctx context.Context, text string, questionID 
 		Text:       text,
 		IsCorrect:  isCorrect,
 	}
+	// RADEK: mě asi nepříjde nic špatného na tom, kdyby byla funkce create, klidně generická a result by byl answers, nad kterým by si následně zavolal toDomain()
+	// Tahle funkce a ani žádná z těch domain_mapperu (getByFilterAndConvert, getByFilterAndConvert, getManyByFilterAndConvert, getManyByFilterAndConvert) nedodržuje single responsibility
+	// Když budeš chtít vytvořit odpověd, a ještě s tím něco udělat tak máš smulu protože už si to převedl do modelu
 	return createAndConvert(ctx, s.answersCollection(), mongoAnswer)
 }
 
 // GetAnswerByID implements store.AnswerStore.
 func (s *answerStore) GetAnswerByID(ctx context.Context, id uuid.UUID) (*model.Answer, error) {
+	// RADEK: jinak tyhle generické funkce se mi líbí, ale vypadájí generované AI :D
 	return getByFilterAndConvert[*answer](ctx, s.answersCollection(), bson.M{AnswerFieldID: id.String()})
 }
 

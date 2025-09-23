@@ -25,7 +25,7 @@ type Client struct {
 func NewClient(conn *websocket.Conn, logger *slog.Logger) *Client {
 	return &Client{
 		conn:   conn,
-		send:   make(chan []byte, 256),
+		send:   make(chan []byte, 256), // RADEK: konstanta, a je to celkem zase velký channel, plus bych se snažil to udělat genericky tak, že sem bude chodit nějaký interface místo pole bytu
 		topics: make(map[string]bool),
 		logger: logger,
 	}
@@ -34,6 +34,10 @@ func NewClient(conn *websocket.Conn, logger *slog.Logger) *Client {
 // ReadPump reads messages from the WebSocket and handles client disconnects
 func (c *Client) ReadPump(h *Hub) {
 	defer func() {
+		// RADEK: tohle je to čemu jsem chtěl aby si se pokud možno vyhnul
+		// kdokoliv nevědomky může zavolat
+		// close(h.unregister) a dostaneš za chvíli paniku a na unregistr uživatelů nepotřebuješ channel stačí ti funkce s mutexem
+
 		h.unregister <- c
 		c.conn.Close()
 		c.logger.Info("Client disconnected", "remote", c.conn.RemoteAddr())
@@ -60,6 +64,8 @@ func (c *Client) ReadPump(h *Hub) {
 			break
 		}
 
+		// RADEK: tohle by šlo udělattak, že tady už rozhodneš co teda přišlo a budeš mít dva modely pro každý topic. Message to bude mít jako interface, který pošleš do toho hubu
+		// Ale koukam, že je to jen na ping
 		env, err := unwrapEvent[any](msg) // assuming you have wrapEvent/unwrapEvent
 		if err != nil {
 			c.logger.Warn("Failed to parse message", "error", err)
@@ -88,6 +94,7 @@ func (c *Client) WritePump() {
 	for {
 		select {
 		case msg, ok := <-c.send:
+			// RADEK: ignoruješ error
 			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
 				// Hub closed the channel
@@ -102,6 +109,7 @@ func (c *Client) WritePump() {
 
 		case <-ticker.C:
 			// send ping to client
+			// RADEK: tady taky ignoruješ error
 			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 
 			data, err := wrapEvent(TopicHeartbeatEvent, "ping!")

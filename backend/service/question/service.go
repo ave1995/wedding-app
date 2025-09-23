@@ -3,6 +3,7 @@ package question
 import (
 	"context"
 	"fmt"
+
 	"wedding-app/domain/model"
 	"wedding-app/domain/service"
 	"wedding-app/domain/store"
@@ -19,6 +20,7 @@ type questionService struct {
 	attemptAnswerStore store.AttemptStore
 }
 
+// RADEK: v golangu je build in formater, ale moc neřeší dlouhé řádky, je dobré držet ale nějakých 120 znaků, potom to rozdělit na řádky
 func NewQuestionService(questionStore store.QuestionStore, sessionStore store.SessionStore, answerStore store.AnswerStore, attemptAnswerStore store.AttemptStore) service.QuestionService {
 	return &questionService{questionStore: questionStore, sessionStore: sessionStore, answerStore: answerStore, attemptAnswerStore: attemptAnswerStore}
 }
@@ -61,6 +63,16 @@ func (q *questionService) RevealQuestionByQuizIDAndIndex(ctx context.Context, qu
 	if err != nil {
 		return nil, fmt.Errorf("failed to load questions: %w", err)
 	}
+
+	// RADEK: switch je v golangu celkem kamarád
+
+	//lenQuestions := len(questions)
+	//switch {
+	//case lenQuestions == 0:
+	//	return nil, fmt.Errorf("no questions found for quiz ID %s", parsed)
+	//case index < 0 || index >= lenQuestions:
+	//	return nil, fmt.Errorf("current question index %d out of range (0-%d)", index, lenQuestions-1)
+	//}
 
 	lenQuestions := len(questions)
 
@@ -117,12 +129,24 @@ func (q *questionService) RevealQuestionStatsByID(ctx context.Context, id string
 		if !s.IsCompleted {
 			continue
 		}
+		// RADEK: udělal bych jednu funkci, která načte všechny odpovědi pro všechny sessions, když budeš mít 100 session, tak půjde do DB 100x? když můžeš jen jednou?
 		answered, err := q.attemptAnswerStore.GetAnsweredBySessionIDAndQuestionID(ctx, s.ID, question.ID)
 		if err != nil {
 			return nil, err
 		}
 
 		correct, err := utils.IsQuestionCorrect(question, answered, correctAnswers)
+		// RADEK: switch je kamarad v2.
+		// lépe čitelné
+		//switch {
+		//case err != nil:
+		//	return nil, err
+		//case correct:
+		//	right++
+		//default:
+		//	wrong++
+		//}
+
 		if err != nil {
 			return nil, err
 		}

@@ -3,6 +3,7 @@ package session_test
 import (
 	"fmt"
 	"testing"
+
 	"wedding-app/domain/apperrors"
 	"wedding-app/domain/model"
 	"wedding-app/mocks/wedding-app/domain/storemock"
@@ -35,6 +36,7 @@ func TestGetCurrentQuestion(t *testing.T) {
 			ExpectedError:  nil,
 			ExpectedResult: expectedQuestion,
 			Mock: func(ss *storemock.MockSessionStore, qs *storemock.MockQuestionStore) {
+				// RADEK: Pokud Je proměnná použitá jednou tak jí ani nevytvářej - u testu asi tolik nevadí
 				expectedSession := &model.Session{ID: sessionID, QuizID: quizID}
 				ss.EXPECT().FindByID(mock.Anything, sessionID).Return(expectedSession, nil)
 				expectedQuestions := []*model.Question{expectedQuestion}

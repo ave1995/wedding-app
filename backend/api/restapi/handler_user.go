@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 	"time"
+
 	"wedding-app/domain/model"
 	"wedding-app/domain/service"
 
@@ -75,6 +76,7 @@ func (h *UserHandler) loginUser(c *gin.Context) {
 		return
 	}
 
+	// RADEK: Funkce login user vrací a kontroluje uživatele dle emailu a heslo :|
 	user, err := h.userService.LoginUser(c, req.Email, req.Password)
 	if err != nil {
 		c.Error(NewInternalAPIError(err))
@@ -117,13 +119,14 @@ func (h *UserHandler) handleAuthentication(c *gin.Context, user *model.User, mes
 		slog.String("token", accessToken.Token),
 		slog.Time("duration", accessToken.ExpiresAt))
 
+	// RADEK: Tohle je 100% špatně, ale nevím jak by to mělo být dobře.
 	c.SetCookie(
 		CookieAccessTokenName,
 		accessToken.Token,
 		int(time.Until(accessToken.ExpiresAt).Seconds()),
 		"/",   // path
-		"",    // domain ("" works for localhost)
-		false, // secure (HTTPS only)
+		"",    // domain ("" works for localhost) // tohle je podezřelé
+		false, // secure (HTTPS only) // tohle je extra podezřelé
 		true,  // httpOnly
 	)
 

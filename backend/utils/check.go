@@ -4,6 +4,7 @@ import (
 	"wedding-app/domain/model"
 )
 
+// RADEK: neexistuje žádné pravidlo, že funkce musí mít v návratovém typu error, tady error nikdy nevznikne tak proč ho vracíš?
 func IsQuestionCorrect(q *model.Question, userAnswers []*model.Attempt, correctAnswers []*model.Answer) (bool, error) {
 	switch q.Type {
 	case model.SingleChoice:

@@ -3,12 +3,18 @@ package assembler
 import (
 	"context"
 	"time"
+
 	"wedding-app/domain/event"
 	"wedding-app/domain/store"
 
 	"github.com/google/uuid"
 )
 
+// RADEK: tenhle objekt mi příjde uplně zbytečnej:
+// 1. je uplně mimo definovanou strukturu - což už naznačuje že to není masterpiece
+// 2. pokud vidím, tak všechny pulic funkce jsou volané ve službách a to vždycky jednou
+// 3. služba by měla mít sama přístup k těm storům, takže tohle je jen jakýsi wrapper
+// 4. pokud to chceš zpřehlednit tak tyhle funkce udělej jako privatní metody služeb, tohle je roztahaná logika a dělá to kod nepřehledný
 type Assembler struct {
 	quizStore     store.QuizStore
 	userStore     store.UserStore

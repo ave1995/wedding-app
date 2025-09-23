@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"time"
+
 	"wedding-app/domain/model"
 	"wedding-app/domain/store"
 
@@ -68,6 +69,7 @@ func (s *questionStore) GetCountQuestionsByQuizID(ctx context.Context, quizID uu
 		return 0, fmt.Errorf("failed to count questions: %w", err)
 	}
 
+	// RADEk: co je tohle za kontrolu? int32 ma maximální hodnotu: 2 147 483 647, je nutné kontrolovat, zda náhodou quiz nemá přes 2,1 miliardy otázek? :D :D
 	// Check for overflow on 32-bit systems
 	if count64 > int64(^uint(0)>>1) { // max int value
 		return 0, fmt.Errorf("question count too large to fit in int: %d", count64)

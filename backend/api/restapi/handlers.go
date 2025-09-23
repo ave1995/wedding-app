@@ -10,6 +10,7 @@ import (
 )
 
 type GinHandlers struct {
+	// RADEK: mě by se líbilo spíš mít jeden handler, můžeš mít víc souborů, ale jen jeden handler struct, tak to budeš mít přehledné a bude to přehledné i pro ostatní
 	User           *UserHandler
 	Basic          *StorageHandler
 	Quiz           *QuizHandler
@@ -21,6 +22,8 @@ type GinHandlers struct {
 }
 
 func NewGinHandlers(user *UserHandler, basic *StorageHandler, quiz *QuizHandler, question *QuestionHandler, answer *AnswerHandler, session *SessionHandler, ws *WSHandler, authMiddleware gin.HandlerFunc) (*GinHandlers, error) {
+	// RADEK: tyhle handlery jsou vlastně jenom wrappery pro služby, tahle nil kontrola tady nemusí být
+	// bud budeš počítat, že kdyby tohle nastalo tak to někdo špatně napsal, nebo při vytváření handleru vracej struct bez pointru takže sem nebudeš dávat pointer
 	if user == nil {
 		return nil, errors.New("user handler must not be nil")
 	}
@@ -61,20 +64,24 @@ func NewGinHandlers(user *UserHandler, basic *StorageHandler, quiz *QuizHandler,
 func (h *GinHandlers) RegisterAll(router *gin.Engine) {
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
+	// RADEK: kombinace anonymních funkcí a handlerů se mi moc nelíbí je to i u /auth-check
 	router.GET("/ping", func(c *gin.Context) {
 		c.String(200, "pong")
 	})
 	router.GET("/user-svgs", h.Basic.getUserSvgs)
 
+	// RADEK: používáš všude cesty napevno a tady máš najednou dvě konstanty, u těch EP ty konstanty moc nedávají smysl, není vidět na první pohled cesta
 	router.GET(BucketUrlsEndpoint, h.Basic.getBucketUrls)
 	router.GET(BucketDataEndpoint, h.Basic.getBucketItemData)
 
 	auth := router.Group("/auth")
+	// RADEK: snaž se mít stejný formát dole u group zavíráš EP v groupě do složených závorek {} to ti udělá odsazení ale tady to nemáš, působí to nepřehledně
 	auth.POST("/register", h.User.registerUser)
 	auth.POST("/login", h.User.loginUser)
 	auth.POST("/create-guest", h.User.createGuest)
 	auth.GET("/join-quiz", h.Quiz.joinQuiz)
 
+	// RADEK: proč všechno není pod API group? a to "/api" má být spíš "/v1/ a má tam být "ping", "/user-svgs", celý "auth"
 	api := router.Group("/api")
 	api.Use(h.AuthMiddleware)
 
@@ -82,17 +89,21 @@ func (h *GinHandlers) RegisterAll(router *gin.Engine) {
 	api.GET("/ws", Require(RoleUser), h.WS.serveWS)
 
 	// Quiz endpoints
+	// RADEK: tohle je uplně špatnej návrh RestAPI, máš mít pro každý model stejnou cestu proč není POST "/quiz" a máš "create-quiz" to že děláš create definuje metoda POST
+	// plus by kolekce vždycky měli být v množném čísle takže, "quizzes" protože máš "questions" nebo "answers", potom si každou kolekci také můžeš v pohodě uzavřít do groupy a budeš to mít ještě víc přehledné
 	api.POST("/create-quiz", h.Quiz.createQuiz)
 	api.GET("/quiz/:id", h.Quiz.getQuiz)
 	api.GET("/quiz/:id/reveal", Require(RoleUser), h.Question.revealQuestionByQuizIDAndIndex)
 	api.GET("/quiz/:id/active", Require(RoleUser), h.Session.getActiveSessionsByQuizID)
 	api.GET("/quiz/:id/results", Require(RoleUser), h.Session.getResults)
 	// Questions endpoints
+	// RADEK: stejný jak u quiz
 	api.POST("/create-question", h.Question.createQuestion)
 	api.GET("/questions/:id", h.Question.getQuestionByID)
 	api.GET("/questions", h.Question.getQuestionsByQuizID)
 	api.GET("/questions/:id/stats", Require(RoleUser), h.Question.revealQuestionStatsByID)
 	// Answers endpoints
+	// RADEK: stejný
 	api.POST("/create-answer", h.Answer.createAnswer)
 	api.GET("/answers/:id", h.Answer.getAnswerByID)
 	api.GET("/answers", h.Answer.getAnswersByQuestionID)

@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// RADEK: i type aliasy si zaslouží sepre soubor
 type QuestionType string
 
 const (

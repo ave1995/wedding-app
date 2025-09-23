@@ -1,3 +1,5 @@
+// RADEK: tohle asi není úplně špatné, ale já bych radši měl domain errory, které se umí samy převést na HTTP errory nebo mít
+// konverzi v nějakém middleware, když teď budeš dělat třeba grpc, tak by se to podle mě dělalo líp.
 package restapi
 
 import (
@@ -27,7 +29,7 @@ func NewAPIError(statusCode int, message string, err error) *APIError {
 	}
 }
 
-// The 'err' parameter is optional.
+// NewInternalAPIError The 'err' parameter is optional. RADEK: všechny poznámky musí začínat takto.
 func NewInternalAPIError(err error) *APIError {
 	return &APIError{
 		StatusCode: http.StatusInternalServerError,

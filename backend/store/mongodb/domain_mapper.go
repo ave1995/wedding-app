@@ -42,6 +42,8 @@ func getByFilterAndConvert[L DomainMapper[D], D any](
 		return nil, err
 	}
 
+	// RADEK: tohle mi nepříjde dobře, ale nepřišel jsem na to jak to udělat líp, nechci na tom pálit moc času.
+	// Ale kdyby tyhle metody nedělali konvert, tak možná ani není třeba řešit :D
 	domain, err := (*result).ToDomain()
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert to domain: %w", err)

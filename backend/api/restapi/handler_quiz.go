@@ -2,6 +2,7 @@ package restapi
 
 import (
 	"net/http"
+
 	"wedding-app/domain/service"
 
 	"github.com/gin-gonic/gin"
@@ -70,6 +71,9 @@ func (h *QuizHandler) joinQuiz(c *gin.Context) {
 
 	quiz, err := h.quizService.GetQuizByInviteCode(c, inviteCode)
 	if err != nil {
+		// RADEK: failed to find quiz! jsem našel 2x
+		// správně definovat ErrQuizNotFound = errors.New("failed to find quiz!")
+		// to platí víceméně pro všechny errory v handlerech..
 		c.Error(NewAPIError(http.StatusNotFound, "failed to find quiz!", err))
 		return
 	}
@@ -78,7 +82,9 @@ func (h *QuizHandler) joinQuiz(c *gin.Context) {
 	token, err := c.Cookie(CookieAccessTokenName) // Trying get acces token
 	if err == nil {                               // I did find it
 		_, verifyErr := h.jwtService.Verify(token) // Trying verify access token
-		authenticated = (verifyErr == nil)         // Without error then I know it's authenticated
+		// RADEK: tyhle závorky jsou tady navíc, stačí:
+		// authenticated = verifyErr == nil
+		authenticated = (verifyErr == nil) // Without error then I know it's authenticated
 	}
 
 	// TODO: work differently with response, use unauthorized

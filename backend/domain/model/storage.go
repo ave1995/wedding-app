@@ -1,5 +1,6 @@
 package model
 
+// RADEK: znovu rozdělit struct per soubor, platí všude
 type BucketItemUrl struct {
 	Name string
 	URL  string

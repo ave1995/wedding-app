@@ -9,6 +9,9 @@ import (
 )
 
 // ErrorHandler is a middleware that catches errors pushed to the context
+// RADEK: tohle je zkopírovaná funkce z AI nebo dokumentace ne? :D proč je v argumentu logger, který se nepoužívá?
+// Já nikdy nebyl fanoušek předávat něco přes kontext, ale Gin to má takhle blbě vyřešené prostě. Já bych si udělal tu univerzální funkci, co příjmá error. A pokud by to byl Internal error tak bych logoval.
+// 4XX errory je zbytečné logovat.
 func ErrorHandler(logger *slog.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Next()

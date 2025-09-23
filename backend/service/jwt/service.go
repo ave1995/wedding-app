@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"time"
+
 	"wedding-app/config"
 	"wedding-app/domain/model"
 	"wedding-app/domain/service"
@@ -23,6 +24,7 @@ func NewJWTService(config config.AuthConfig, logger *slog.Logger) service.JWTSer
 	return &jwtService{secretKey: config.SecretKey, tokenDuration: config.Duration, logger: logger}
 }
 
+// RADEK: služby klidně mohou mít pomocné structy, ale dávej je do separe souborů zase.
 type claims struct {
 	UserID  string `json:"UserID"`
 	IsGuest bool   `json:"IsGuest"`
@@ -34,6 +36,7 @@ type claims struct {
 func (j *jwtService) Generate(user *model.User) (*model.AccessToken, error) {
 	expiresAt := time.Now().Add(j.tokenDuration)
 
+	// RADEK: proměnná se jmenuje stejně jako struct = špatný
 	claims := claims{
 		UserID:  user.ID.String(),
 		IsGuest: user.IsGuest,
@@ -72,6 +75,7 @@ func (j *jwtService) Verify(tokenString string) (*model.AccessToken, error) {
 	}
 
 	if !token.Valid {
+		// RADEK: pokud neděláš wrapping erroru nebo nepřidáváš nějaké další informace tak použivej errors.New("token is not valid")
 		return nil, fmt.Errorf("token is not valid")
 	}
 
@@ -80,6 +84,8 @@ func (j *jwtService) Verify(tokenString string) (*model.AccessToken, error) {
 		return nil, fmt.Errorf("invalid user ID in claims: %q: %w", claims.UserID, err)
 	}
 
+	// RADEK: tohle je samozřejmě věc celého designu, ale potom při testování bylo vidět, že to není dobře navržené.
+	// já bych se snažil nevízat takhle funkcionalitu na roli (flag) potom nejsi schopný testovat tu administraci a quiz zaroven a dostaneš ten systém do takového stavu, z kterého se dostaneš jen smazáním cookie z prohlížeče
 	var quizID uuid.UUID
 	if claims.IsGuest {
 		var err error
